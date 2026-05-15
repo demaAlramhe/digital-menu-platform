@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 function normalizeSlug(value: string) {
   return value
@@ -10,6 +11,7 @@ function normalizeSlug(value: string) {
 }
 
 export function AdminCreateStoreForm() {
+  const { dict } = useLocale();
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
@@ -32,7 +34,7 @@ export function AdminCreateStoreForm() {
       !ownerPassword.trim() ||
       !ownerFullName.trim()
     ) {
-      setMessage("Store name, store slug, owner name, owner email, and password are required.");
+      setMessage(dict.admin.createRequired);
       return;
     }
 
@@ -59,11 +61,11 @@ export function AdminCreateStoreForm() {
       const result = await response.json();
 
       if (!response.ok) {
-        setMessage(result.error || "Failed to create store.");
+        setMessage(result.error || dict.admin.createFailed);
         return;
       }
 
-      setMessage("Store and owner created successfully.");
+      setMessage(dict.admin.createSuccess);
 
       setStoreName("");
       setStoreSlug("");
@@ -73,8 +75,8 @@ export function AdminCreateStoreForm() {
       setPhone("");
       setEmail("");
       setAddress("");
-    } catch (error) {
-      setMessage("Something went wrong while creating the store.");
+    } catch {
+      setMessage(dict.admin.createError);
     } finally {
       setLoading(false);
     }
@@ -83,90 +85,90 @@ export function AdminCreateStoreForm() {
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl space-y-4">
       <div>
-        <label className="mb-1 block font-medium">Store Name</label>
+        <label className="mb-1 block font-medium">{dict.common.name}</label>
         <input
           type="text"
           value={storeName}
           onChange={(e) => setStoreName(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Store name"
+          placeholder={dict.admin.placeholders.storeName}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Store Slug</label>
+        <label className="mb-1 block font-medium">{dict.common.slug}</label>
         <input
           type="text"
           value={storeSlug}
           onChange={(e) => setStoreSlug(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="store-slug"
+          placeholder={dict.admin.placeholders.storeSlug}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Owner Full Name</label>
+        <label className="mb-1 block font-medium">{dict.admin.ownerFullName}</label>
         <input
           type="text"
           value={ownerFullName}
           onChange={(e) => setOwnerFullName(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Owner full name"
+          placeholder={dict.admin.placeholders.ownerName}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Owner Email</label>
+        <label className="mb-1 block font-medium">{dict.admin.ownerEmail}</label>
         <input
           type="email"
           value={ownerEmail}
           onChange={(e) => setOwnerEmail(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="owner@email.com"
+          placeholder={dict.admin.placeholders.ownerEmail}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Owner Password</label>
+        <label className="mb-1 block font-medium">{dict.admin.ownerPassword}</label>
         <input
           type="password"
           value={ownerPassword}
           onChange={(e) => setOwnerPassword(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Password"
+          placeholder={dict.admin.placeholders.password}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Store Phone</label>
+        <label className="mb-1 block font-medium">{dict.common.phone}</label>
         <input
           type="text"
           value={phone}
           onChange={(e) => setPhone(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Store phone"
+          placeholder={dict.admin.placeholders.storePhone}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Store Email</label>
+        <label className="mb-1 block font-medium">{dict.common.email}</label>
         <input
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Store email"
+          placeholder={dict.admin.placeholders.storeEmail}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Store Address</label>
+        <label className="mb-1 block font-medium">{dict.common.address}</label>
         <textarea
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
           rows={3}
-          placeholder="Store address"
+          placeholder={dict.admin.placeholders.storeAddress}
         />
       </div>
 
@@ -177,7 +179,7 @@ export function AdminCreateStoreForm() {
         disabled={loading}
         className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
       >
-        {loading ? "Creating..." : "Create Store"}
+        {loading ? dict.admin.creating : dict.admin.createStore}
       </button>
     </form>
   );

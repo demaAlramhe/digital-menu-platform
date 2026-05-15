@@ -1,12 +1,14 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
+import { createClient } from "@/lib/supabase/client";
 
 export function LogoutButton() {
   const router = useRouter();
   const supabase = createClient();
+  const { dict } = useLocale();
   const [loading, setLoading] = useState(false);
 
   async function handleLogout() {
@@ -27,7 +29,7 @@ export function LogoutButton() {
       disabled={loading}
       className="rounded-lg border px-4 py-2 font-medium"
     >
-      {loading ? "Logging out..." : "Logout"}
+      {loading ? dict.common.loading : dict.common.logout}
     </button>
   );
 }

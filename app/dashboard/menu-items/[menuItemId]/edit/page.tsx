@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { EditMenuItemForm } from "@/components/dashboard/edit-menu-item-form";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ type EditMenuItemPageProps = {
 
 export default async function EditMenuItemPage({ params }: EditMenuItemPageProps) {
   const current = await getCurrentProfile();
+  const { dict } = await getTranslations();
 
   if (!current) {
     redirect("/auth/login");
@@ -20,8 +22,8 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
   if (!current.profile?.store_id) {
     return (
       <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">Edit Menu Item</h1>
-        <p>No store is linked to this account.</p>
+        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.editTitle}</h1>
+        <p>{dict.common.noStore}</p>
       </main>
     );
   }
@@ -50,13 +52,13 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
   return (
     <main className="p-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Edit Menu Item</h1>
+        <h1 className="text-3xl font-bold">{dict.menuItems.editTitle}</h1>
 
         <Link
           href="/dashboard/menu-items"
           className="rounded-lg border px-4 py-2 font-medium"
         >
-          Back to Menu Items
+          {dict.menuItems.backToList}
         </Link>
       </div>
 

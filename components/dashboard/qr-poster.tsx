@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { normalizePhoneForTel } from "@/lib/utils/whatsapp";
 
 export type PosterStyle = "a4" | "compact";
@@ -22,6 +23,7 @@ export function QrPoster({
   phone,
   primaryColor = "#111827",
 }: QrPosterProps) {
+  const { dict } = useLocale();
   const [style, setStyle] = useState<PosterStyle>("a4");
 
   const qrSize = style === "a4" ? 280 : 180;
@@ -40,35 +42,31 @@ export function QrPoster({
           onClick={handlePrint}
           className="rounded-lg bg-slate-900 px-5 py-2.5 font-medium text-white"
         >
-          Print Poster
+          {dict.poster.print}
         </button>
 
         <Link
           href="/dashboard/qr"
           className="rounded-lg border px-5 py-2.5 font-medium"
         >
-          Back to QR Page
+          {dict.poster.backToQr}
         </Link>
 
         <div className="ml-auto flex rounded-lg border bg-white p-1 text-sm">
           <StyleToggle
             active={style === "a4"}
-            label="A4 poster"
+            label={dict.poster.a4}
             onClick={() => setStyle("a4")}
           />
           <StyleToggle
             active={style === "compact"}
-            label="Table card"
+            label={dict.poster.compact}
             onClick={() => setStyle("compact")}
           />
         </div>
       </div>
 
-      <p className="text-sm text-slate-600 print:hidden">
-        Preview below. Use <strong>Print Poster</strong> and choose your printer.
-        For best results, enable &quot;Background graphics&quot; if your browser
-        offers it.
-      </p>
+      <p className="text-sm text-slate-600 print:hidden">{dict.poster.previewHint}</p>
 
       <div
         id="qr-poster-print"
@@ -88,6 +86,9 @@ export function QrPoster({
           qrSize={qrSize}
           style={style}
           hasPhone={hasPhone}
+          scanInstruction={dict.poster.scanInstruction}
+          phoneLabel={dict.common.phone}
+          whatsappLabel={dict.poster.whatsappLabel}
         />
       </div>
     </div>
@@ -104,6 +105,9 @@ function PosterContent({
   qrSize,
   style,
   hasPhone,
+  scanInstruction,
+  phoneLabel,
+  whatsappLabel,
 }: {
   storeName: string;
   menuUrl: string;
@@ -114,6 +118,9 @@ function PosterContent({
   qrSize: number;
   style: PosterStyle;
   hasPhone: boolean;
+  scanInstruction: string;
+  phoneLabel: string;
+  whatsappLabel: string;
 }) {
   const titleClass =
     style === "a4"
@@ -156,7 +163,7 @@ function PosterContent({
         <h1 className={titleClass} style={{ color: primaryColor }}>
           {storeName}
         </h1>
-        <p className={instructionClass}>Scan to view our menu</p>
+        <p className={instructionClass}>{scanInstruction}</p>
       </div>
 
       <div className="rounded-2xl border-2 border-slate-200 bg-white p-4 print:border-slate-300">
@@ -185,11 +192,11 @@ function PosterContent({
           }`}
         >
           <p>
-            <span className="font-medium">Phone: </span>
+            <span className="font-medium">{phoneLabel}: </span>
             <span>{phone}</span>
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            WhatsApp: {normalizePhoneForTel(phone!)}
+            {whatsappLabel}: {normalizePhoneForTel(phone!)}
           </p>
         </div>
       )}

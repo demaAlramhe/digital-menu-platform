@@ -3,11 +3,24 @@ import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { QrPoster } from "@/components/dashboard/qr-poster";
 import { buildPublicMenuUrl } from "@/lib/utils/public-menu-url";
+import { formatMessage } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
+function storeStatusLabel(
+  status: string,
+  dict: Awaited<ReturnType<typeof getTranslations>>["dict"]
+) {
+  if (status === "active") return dict.common.statusActive;
+  if (status === "inactive") return dict.common.statusInactive;
+  if (status === "archived") return dict.common.statusArchived;
+  return status;
+}
+
 export default async function DashboardQrPosterPage() {
   const current = await getCurrentProfile();
+  const { dict } = await getTranslations();
 
   if (!current) {
     redirect("/auth/login");
@@ -16,8 +29,8 @@ export default async function DashboardQrPosterPage() {
   if (!current.profile?.store_id) {
     return (
       <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">Print QR Poster</h1>
-        <p>No store is linked to this account.</p>
+        <h1 className="mb-6 text-3xl font-bold">{dict.poster.title}</h1>
+        <p>{dict.common.noStore}</p>
       </main>
     );
   }
@@ -33,8 +46,8 @@ export default async function DashboardQrPosterPage() {
   if (error || !store?.slug) {
     return (
       <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">Print QR Poster</h1>
-        <p>Could not load your store.</p>
+        <h1 className="mb-6 text-3xl font-bold">{dict.poster.title}</h1>
+        <p>{dict.common.loadStoreError}</p>
       </main>
     );
   }
@@ -44,22 +57,20 @@ export default async function DashboardQrPosterPage() {
   return (
     <main className="p-8 print:p-0">
       <div className="mb-8 print:hidden">
-        <h1 className="mb-2 text-3xl font-bold">Print QR Poster</h1>
-        <p className="text-slate-600">
-          Print this poster for tables, counters, or walls. Customers scan the QR
-          code to open your menu.
-        </p>
+        <h1 className="mb-2 text-3xl font-bold">{dict.poster.title}</h1>
+        <p className="text-slate-600">{dict.poster.subtitle}</p>
 
         {store.status !== "active" && (
           <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-            Your store is currently <strong>{store.status}</strong>. The menu
-            link may not work for customers until the store is active.
+            {formatMessage(dict.common.storeInactiveWarning, {
+              status: storeStatusLabel(store.status ?? "inactive", dict),
+            })}
           </p>
         )}
       </div>
 
       <QrPoster
-        storeName={store.name ?? "Your store"}
+        storeName={store.name ?? dict.qr.store}
         menuUrl={menuUrl}
         logoUrl={store.logo_url}
         phone={store.phone}

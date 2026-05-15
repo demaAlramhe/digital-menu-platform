@@ -5,6 +5,9 @@ import { createAdminClient } from "../../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
 import { AdminUserStoreSelect } from "@/components/admin/admin-user-store-select";
+import { getRoleLabel } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n/server";
+import type { Dictionary } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -28,13 +31,13 @@ type AdminUsersPageProps = {
   searchParams: Promise<{ role?: string; q?: string }>;
 };
 
-const ROLE_FILTERS = [
-  { label: "All", value: "all" },
-  { label: "Super Admin", value: "super_admin" },
-  { label: "Store Owner", value: "store_owner" },
-];
-
-function RoleBadge({ role }: { role: string | null }) {
+function RoleBadge({
+  role,
+  dict,
+}: {
+  role: string | null;
+  dict: Dictionary;
+}) {
   const styles =
     role === "super_admin"
       ? { backgroundColor: "#dbeafe", color: "#1d4ed8" }
@@ -47,7 +50,7 @@ function RoleBadge({ role }: { role: string | null }) {
       className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
       style={styles}
     >
-      {role ?? "unknown"}
+      {getRoleLabel(role, dict)}
     </span>
   );
 }
@@ -56,6 +59,13 @@ export default async function AdminUsersPage({
   searchParams,
 }: AdminUsersPageProps) {
   await requireSuperAdmin();
+  const { dict } = await getTranslations();
+
+  const ROLE_FILTERS = [
+    { label: dict.roles.all, value: "all" },
+    { label: dict.roles.superAdmin, value: "super_admin" },
+    { label: dict.roles.storeOwner, value: "store_owner" },
+  ];
 
   const { role, q } = await searchParams;
   const selectedRole =
@@ -148,22 +158,19 @@ export default async function AdminUsersPage({
   };
 
   return (
-    <AppShell
-      title="Manage Users"
-      subtitle="Super admin view for all users in the platform"
-    >
+    <AppShell title={dict.admin.manageUsers} subtitle={dict.admin.usersTitle}>
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-3">
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Total Users</p>
+              <p className="text-sm text-slate-500">{dict.admin.totalUsers}</p>
               <p className="text-3xl font-bold text-slate-900">{counters.total}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Super Admins</p>
+              <p className="text-sm text-slate-500">{dict.roles.superAdmin}</p>
               <p className="text-3xl font-bold text-blue-700">
                 {counters.super_admin}
               </p>
@@ -172,7 +179,7 @@ export default async function AdminUsersPage({
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Store Owners</p>
+              <p className="text-sm text-slate-500">{dict.roles.storeOwner}</p>
               <p className="text-3xl font-bold text-green-700">
                 {counters.store_owner}
               </p>
@@ -183,7 +190,7 @@ export default async function AdminUsersPage({
         <Card>
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold">All Users</h2>
+              <h2 className="text-xl font-semibold">{dict.admin.usersTitle}</h2>
 
               <div className="flex flex-wrap gap-2">
                 {ROLE_FILTERS.map((filter) => {
@@ -228,32 +235,32 @@ export default async function AdminUsersPage({
                 type="text"
                 name="q"
                 defaultValue={searchQuery}
-                placeholder="Search by name, email, role, store..."
+                placeholder={`${dict.common.name}, ${dict.common.email}...`}
                 className="min-w-[280px] flex-1 rounded-lg border px-3 py-2"
               />
               <button
                 type="submit"
                 className="rounded-lg bg-slate-900 px-4 py-2 text-white"
               >
-                Search
+                {dict.common.search}
               </button>
               <Link
                 href={selectedRole === "all" ? "/admin/users" : `/admin/users?role=${selectedRole}`}
                 className="rounded-lg border px-4 py-2 font-medium"
               >
-                Clear
+                {dict.common.clear}
               </Link>
             </form>
 
             {profilesError ? (
               <div>
-                <p className="text-sm text-red-600">Could not load users.</p>
+                <p className="text-sm text-red-600">{dict.roles.loadUsersError}</p>
                 <pre className="mt-2 text-xs text-slate-600">
                   {JSON.stringify(profilesError, null, 2)}
                 </pre>
               </div>
             ) : finalUsers.length === 0 ? (
-              <p className="text-sm text-slate-600">No users found for this filter/search.</p>
+              <p className="text-sm text-slate-600">{dict.admin.noData}</p>
             ) : (
               <div className="space-y-4">
                 {finalUsers.map((user) => (
@@ -263,36 +270,36 @@ export default async function AdminUsersPage({
                   >
                     <div className="grid gap-2 md:grid-cols-2">
                       <p>
-                        <strong>Full Name:</strong> {user.full_name ?? "-"}
+                        <strong>{dict.common.name}:</strong> {user.full_name ?? "-"}
                       </p>
                       <p>
-                        <strong>Email:</strong> {user.email ?? "-"}
+                        <strong>{dict.common.email}:</strong> {user.email ?? "-"}
                       </p>
                       <div className="flex items-center gap-2">
-                        <strong>Role:</strong>
-                        <RoleBadge role={user.role} />
+                        <strong>{dict.roles.label}:</strong>
+                        <RoleBadge role={user.role} dict={dict} />
                       </div>
                       <p>
-                        <strong>User ID:</strong> {user.id}
+                        <strong>{dict.roles.userId}:</strong> {user.id}
                       </p>
                       <p>
-                        <strong>Store Name:</strong> {user.store_name ?? "-"}
+                        <strong>{dict.qr.store}:</strong> {user.store_name ?? "-"}
                       </p>
                       <p>
-                        <strong>Store Slug:</strong> {user.store_slug ?? "-"}
+                        <strong>{dict.common.slug}:</strong> {user.store_slug ?? "-"}
                       </p>
                     </div>
 
                     {user.role === "store_owner" && !user.store_id && (
                       <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
-                        Warning: This store owner is not assigned to any store yet.
+                        {dict.roles.unassignedWarning}
                       </div>
                     )}
 
                     <div className="mt-4 grid gap-4 md:grid-cols-2">
                       <div>
                         <p className="mb-2 text-sm font-medium text-slate-700">
-                          Change Role
+                          {dict.roles.changeRole}
                         </p>
                         <AdminUserRoleSelect
                           userId={user.id}
@@ -302,7 +309,7 @@ export default async function AdminUsersPage({
 
                       <div>
                         <p className="mb-2 text-sm font-medium text-slate-700">
-                          Assign Store
+                          {dict.roles.assignStore}
                         </p>
                         <AdminUserStoreSelect
                           userId={user.id}

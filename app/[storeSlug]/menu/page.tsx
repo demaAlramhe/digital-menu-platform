@@ -3,7 +3,10 @@ import { createClient } from "@/lib/supabase/server";
 import { MenuCategoryNav } from "@/components/storefront/menu-category-nav";
 import { MenuItemCard } from "@/components/storefront/menu-item-card";
 import { StoreContact } from "@/components/storefront/store-contact";
+import { StoreLocaleBar } from "@/components/storefront/store-locale-bar";
 import { StoreMenuHeader } from "@/components/storefront/store-menu-header";
+import { getTranslations } from "@/lib/i18n/server";
+import type { Dictionary } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -33,6 +36,7 @@ const SECTION_SCROLL_CLASS = "scroll-mt-[7.5rem]";
 
 export default async function StoreMenuPage({ params }: MenuPageProps) {
   const { storeSlug } = await params;
+  const { dict } = await getTranslations();
   const supabase = await createClient();
 
   const { data: store, error: storeError } = await supabase
@@ -85,22 +89,28 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
     .map((category) => ({ id: category.id, name: category.name }));
 
   if (uncategorized.length > 0) {
-    navCategories.push({ id: "other", name: "More" });
+    navCategories.push({ id: "other", name: dict.common.uncategorized });
   }
 
   const primaryColor = store.primary_color || "#111827";
   const secondaryColor = store.secondary_color || "#f59e0b";
   const isEmpty = cats.length === 0 && items.length === 0;
+  const storeName = store.name ?? dict.menu.digitalMenu;
 
   return (
     <main className="min-h-screen bg-slate-50 pb-10">
+      <StoreLocaleBar />
       <StoreMenuHeader
         storeSlug={storeSlug}
-        storeName={store.name ?? "Menu"}
+        storeName={storeName}
         logoUrl={store.logo_url}
         bannerUrl={store.banner_url}
         primaryColor={primaryColor}
         secondaryColor={secondaryColor}
+        labels={{
+          digitalMenu: dict.menu.digitalMenu,
+          backLinkText: `${dict.common.back} ${storeName}`,
+        }}
       />
 
       {!isEmpty && (
@@ -113,14 +123,14 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
       <div className="mx-auto max-w-2xl px-4 py-6 sm:px-5 sm:py-8">
         {isEmpty ? (
-          <EmptyMenuState primaryColor={primaryColor} />
+          <EmptyMenuState primaryColor={primaryColor} dict={dict} />
         ) : (
           <div className="space-y-10 sm:space-y-12">
             {featuredItems.length > 0 && (
               <section id="menu-featured" className={SECTION_SCROLL_CLASS}>
                 <SectionHeading
-                  title="Featured"
-                  subtitle="Chef picks & highlights"
+                  title={dict.menu.featured}
+                  subtitle={dict.menu.featuredSubtitle}
                   primaryColor={primaryColor}
                 />
                 <ul className="mt-4 space-y-4">
@@ -169,7 +179,10 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
             {uncategorized.length > 0 && (
               <section id="category-other" className={SECTION_SCROLL_CLASS}>
-                <SectionHeading title="More" primaryColor={primaryColor} />
+                <SectionHeading
+                  title={dict.common.uncategorized}
+                  primaryColor={primaryColor}
+                />
                 <ul className="mt-4 space-y-4">
                   {uncategorized.map((item) => (
                     <li key={item.id}>
@@ -188,7 +201,7 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
         <div className="mt-10 sm:mt-12">
           <StoreContact
-            storeName={store.name ?? "Restaurant"}
+            storeName={storeName}
             phone={store.phone}
             email={store.email}
             address={store.address}
@@ -224,7 +237,13 @@ function SectionHeading({
   );
 }
 
-function EmptyMenuState({ primaryColor }: { primaryColor: string }) {
+function EmptyMenuState({
+  primaryColor,
+  dict,
+}: {
+  primaryColor: string;
+  dict: Dictionary;
+}) {
   return (
     <div className="rounded-2xl border border-dashed border-slate-300 bg-white px-6 py-14 text-center shadow-sm">
       <div
@@ -234,9 +253,11 @@ function EmptyMenuState({ primaryColor }: { primaryColor: string }) {
       >
         🍽
       </div>
-      <h2 className="text-lg font-semibold text-slate-900">Menu coming soon</h2>
+      <h2 className="text-lg font-semibold text-slate-900">
+        {dict.menu.emptyTitle}
+      </h2>
       <p className="mx-auto mt-2 max-w-xs text-[15px] leading-relaxed text-slate-600">
-        We&apos;re preparing our dishes. Please check back a little later.
+        {dict.menu.emptyText}
       </p>
     </div>
   );

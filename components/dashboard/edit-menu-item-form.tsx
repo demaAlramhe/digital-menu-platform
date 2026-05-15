@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = {
@@ -29,6 +31,7 @@ type EditMenuItemFormProps = {
 
 export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps) {
   const router = useRouter();
+  const { dict } = useLocale();
 
   const [name, setName] = useState(menuItem.name);
   const [slug, setSlug] = useState(menuItem.slug);
@@ -47,7 +50,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
     setMessage("");
 
     if (!name.trim() || !slug.trim() || !price.trim()) {
-      setMessage("Name, slug, and price are required.");
+      setMessage(dict.menuItems.requiredFields);
       return;
     }
 
@@ -75,14 +78,14 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       const result = await response.json();
 
       if (!response.ok) {
-        setMessage(result.error || "Failed to update menu item.");
+        setMessage(result.error || dict.menuItems.updateError);
         return;
       }
 
       router.push("/dashboard/menu-items");
       router.refresh();
     } catch {
-      setMessage("Something went wrong while updating the menu item.");
+      setMessage(dict.menuItems.updateError);
     } finally {
       setLoading(false);
     }
@@ -91,7 +94,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
       <div>
-        <label className="mb-1 block font-medium">Name</label>
+        <label className="mb-1 block font-medium">{dict.common.name}</label>
         <input
           type="text"
           value={name}
@@ -101,7 +104,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Slug</label>
+        <label className="mb-1 block font-medium">{dict.common.slug}</label>
         <input
           type="text"
           value={slug}
@@ -111,7 +114,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Description</label>
+        <label className="mb-1 block font-medium">{dict.common.description}</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
@@ -121,14 +124,14 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Category</label>
+        <label className="mb-1 block font-medium">{dict.common.category}</label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
         >
           {categories.length === 0 ? (
-            <option value="">No categories yet</option>
+            <option value="">{dict.common.noCategories}</option>
           ) : (
             categories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -139,10 +142,14 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
         </select>
       </div>
 
-      <MenuItemImageUpload value={imageUrl} onChange={setImageUrl} />
+      <MenuItemImageUpload
+        value={imageUrl}
+        onChange={setImageUrl}
+        folder={CLOUDINARY_FOLDERS.menuItems}
+      />
 
       <div>
-        <label className="mb-1 block font-medium">Price</label>
+        <label className="mb-1 block font-medium">{dict.common.price}</label>
         <input
           type="number"
           step="0.01"
@@ -153,7 +160,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Sort Order</label>
+        <label className="mb-1 block font-medium">{dict.common.sortOrder}</label>
         <input
           type="number"
           value={sortOrder}
@@ -170,7 +177,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           onChange={(e) => setIsActive(e.target.checked)}
         />
         <label htmlFor="editIsActive" className="font-medium">
-          Active menu item
+          {dict.menuItems.activeItem}
         </label>
       </div>
 
@@ -182,7 +189,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           onChange={(e) => setIsFeatured(e.target.checked)}
         />
         <label htmlFor="editIsFeatured" className="font-medium">
-          Featured item
+          {dict.menuItems.featuredItem}
         </label>
       </div>
 
@@ -194,14 +201,14 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           disabled={loading}
           className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
         >
-          {loading ? "Saving..." : "Save Changes"}
+          {loading ? dict.common.saving : dict.menuItems.saveChanges}
         </button>
 
         <Link
           href="/dashboard/menu-items"
           className="rounded-lg border px-4 py-2 font-medium"
         >
-          Cancel
+          {dict.common.cancel}
         </Link>
       </div>
     </form>

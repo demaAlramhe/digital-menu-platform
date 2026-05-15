@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 type AdminUserRoleSelectProps = {
   userId: string;
@@ -13,6 +14,7 @@ export function AdminUserRoleSelect({
   currentRole,
 }: AdminUserRoleSelectProps) {
   const router = useRouter();
+  const { dict } = useLocale();
   const [role, setRole] = useState(currentRole ?? "store_owner");
   const [loading, setLoading] = useState(false);
 
@@ -35,14 +37,14 @@ export function AdminUserRoleSelect({
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Failed to update user role.");
+        alert(result.error || dict.admin.roleUpdateFailed);
         setRole(currentRole ?? "store_owner");
         return;
       }
 
       router.refresh();
-    } catch (error) {
-      alert("Something went wrong while updating the role.");
+    } catch {
+      alert(dict.admin.roleUpdateError);
       setRole(currentRole ?? "store_owner");
     } finally {
       setLoading(false);
@@ -56,8 +58,8 @@ export function AdminUserRoleSelect({
       disabled={loading}
       className="rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
     >
-      <option value="super_admin">super_admin</option>
-      <option value="store_owner">store_owner</option>
+      <option value="super_admin">{dict.roles.superAdmin}</option>
+      <option value="store_owner">{dict.roles.storeOwner}</option>
     </select>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 type DeleteCategoryButtonProps = {
   categoryId: string;
@@ -9,12 +10,11 @@ type DeleteCategoryButtonProps = {
 
 export function DeleteCategoryButton({ categoryId }: DeleteCategoryButtonProps) {
   const router = useRouter();
+  const { dict } = useLocale();
   const [loading, setLoading] = useState(false);
 
   async function handleDelete() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this category?"
-    );
+    const confirmed = window.confirm(dict.categories.deleteConfirm);
 
     if (!confirmed) return;
 
@@ -28,13 +28,13 @@ export function DeleteCategoryButton({ categoryId }: DeleteCategoryButtonProps) 
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Failed to delete category.");
+        alert(result.error || dict.menuItems.deleteError);
         return;
       }
 
       router.refresh();
     } catch {
-      alert("Something went wrong while deleting the category.");
+      alert(dict.menuItems.deleteError);
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,7 @@ export function DeleteCategoryButton({ categoryId }: DeleteCategoryButtonProps) 
       disabled={loading}
       className="rounded-lg border border-red-300 px-4 py-2 font-medium text-red-600 disabled:opacity-50"
     >
-      {loading ? "Deleting..." : "Delete"}
+      {loading ? dict.common.deleting : dict.common.delete}
     </button>
   );
 }

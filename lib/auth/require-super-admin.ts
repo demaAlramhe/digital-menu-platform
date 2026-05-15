@@ -9,7 +9,7 @@ export async function requireSuperAdmin() {
   }
 
   if (!current.profile) {
-    redirect("/dashboard");
+    redirect("/auth/login?error=no_profile");
   }
 
   if (current.profile.role === "store_owner") {
@@ -17,7 +17,7 @@ export async function requireSuperAdmin() {
   }
 
   if (current.profile.role !== "super_admin") {
-    redirect("/dashboard");
+    redirect("/auth/login?error=unsupported_role");
   }
 
   return current;

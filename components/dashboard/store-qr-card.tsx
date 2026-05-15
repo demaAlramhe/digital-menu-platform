@@ -2,6 +2,7 @@
 
 import { QRCodeCanvas } from "qrcode.react";
 import { useRef, useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 type StoreQrCardProps = {
   storeName: string;
@@ -10,6 +11,7 @@ type StoreQrCardProps = {
 };
 
 export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps) {
+  const { dict } = useLocale();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [copyMessage, setCopyMessage] = useState("");
   const [downloadMessage, setDownloadMessage] = useState("");
@@ -19,9 +21,9 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
 
     try {
       await navigator.clipboard.writeText(menuUrl);
-      setCopyMessage("Link copied to clipboard.");
+      setCopyMessage(dict.qr.copied);
     } catch {
-      setCopyMessage("Could not copy link. Please copy it manually.");
+      setCopyMessage(dict.qr.copyFailed);
     }
   }
 
@@ -30,7 +32,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
 
     const canvas = canvasRef.current;
     if (!canvas) {
-      setDownloadMessage("QR code is not ready yet. Try again.");
+      setDownloadMessage(dict.qr.qrNotReady);
       return;
     }
 
@@ -40,26 +42,26 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
       link.href = dataUrl;
       link.download = `${storeSlug}-menu-qr.png`;
       link.click();
-      setDownloadMessage("QR code downloaded.");
+      setDownloadMessage(dict.qr.downloadReady);
     } catch {
-      setDownloadMessage("Could not download QR code.");
+      setDownloadMessage(dict.qr.downloadFailed);
     }
   }
 
   return (
     <div className="max-w-xl space-y-6 rounded-2xl border bg-white p-8 shadow-sm">
       <div className="space-y-1">
-        <p className="text-sm text-slate-500">Store</p>
+        <p className="text-sm text-slate-500">{dict.qr.store}</p>
         <p className="text-2xl font-semibold text-slate-900">{storeName}</p>
       </div>
 
       <div className="space-y-1">
-        <p className="text-sm text-slate-500">Store slug</p>
+        <p className="text-sm text-slate-500">{dict.qr.storeSlug}</p>
         <p className="font-mono text-slate-800">{storeSlug}</p>
       </div>
 
       <div className="space-y-1">
-        <p className="text-sm text-slate-500">Public menu URL</p>
+        <p className="text-sm text-slate-500">{dict.qr.publicUrl}</p>
         <a
           href={menuUrl}
           target="_blank"
@@ -82,9 +84,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
         />
       </div>
 
-      <p className="text-center text-sm text-slate-600">
-        Customers can scan this code to open your digital menu.
-      </p>
+      <p className="text-center text-sm text-slate-600">{dict.qr.scanHint}</p>
 
       <div className="flex flex-wrap gap-3">
         <button
@@ -92,7 +92,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
           onClick={handleCopyLink}
           className="rounded-lg border px-4 py-2 font-medium"
         >
-          Copy menu link
+          {dict.qr.copyLink}
         </button>
 
         <button
@@ -100,7 +100,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
           onClick={handleDownload}
           className="rounded-lg bg-slate-900 px-4 py-2 font-medium text-white"
         >
-          Download QR (PNG)
+          {dict.qr.downloadPng}
         </button>
       </div>
 

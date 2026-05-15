@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 type StoreOption = {
   id: string;
@@ -23,6 +24,7 @@ export function AdminUserStoreSelect({
   stores,
 }: AdminUserStoreSelectProps) {
   const router = useRouter();
+  const { dict } = useLocale();
   const [storeId, setStoreId] = useState(currentStoreId ?? "");
   const [loading, setLoading] = useState(false);
 
@@ -45,14 +47,14 @@ export function AdminUserStoreSelect({
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Failed to update assigned store.");
+        alert(result.error || dict.admin.assignUpdateFailed);
         setStoreId(currentStoreId ?? "");
         return;
       }
 
       router.refresh();
-    } catch (error) {
-      alert("Something went wrong while updating the store assignment.");
+    } catch {
+      alert(dict.admin.assignUpdateError);
       setStoreId(currentStoreId ?? "");
     } finally {
       setLoading(false);
@@ -68,7 +70,7 @@ export function AdminUserStoreSelect({
       disabled={disabled}
       className="rounded-lg border px-3 py-2 text-sm disabled:opacity-50"
     >
-      <option value="">No store</option>
+      <option value="">{dict.admin.noStoreAssigned}</option>
       {stores.map((store) => (
         <option key={store.id} value={store.id}>
           {store.name} ({store.slug})

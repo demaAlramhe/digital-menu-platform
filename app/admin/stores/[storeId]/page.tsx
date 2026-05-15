@@ -5,6 +5,7 @@ import { Card } from "@/components/ui/card";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { AdminEditStoreForm } from "@/components/admin/admin-edit-store-form";
 import { buildPublicMenuUrl } from "@/lib/utils/public-menu-url";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -14,7 +15,8 @@ type AdminStorePageProps = {
 
 export default async function AdminStorePage({ params }: AdminStorePageProps) {
   await requireSuperAdmin();
-  
+  const { dict } = await getTranslations();
+
   const { storeId } = await params;
   const supabase = createAdminClient();
 
@@ -32,13 +34,15 @@ export default async function AdminStorePage({ params }: AdminStorePageProps) {
 
   return (
     <AppShell
-      title={`Store: ${store.name}`}
-      subtitle="View and edit store details"
+      title={`${dict.admin.storePageTitle}: ${store.name}`}
+      subtitle={dict.admin.storePageSubtitle}
     >
       {menuUrl && (
         <Card>
           <div className="space-y-1">
-            <p className="text-sm font-medium text-slate-700">Public menu URL</p>
+            <p className="text-sm font-medium text-slate-700">
+              {dict.admin.publicMenuUrl}
+            </p>
             <a
               href={menuUrl}
               target="_blank"
@@ -47,7 +51,9 @@ export default async function AdminStorePage({ params }: AdminStorePageProps) {
             >
               {menuUrl}
             </a>
-            <p className="text-xs text-slate-500">QR target: /{store.slug}/menu</p>
+            <p className="text-xs text-slate-500">
+              {dict.admin.qrTarget}: /{store.slug}/menu
+            </p>
           </div>
         </Card>
       )}

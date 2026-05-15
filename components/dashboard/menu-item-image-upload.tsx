@@ -1,18 +1,26 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
+import type { CloudinaryUploadFolder } from "@/lib/cloudinary/folders";
 
 type MenuItemImageUploadProps = {
   value: string;
   onChange: (url: string) => void;
+  folder: CloudinaryUploadFolder;
+  label?: string;
 };
 
 export function MenuItemImageUpload({
   value,
   onChange,
+  folder,
+  label,
 }: MenuItemImageUploadProps) {
+  const { dict } = useLocale();
   const [uploading, setUploading] = useState(false);
   const [message, setMessage] = useState("");
+  const fieldLabel = label ?? dict.menuItems.imageLabel;
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
@@ -27,15 +35,13 @@ export function MenuItemImageUpload({
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          folder: "digital-menu-items",
-        }),
+        body: JSON.stringify({ folder }),
       });
 
       const signResult = await signResponse.json();
 
       if (!signResponse.ok) {
-        setMessage(signResult.error || "Failed to prepare upload.");
+        setMessage(signResult.error || dict.menuItems.createError);
         return;
       }
 
@@ -57,19 +63,19 @@ export function MenuItemImageUpload({
       const uploadResult = await uploadResponse.json();
 
       if (!uploadResponse.ok) {
-        setMessage(uploadResult.error?.message || "Upload failed.");
+        setMessage(uploadResult.error?.message || dict.menuItems.createError);
         return;
       }
 
       if (!uploadResult.secure_url) {
-        setMessage("Upload finished but no image URL was returned.");
+        setMessage(dict.menuItems.createError);
         return;
       }
 
       onChange(uploadResult.secure_url);
-      setMessage("Image uploaded successfully.");
+      setMessage(dict.common.save);
     } catch {
-      setMessage("Something went wrong while uploading the image.");
+      setMessage(dict.menuItems.createError);
     } finally {
       setUploading(false);
     }
@@ -78,7 +84,7 @@ export function MenuItemImageUpload({
   return (
     <div className="space-y-3">
       <div>
-        <label className="mb-1 block font-medium">Menu Item Image</label>
+        <label className="mb-1 block font-medium">{fieldLabel}</label>
         <input
           type="file"
           accept="image/*"
@@ -87,14 +93,16 @@ export function MenuItemImageUpload({
         />
       </div>
 
-      {uploading && <p className="text-sm text-slate-600">Uploading image...</p>}
+      {uploading && (
+        <p className="text-sm text-slate-600">{dict.common.loading}</p>
+      )}
       {message && <p className="text-sm text-slate-600">{message}</p>}
 
       {value && (
         <div className="space-y-2">
           <img
             src={value}
-            alt="Uploaded menu item"
+            alt={fieldLabel}
             className="h-40 w-40 rounded-lg border object-cover"
           />
           <button
@@ -102,7 +110,7 @@ export function MenuItemImageUpload({
             onClick={() => onChange("")}
             className="rounded-lg border px-3 py-2 text-sm"
           >
-            Remove Image
+            {dict.common.delete}
           </button>
         </div>
       )}

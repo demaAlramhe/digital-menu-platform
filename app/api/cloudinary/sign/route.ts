@@ -1,10 +1,18 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
+import { isAllowedCloudinaryFolder } from "@/lib/cloudinary/folders";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const folder = body.folder || "digital-menu-items";
+    const folder = body.folder;
+
+    if (!folder || typeof folder !== "string" || !isAllowedCloudinaryFolder(folder)) {
+      return NextResponse.json(
+        { error: "Invalid or missing Cloudinary upload folder." },
+        { status: 400 }
+      );
+    }
 
     const timestamp = Math.floor(Date.now() / 1000).toString();
     const apiKey = process.env.CLOUDINARY_API_KEY;

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type EditCategoryFormProps = {
@@ -17,6 +18,7 @@ type EditCategoryFormProps = {
 
 export function EditCategoryForm({ category }: EditCategoryFormProps) {
   const router = useRouter();
+  const { dict } = useLocale();
 
   const [name, setName] = useState(category.name);
   const [slug, setSlug] = useState(category.slug);
@@ -30,7 +32,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
     setMessage("");
 
     if (!name.trim() || !slug.trim()) {
-      setMessage("Name and slug are required.");
+      setMessage(dict.categories.requiredFields);
       return;
     }
 
@@ -53,14 +55,14 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        setMessage(result.error || "Failed to update category.");
+        setMessage(result.error || dict.menuItems.updateError);
         return;
       }
 
       router.push("/dashboard/categories");
       router.refresh();
     } catch {
-      setMessage("Something went wrong while updating the category.");
+      setMessage(dict.menuItems.updateError);
     } finally {
       setLoading(false);
     }
@@ -69,7 +71,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
       <div>
-        <label className="mb-1 block font-medium">Name</label>
+        <label className="mb-1 block font-medium">{dict.common.name}</label>
         <input
           type="text"
           value={name}
@@ -79,7 +81,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Slug</label>
+        <label className="mb-1 block font-medium">{dict.common.slug}</label>
         <input
           type="text"
           value={slug}
@@ -89,7 +91,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Sort Order</label>
+        <label className="mb-1 block font-medium">{dict.common.sortOrder}</label>
         <input
           type="number"
           value={sortOrder}
@@ -106,7 +108,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
           onChange={(e) => setIsActive(e.target.checked)}
         />
         <label htmlFor="editCategoryIsActive" className="font-medium">
-          Active category
+          {dict.categories.activeCategory}
         </label>
       </div>
 
@@ -118,14 +120,14 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
           disabled={loading}
           className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
         >
-          {loading ? "Saving..." : "Save Changes"}
+          {loading ? dict.common.saving : dict.menuItems.saveChanges}
         </button>
 
         <Link
           href="/dashboard/categories"
           className="rounded-lg border px-4 py-2 font-medium"
         >
-          Cancel
+          {dict.common.cancel}
         </Link>
       </div>
     </form>

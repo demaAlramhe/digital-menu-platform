@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 
 type AdminStoreStatusButtonProps = {
   storeId: string;
@@ -13,14 +14,15 @@ export function AdminStoreStatusButton({
   currentStatus,
 }: AdminStoreStatusButtonProps) {
   const router = useRouter();
+  const { dict } = useLocale();
   const [loading, setLoading] = useState(false);
 
   const nextStatus =
     currentStatus === "active"
       ? "inactive"
       : currentStatus === "inactive"
-      ? "active"
-      : "active";
+        ? "active"
+        : "active";
 
   async function handleToggle() {
     try {
@@ -39,22 +41,20 @@ export function AdminStoreStatusButton({
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Failed to update store status.");
+        alert(result.error || dict.admin.statusUpdateFailed);
         return;
       }
 
       router.refresh();
-    } catch (error) {
-      alert("Something went wrong while updating store status.");
+    } catch {
+      alert(dict.admin.statusUpdateError);
     } finally {
       setLoading(false);
     }
   }
 
   async function handleArchive() {
-    const confirmed = window.confirm(
-      "Are you sure you want to archive this store?"
-    );
+    const confirmed = window.confirm(dict.admin.archiveConfirm);
 
     if (!confirmed) return;
 
@@ -74,13 +74,13 @@ export function AdminStoreStatusButton({
       const result = await response.json();
 
       if (!response.ok) {
-        alert(result.error || "Failed to archive store.");
+        alert(result.error || dict.admin.archiveFailed);
         return;
       }
 
       router.refresh();
-    } catch (error) {
-      alert("Something went wrong while archiving the store.");
+    } catch {
+      alert(dict.admin.archiveError);
     } finally {
       setLoading(false);
     }
@@ -95,12 +95,12 @@ export function AdminStoreStatusButton({
         className="rounded-lg border px-4 py-2 font-medium disabled:opacity-50"
       >
         {loading
-          ? "Updating..."
+          ? dict.admin.updating
           : currentStatus === "active"
-          ? "Set Inactive"
-          : currentStatus === "inactive"
-          ? "Set Active"
-          : "Archived"}
+            ? dict.admin.setInactive
+            : currentStatus === "inactive"
+              ? dict.admin.setActive
+              : dict.admin.archived}
       </button>
 
       {currentStatus !== "archived" && (
@@ -110,7 +110,7 @@ export function AdminStoreStatusButton({
           disabled={loading}
           className="rounded-lg border border-red-300 px-4 py-2 font-medium text-red-600 disabled:opacity-50"
         >
-          Archive
+          {dict.admin.archive}
         </button>
       )}
     </div>

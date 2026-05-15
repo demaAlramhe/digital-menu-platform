@@ -9,11 +9,11 @@ export async function requireStoreOwner() {
   }
 
   if (!current.profile) {
-    redirect("/auth/login");
+    redirect("/auth/login?error=no_profile");
   }
 
   if (current.profile.role === "super_admin") {
-    redirect("/admin/stores");
+    redirect("/admin");
   }
 
   if (current.profile.role !== "store_owner") {

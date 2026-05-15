@@ -1,3 +1,7 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
+
 export type MenuItemDisplay = {
   id: string;
   name: string;
@@ -20,6 +24,7 @@ export function MenuItemCard({
   secondaryColor,
   showFeaturedBadge = false,
 }: MenuItemCardProps) {
+  const { dict } = useLocale();
   const isFeatured = showFeaturedBadge || item.is_featured;
 
   return (
@@ -39,15 +44,15 @@ export function MenuItemCard({
             />
           ) : (
             <div className="flex h-full min-h-[140px] w-full items-center justify-center bg-slate-100 text-sm text-slate-500 sm:min-h-0">
-              No photo
+              {dict.common.noPhoto}
             </div>
           )}
           {isFeatured && (
             <span
-              className="absolute left-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white shadow"
+              className="absolute start-3 top-3 rounded-full px-2.5 py-1 text-xs font-semibold text-white shadow"
               style={{ backgroundColor: primaryColor }}
             >
-              Featured
+              {dict.menu.featured}
             </span>
           )}
         </div>
@@ -61,10 +66,10 @@ export function MenuItemCard({
               className="shrink-0 text-lg font-bold tabular-nums sm:text-xl"
               style={{ color: primaryColor }}
             >
-              ₪{formatPrice(item.price)}
+              {dict.common.currency}
+              {formatPrice(item.price)}
             </p>
           </div>
-
           {item.description && (
             <p className="text-[15px] leading-relaxed text-slate-600 line-clamp-3">
               {item.description}

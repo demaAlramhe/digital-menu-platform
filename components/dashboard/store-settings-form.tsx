@@ -2,7 +2,9 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 
 type StoreSettingsFormProps = {
   store: {
@@ -20,6 +22,7 @@ type StoreSettingsFormProps = {
 
 export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   const router = useRouter();
+  const { dict } = useLocale();
 
   const [name, setName] = useState(store.name);
   const [logoUrl, setLogoUrl] = useState(store.logoUrl);
@@ -37,7 +40,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
     setMessage("");
 
     if (!name.trim()) {
-      setMessage("Store name is required.");
+      setMessage(dict.categories.requiredFields);
       return;
     }
 
@@ -64,14 +67,14 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        setMessage(result.error || "Failed to update store settings.");
+        setMessage(result.error || dict.menuItems.updateError);
         return;
       }
 
-      setMessage("Store settings updated successfully.");
+      setMessage(dict.settings.saveSettings);
       router.refresh();
-    } catch (error) {
-      setMessage("Something went wrong while updating store settings.");
+    } catch {
+      setMessage(dict.menuItems.updateError);
     } finally {
       setLoading(false);
     }
@@ -80,7 +83,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   return (
     <form onSubmit={handleSubmit} className="max-w-3xl space-y-6">
       <div>
-        <label className="mb-1 block font-medium">Store Name</label>
+        <label className="mb-1 block font-medium">{dict.common.name}</label>
         <input
           type="text"
           value={name}
@@ -91,19 +94,31 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <p className="mb-2 font-medium">Logo</p>
-          <MenuItemImageUpload value={logoUrl} onChange={setLogoUrl} />
+          <p className="mb-2 font-medium">{dict.settings.logo}</p>
+          <MenuItemImageUpload
+            value={logoUrl}
+            onChange={setLogoUrl}
+            folder={CLOUDINARY_FOLDERS.storeLogos}
+            label={dict.settings.logo}
+          />
         </div>
 
         <div>
-          <p className="mb-2 font-medium">Banner</p>
-          <MenuItemImageUpload value={bannerUrl} onChange={setBannerUrl} />
+          <p className="mb-2 font-medium">{dict.settings.banner}</p>
+          <MenuItemImageUpload
+            value={bannerUrl}
+            onChange={setBannerUrl}
+            folder={CLOUDINARY_FOLDERS.storeBanners}
+            label={dict.settings.banner}
+          />
         </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
         <div>
-          <label className="mb-1 block font-medium">Primary Color</label>
+          <label className="mb-1 block font-medium">
+            {dict.settings.primaryColor}
+          </label>
           <input
             type="color"
             value={primaryColor}
@@ -113,7 +128,9 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         </div>
 
         <div>
-          <label className="mb-1 block font-medium">Secondary Color</label>
+          <label className="mb-1 block font-medium">
+            {dict.settings.secondaryColor}
+          </label>
           <input
             type="color"
             value={secondaryColor}
@@ -125,7 +142,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
       <div className="grid gap-4 md:grid-cols-2">
         <div>
-          <label className="mb-1 block font-medium">Phone</label>
+          <label className="mb-1 block font-medium">{dict.common.phone}</label>
           <input
             type="text"
             value={phone}
@@ -135,7 +152,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         </div>
 
         <div>
-          <label className="mb-1 block font-medium">Email</label>
+          <label className="mb-1 block font-medium">{dict.common.email}</label>
           <input
             type="email"
             value={email}
@@ -146,7 +163,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Address</label>
+        <label className="mb-1 block font-medium">{dict.common.address}</label>
         <textarea
           rows={3}
           value={address}
@@ -162,7 +179,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         disabled={loading}
         className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
       >
-        {loading ? "Saving..." : "Save Settings"}
+        {loading ? dict.common.saving : dict.settings.saveSettings}
       </button>
     </form>
   );

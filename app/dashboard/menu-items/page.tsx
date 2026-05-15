@@ -3,12 +3,14 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { DeleteMenuItemButton } from "@/components/dashboard/delete-menu-item-button";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardMenuItemsPage() {
   const supabase = await createClient();
   const current = await getCurrentProfile();
+  const { dict } = await getTranslations();
 
   if (!current) {
     redirect("/auth/login");
@@ -17,8 +19,8 @@ export default async function DashboardMenuItemsPage() {
   if (!current.profile?.store_id) {
     return (
       <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">Menu Items</h1>
-        <p>No store is linked to this account.</p>
+        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
+        <p>{dict.common.noStore}</p>
       </main>
     );
   }
@@ -32,8 +34,8 @@ export default async function DashboardMenuItemsPage() {
   if (storeError || !store) {
     return (
       <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">Menu Items</h1>
-        <p>Could not load your store.</p>
+        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
+        <p>{dict.common.loadStoreError}</p>
       </main>
     );
   }
@@ -48,8 +50,8 @@ export default async function DashboardMenuItemsPage() {
   if (menuItemsError) {
     return (
       <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">Menu Items</h1>
-        <p>Could not load menu items.</p>
+        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
+        <p>{dict.menuItems.loadError}</p>
         <pre>{JSON.stringify(menuItemsError, null, 2)}</pre>
       </main>
     );
@@ -59,9 +61,11 @@ export default async function DashboardMenuItemsPage() {
     <main className="p-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">{store.name} Menu Items</h1>
+          <h1 className="text-3xl font-bold">
+            {store.name} — {dict.menuItems.title}
+          </h1>
           <p className="mt-2 text-slate-600">
-            Public menu: /{store.slug}/menu
+            {dict.menuItems.publicMenu}: /{store.slug}/menu
           </p>
         </div>
 
@@ -69,12 +73,12 @@ export default async function DashboardMenuItemsPage() {
           href="/dashboard/menu-items/new"
           className="rounded-lg bg-slate-900 px-4 py-2 text-white"
         >
-          Add Menu Item
+          {dict.menuItems.add}
         </Link>
       </div>
 
       {!menuItems || menuItems.length === 0 ? (
-        <p>No menu items found yet.</p>
+        <p>{dict.menuItems.empty}</p>
       ) : (
         <div className="space-y-4">
           {menuItems.map((item) => (
@@ -89,7 +93,7 @@ export default async function DashboardMenuItemsPage() {
                     />
                   ) : (
                     <div className="flex h-40 w-40 items-center justify-center rounded-lg border text-sm text-slate-500">
-                      No Image
+                      {dict.common.noImage}
                     </div>
                   )}
                 </div>
@@ -97,29 +101,30 @@ export default async function DashboardMenuItemsPage() {
                 <div>
                   <div className="grid gap-2 md:grid-cols-2">
                     <p>
-                      <strong>Name:</strong> {item.name}
+                      <strong>{dict.common.name}:</strong> {item.name}
                     </p>
                     <p>
-                      <strong>Slug:</strong> {item.slug}
+                      <strong>{dict.common.slug}:</strong> {item.slug}
                     </p>
                     <p>
-                      <strong>Price:</strong> ₪{item.price}
+                      <strong>{dict.common.price}:</strong> {dict.common.currency}
+                      {item.price}
                     </p>
                     <p>
-                      <strong>Category:</strong>{" "}
+                      <strong>{dict.common.category}:</strong>{" "}
                       {(item.menu_categories as { name?: string } | null)?.name ??
-                        "Uncategorized"}
+                        dict.common.uncategorized}
                     </p>
                     <p>
-                      <strong>Status:</strong>{" "}
-                      {item.is_active ? "Active" : "Inactive"}
+                      <strong>{dict.common.active}:</strong>{" "}
+                      {item.is_active ? dict.common.active : dict.common.inactive}
                     </p>
                     <p>
-                      <strong>Featured:</strong>{" "}
-                      {item.is_featured ? "Yes" : "No"}
+                      <strong>{dict.common.featured}:</strong>{" "}
+                      {item.is_featured ? dict.common.active : dict.common.inactive}
                     </p>
                     <p>
-                      <strong>Sort Order:</strong> {item.sort_order}
+                      <strong>{dict.common.sortOrder}:</strong> {item.sort_order}
                     </p>
                   </div>
 
@@ -134,7 +139,7 @@ export default async function DashboardMenuItemsPage() {
                       href={`/dashboard/menu-items/${item.id}/edit`}
                       className="rounded-lg border px-4 py-2 font-medium"
                     >
-                      Edit
+                      {dict.common.edit}
                     </Link>
 
                     <DeleteMenuItemButton menuItemId={item.id} />

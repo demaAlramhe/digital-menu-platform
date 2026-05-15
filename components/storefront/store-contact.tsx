@@ -1,3 +1,6 @@
+"use client";
+
+import { useLocale } from "@/components/i18n/locale-provider";
 import {
   buildWhatsAppUrl,
   normalizePhoneForTel,
@@ -20,6 +23,7 @@ export function StoreContact({
   primaryColor,
   compact = false,
 }: StoreContactProps) {
+  const { dict } = useLocale();
   const hasPhone = Boolean(phone?.trim());
   const hasEmail = Boolean(email?.trim());
   const hasAddress = Boolean(address?.trim());
@@ -44,14 +48,14 @@ export function StoreContact({
         className="text-lg font-semibold sm:text-xl"
         style={{ color: primaryColor }}
       >
-        Contact
+        {dict.store.contactTitle}
       </h2>
 
       <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-slate-700">
         {hasPhone && (
           <li>
             <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              Phone
+              {dict.common.phone}
             </span>
             <a
               href={`tel:${normalizePhoneForTel(phone!)}`}
@@ -65,7 +69,7 @@ export function StoreContact({
         {hasEmail && (
           <li>
             <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              Email
+              {dict.common.email}
             </span>
             <a
               href={`mailto:${email}`}
@@ -79,7 +83,7 @@ export function StoreContact({
         {hasAddress && (
           <li>
             <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              Address
+              {dict.common.address}
             </span>
             <p className="mt-0.5 text-slate-800">{address}</p>
           </li>
@@ -94,7 +98,7 @@ export function StoreContact({
           className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-base font-semibold text-white shadow-sm transition active:scale-[0.98]"
         >
           <WhatsAppIcon />
-          Message on WhatsApp
+          {dict.menu.messageOnWhatsApp}
         </a>
       )}
     </section>

@@ -1,8 +1,9 @@
 import "server-only";
 import { createClient } from "@supabase/supabase-js";
+import { getSupabaseUrl } from "./url";
 
 export function createAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseUrl = getSupabaseUrl();
   const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!supabaseUrl || !serviceRoleKey) {

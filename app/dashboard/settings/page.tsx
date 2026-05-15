@@ -1,12 +1,14 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
-import { StoreSettingsForm } from "../../../components/dashboard/store-settings-form";
+import { StoreSettingsForm } from "@/components/dashboard/store-settings-form";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardSettingsPage() {
   const current = await getCurrentProfile();
+  const { dict } = await getTranslations();
 
   if (!current) {
     redirect("/auth/login");
@@ -15,8 +17,8 @@ export default async function DashboardSettingsPage() {
   if (!current.profile?.store_id) {
     return (
       <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">Store Settings</h1>
-        <p>No store is linked to this account.</p>
+        <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
+        <p>{dict.common.noStore}</p>
       </main>
     );
   }
@@ -32,15 +34,15 @@ export default async function DashboardSettingsPage() {
   if (error || !store) {
     return (
       <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">Store Settings</h1>
-        <p>Could not load store settings.</p>
+        <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
+        <p>{dict.common.loadStoreError}</p>
       </main>
     );
   }
 
   return (
     <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">Store Settings</h1>
+      <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
 
       <StoreSettingsForm
         store={{

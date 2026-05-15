@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { EditCategoryForm } from "@/components/dashboard/edit-category-form";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -12,6 +13,7 @@ type EditCategoryPageProps = {
 
 export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
   const current = await getCurrentProfile();
+  const { dict } = await getTranslations();
 
   if (!current) {
     redirect("/auth/login");
@@ -20,8 +22,8 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
   if (!current.profile?.store_id) {
     return (
       <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">Edit Category</h1>
-        <p>No store is linked to this account.</p>
+        <h1 className="mb-4 text-3xl font-bold">{dict.categories.editTitle}</h1>
+        <p>{dict.common.noStore}</p>
       </main>
     );
   }
@@ -43,13 +45,13 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
   return (
     <main className="p-8">
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">Edit Category</h1>
+        <h1 className="text-3xl font-bold">{dict.categories.editTitle}</h1>
 
         <Link
           href="/dashboard/categories"
           className="rounded-lg border px-4 py-2 font-medium"
         >
-          Back to Categories
+          {dict.categories.backToList}
         </Link>
       </div>
 

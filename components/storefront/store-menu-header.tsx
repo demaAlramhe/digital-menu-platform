@@ -8,6 +8,10 @@ type StoreMenuHeaderProps = {
   primaryColor: string;
   secondaryColor: string;
   showBackLink?: boolean;
+  labels: {
+    digitalMenu: string;
+    backLinkText: string;
+  };
 };
 
 export function StoreMenuHeader({
@@ -18,6 +22,7 @@ export function StoreMenuHeader({
   primaryColor,
   secondaryColor,
   showBackLink = true,
+  labels,
 }: StoreMenuHeaderProps) {
   const initial = storeName?.charAt(0)?.toUpperCase() || "M";
 
@@ -47,7 +52,7 @@ export function StoreMenuHeader({
               />
               <div className="min-w-0 flex-1 pb-1 text-white">
                 <p className="text-xs font-medium uppercase tracking-wider text-white/80">
-                  Digital menu
+                  {labels.digitalMenu}
                 </p>
                 <h1 className="truncate text-2xl font-bold leading-tight sm:text-3xl">
                   {storeName}
@@ -75,7 +80,7 @@ export function StoreMenuHeader({
                 className="text-xs font-medium uppercase tracking-wider"
                 style={{ color: primaryColor }}
               >
-                Digital menu
+                {labels.digitalMenu}
               </p>
               <h1
                 className="text-2xl font-bold leading-tight sm:text-3xl"
@@ -95,7 +100,7 @@ export function StoreMenuHeader({
               href={`/${storeSlug}`}
               className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 active:text-slate-900"
             >
-              ← Back to {storeName}
+              ← {labels.backLinkText}
             </Link>
           </div>
         </div>

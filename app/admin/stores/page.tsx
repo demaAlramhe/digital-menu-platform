@@ -5,6 +5,9 @@ import { AdminCreateStoreForm } from "@/components/admin/admin-create-store-form
 import { AdminStoreStatusButton } from "@/components/admin/admin-store-status-button";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
+import { getRoleLabel } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n/server";
+import type { Dictionary } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -26,7 +29,20 @@ type AdminStoresPageProps = {
   searchParams: Promise<{ status?: string; q?: string }>;
 };
 
-function StatusBadge({ status }: { status: string | null }) {
+function statusLabel(status: string | null, dict: Dictionary) {
+  if (status === "active") return dict.common.statusActive;
+  if (status === "inactive") return dict.common.statusInactive;
+  if (status === "archived") return dict.common.statusArchived;
+  return status ?? "—";
+}
+
+function StatusBadge({
+  status,
+  dict,
+}: {
+  status: string | null;
+  dict: Dictionary;
+}) {
   const styles =
     status === "active"
       ? { backgroundColor: "#dcfce7", color: "#166534" }
@@ -39,22 +55,23 @@ function StatusBadge({ status }: { status: string | null }) {
       className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
       style={styles}
     >
-      {status ?? "unknown"}
+      {statusLabel(status, dict)}
     </span>
   );
 }
-
-const FILTERS = [
-  { label: "All", value: "all" },
-  { label: "Active", value: "active" },
-  { label: "Inactive", value: "inactive" },
-  { label: "Archived", value: "archived" },
-];
 
 export default async function AdminStoresPage({
   searchParams,
 }: AdminStoresPageProps) {
   await requireSuperAdmin();
+  const { dict } = await getTranslations();
+
+  const FILTERS = [
+    { label: dict.admin.storesTitle, value: "all" },
+    { label: dict.common.statusActive, value: "active" },
+    { label: dict.common.statusInactive, value: "inactive" },
+    { label: dict.common.statusArchived, value: "archived" },
+  ];
 
   const { status, q } = await searchParams;
   const selectedStatus =
@@ -153,17 +170,11 @@ export default async function AdminStoresPage({
     : storesWithOwners;
 
   return (
-    <AppShell
-      title="Manage Stores"
-      subtitle="Super admin view for all tenant stores in the platform"
-    >
+    <AppShell title={dict.admin.manageStores} subtitle={dict.admin.storesTitle}>
       <div className="space-y-6">
         <Card>
           <div className="space-y-4">
-            <p className="text-sm text-slate-700">
-              Create a new store and its owner account. Restrict this route to users with{" "}
-              <code>super_admin</code> role.
-            </p>
+            <p className="text-sm text-slate-700">{dict.admin.createStore}</p>
             <AdminCreateStoreForm />
           </div>
         </Card>
@@ -171,28 +182,28 @@ export default async function AdminStoresPage({
         <div className="grid gap-4 md:grid-cols-4">
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Total Stores</p>
+              <p className="text-sm text-slate-500">{dict.admin.totalStores}</p>
               <p className="text-3xl font-bold text-slate-900">{counters.total}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Active</p>
+              <p className="text-sm text-slate-500">{dict.admin.activeStores}</p>
               <p className="text-3xl font-bold text-green-700">{counters.active}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Inactive</p>
+              <p className="text-sm text-slate-500">{dict.admin.inactiveStores}</p>
               <p className="text-3xl font-bold text-red-700">{counters.inactive}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Archived</p>
+              <p className="text-sm text-slate-500">{dict.admin.archivedStores}</p>
               <p className="text-3xl font-bold text-slate-700">{counters.archived}</p>
             </div>
           </Card>
@@ -201,7 +212,7 @@ export default async function AdminStoresPage({
         <Card>
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold">All Stores</h2>
+              <h2 className="text-xl font-semibold">{dict.admin.storesTitle}</h2>
 
               <div className="flex flex-wrap gap-2">
                 {FILTERS.map((filter) => {
@@ -242,32 +253,32 @@ export default async function AdminStoresPage({
                 type="text"
                 name="q"
                 defaultValue={searchQuery}
-                placeholder="Search by store name, slug, owner, email..."
+                placeholder={`${dict.common.name}, ${dict.common.slug}...`}
                 className="min-w-[280px] flex-1 rounded-lg border px-3 py-2"
               />
               <button
                 type="submit"
                 className="rounded-lg bg-slate-900 px-4 py-2 text-white"
               >
-                Search
+                {dict.common.search}
               </button>
               <Link
                 href={selectedStatus === "all" ? "/admin/stores" : `/admin/stores?status=${selectedStatus}`}
                 className="rounded-lg border px-4 py-2 font-medium"
               >
-                Clear
+                {dict.common.clear}
               </Link>
             </form>
 
             {allStoresError ? (
               <div>
-                <p className="text-sm text-red-600">Could not load stores.</p>
+                <p className="text-sm text-red-600">{dict.common.loadStoreError}</p>
                 <pre className="mt-2 text-xs text-slate-600">
                   {JSON.stringify(allStoresError, null, 2)}
                 </pre>
               </div>
             ) : !finalStores || finalStores.length === 0 ? (
-              <p className="text-sm text-slate-600">No stores found for this filter/search.</p>
+              <p className="text-sm text-slate-600">{dict.admin.noData}</p>
             ) : (
               <div className="space-y-4">
                 {finalStores.map((store) => (
@@ -277,42 +288,44 @@ export default async function AdminStoresPage({
                   >
                     <div className="grid gap-2 md:grid-cols-2">
                       <p>
-                        <strong>Name:</strong> {store.name}
+                        <strong>{dict.common.name}:</strong> {store.name}
                       </p>
                       <p>
-                        <strong>Slug:</strong> {store.slug}
+                        <strong>{dict.common.slug}:</strong> {store.slug}
                       </p>
                       <p>
-                        <strong>Email:</strong> {store.email ?? "-"}
+                        <strong>{dict.common.email}:</strong> {store.email ?? "-"}
                       </p>
                       <p>
-                        <strong>Phone:</strong> {store.phone ?? "-"}
+                        <strong>{dict.common.phone}:</strong> {store.phone ?? "-"}
                       </p>
                       <p>
-                        <strong>Status:</strong> <StatusBadge status={store.status} />
+                        <strong>{dict.common.active}:</strong>{" "}
+                        <StatusBadge status={store.status} dict={dict} />
                       </p>
                       <p>
-                        <strong>Created At:</strong>{" "}
+                        <strong>{dict.roles.createdAt}:</strong>{" "}
                         {store.created_at
                           ? new Date(store.created_at).toLocaleString()
                           : "-"}
                       </p>
                       <p className="md:col-span-2">
-                        <strong>Address:</strong> {store.address ?? "-"}
+                        <strong>{dict.common.address}:</strong> {store.address ?? "-"}
                       </p>
                     </div>
 
                     <div className="mt-4 rounded-lg bg-slate-50 p-4">
-                      <h3 className="mb-2 font-semibold">Owner Info</h3>
+                      <h3 className="mb-2 font-semibold">{dict.roles.ownerSection}</h3>
                       <div className="grid gap-2 md:grid-cols-2">
                         <p>
-                          <strong>Name:</strong> {store.owner_name ?? "-"}
+                          <strong>{dict.common.name}:</strong> {store.owner_name ?? "-"}
                         </p>
                         <p>
-                          <strong>Email:</strong> {store.owner_email ?? "-"}
+                          <strong>{dict.common.email}:</strong> {store.owner_email ?? "-"}
                         </p>
                         <p>
-                          <strong>Role:</strong> {store.owner_role ?? "-"}
+                          <strong>{dict.roles.label}:</strong>{" "}
+                          {getRoleLabel(store.owner_role, dict)}
                         </p>
                       </div>
                     </div>
@@ -322,7 +335,7 @@ export default async function AdminStoresPage({
                         href={`/admin/stores/${store.id}`}
                         className="rounded-lg border px-4 py-2 font-medium"
                       >
-                        View / Edit
+                        {dict.common.edit}
                       </Link>
 
                       <AdminStoreStatusButton

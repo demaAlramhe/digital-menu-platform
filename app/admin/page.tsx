@@ -3,6 +3,8 @@ import { Card } from "@/components/ui/card";
 import Link from "next/link";
 import { createAdminClient } from "../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
+import { formatMessage } from "@/lib/i18n";
+import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
@@ -16,6 +18,7 @@ type StoreMenuSummary = {
 
 export default async function AdminPage() {
   await requireSuperAdmin();
+  const { dict } = await getTranslations();
 
   const supabase = createAdminClient();
 
@@ -83,50 +86,47 @@ export default async function AdminPage() {
     null;
 
   return (
-    <AppShell
-      title="Admin Overview"
-      subtitle="Platform overview for digital menu stores"
-    >
+    <AppShell title={dict.admin.overviewTitle} subtitle={dict.admin.overviewSubtitle}>
       <div className="space-y-6">
         <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Total Stores</p>
+              <p className="text-sm text-slate-500">{dict.admin.totalStores}</p>
               <p className="text-3xl font-bold text-slate-900">{totalStores ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Active Stores</p>
+              <p className="text-sm text-slate-500">{dict.admin.activeStores}</p>
               <p className="text-3xl font-bold text-green-700">{activeStores ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Inactive Stores</p>
+              <p className="text-sm text-slate-500">{dict.admin.inactiveStores}</p>
               <p className="text-3xl font-bold text-red-700">{inactiveStores ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Archived Stores</p>
+              <p className="text-sm text-slate-500">{dict.admin.archivedStores}</p>
               <p className="text-3xl font-bold text-slate-700">{archivedStores ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Total Users</p>
+              <p className="text-sm text-slate-500">{dict.admin.totalUsers}</p>
               <p className="text-3xl font-bold text-blue-700">{totalUsers ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Menu Items</p>
+              <p className="text-sm text-slate-500">{dict.admin.menuItems}</p>
               <p className="text-3xl font-bold text-amber-700">{totalMenuItems ?? 0}</p>
             </div>
           </Card>
@@ -135,28 +135,30 @@ export default async function AdminPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <div className="space-y-1">
-              <p className="text-sm text-slate-500">Menu Categories</p>
+              <p className="text-sm text-slate-500">{dict.admin.menuCategories}</p>
               <p className="text-3xl font-bold text-slate-900">{totalCategories ?? 0}</p>
             </div>
           </Card>
 
           <Card>
             <div className="space-y-2">
-              <p className="text-sm text-slate-500">Top Store by Menu Items</p>
+              <p className="text-sm text-slate-500">{dict.admin.topByItems}</p>
               {topStoreByMenuItems ? (
                 <>
                   <p className="text-xl font-bold text-slate-900">
                     {topStoreByMenuItems.store_name}
                   </p>
                   <p className="text-sm text-slate-600">
-                    {topStoreByMenuItems.menu_items_count} menu items
+                    {formatMessage(dict.admin.itemsCount, {
+                      count: topStoreByMenuItems.menu_items_count,
+                    })}
                   </p>
                   <p className="text-sm text-slate-600">
-                    Public menu: /{topStoreByMenuItems.store_slug}/menu
+                    {dict.admin.publicMenuPath}: /{topStoreByMenuItems.store_slug}/menu
                   </p>
                 </>
               ) : (
-                <p className="text-sm text-slate-600">No data yet.</p>
+                <p className="text-sm text-slate-600">{dict.admin.noData}</p>
               )}
             </div>
           </Card>
@@ -165,21 +167,21 @@ export default async function AdminPage() {
         <div className="grid gap-4 md:grid-cols-2">
           <Card>
             <div className="space-y-4">
-              <h2 className="text-xl font-semibold">Quick Actions</h2>
+              <h2 className="text-xl font-semibold">{dict.admin.quickActions}</h2>
 
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="/admin/stores"
                   className="rounded-lg border px-4 py-2 font-medium"
                 >
-                  Manage Stores
+                  {dict.admin.manageStores}
                 </Link>
 
                 <Link
                   href="/admin/users"
                   className="rounded-lg border px-4 py-2 font-medium"
                 >
-                  Manage Users
+                  {dict.admin.manageUsers}
                 </Link>
               </div>
             </div>
@@ -187,10 +189,10 @@ export default async function AdminPage() {
 
           <Card>
             <div className="space-y-3">
-              <h2 className="text-xl font-semibold">Stores Snapshot</h2>
+              <h2 className="text-xl font-semibold">{dict.admin.storesSnapshot}</h2>
 
               {!storeSummaries.length ? (
-                <p className="text-sm text-slate-600">No store data yet.</p>
+                <p className="text-sm text-slate-600">{dict.admin.noData}</p>
               ) : (
                 <div className="space-y-3">
                   {storeSummaries
@@ -203,8 +205,10 @@ export default async function AdminPage() {
                       >
                         <p className="font-medium text-slate-900">{store.store_name}</p>
                         <p className="text-sm text-slate-600">
-                          {store.menu_items_count} menu items · {store.categories_count}{" "}
-                          categories
+                          {formatMessage(dict.admin.categoriesCount, {
+                            items: store.menu_items_count,
+                            categories: store.categories_count,
+                          })}
                         </p>
                         <p className="text-sm text-slate-600">
                           /{store.store_slug}/menu

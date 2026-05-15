@@ -1,5 +1,7 @@
 "use client";
 
+import { useLocale } from "@/components/i18n/locale-provider";
+
 type CategoryNavItem = {
   id: string;
   name: string;
@@ -16,6 +18,8 @@ export function MenuCategoryNav({
   primaryColor,
   showFeatured = false,
 }: MenuCategoryNavProps) {
+  const { dict } = useLocale();
+
   if (categories.length === 0 && !showFeatured) {
     return null;
   }
@@ -34,12 +38,12 @@ export function MenuCategoryNav({
     >
       <div className="mx-auto max-w-2xl px-4 py-3">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
-          Jump to
+          {dict.menu.jumpTo}
         </p>
         <div className="-mx-1 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {showFeatured && (
             <CategoryPill
-              label="Featured"
+              label={dict.menu.featured}
               onClick={() => scrollToSection("menu-featured")}
               primaryColor={primaryColor}
             />

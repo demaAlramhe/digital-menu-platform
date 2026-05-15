@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = {
@@ -16,6 +18,7 @@ type NewMenuItemFormProps = {
 
 export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
   const router = useRouter();
+  const { dict } = useLocale();
 
   const [name, setName] = useState("");
   const [slug, setSlug] = useState("");
@@ -34,7 +37,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
     setMessage("");
 
     if (!name.trim() || !slug.trim() || !price.trim()) {
-      setMessage("Name, slug, and price are required.");
+      setMessage(dict.menuItems.requiredFields);
       return;
     }
 
@@ -62,14 +65,14 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
       const result = await response.json();
 
       if (!response.ok) {
-        setMessage(result.error || "Failed to create menu item.");
+        setMessage(result.error || dict.menuItems.createError);
         return;
       }
 
       router.push("/dashboard/menu-items");
       router.refresh();
     } catch {
-      setMessage("Something went wrong while creating the menu item.");
+      setMessage(dict.menuItems.createError);
     } finally {
       setLoading(false);
     }
@@ -78,47 +81,47 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
   return (
     <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
       <div>
-        <label className="mb-1 block font-medium">Name</label>
+        <label className="mb-1 block font-medium">{dict.common.name}</label>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Menu item name"
+          placeholder={dict.menuItems.placeholders.name}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Slug</label>
+        <label className="mb-1 block font-medium">{dict.common.slug}</label>
         <input
           type="text"
           value={slug}
           onChange={(e) => setSlug(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="menu-item-slug"
+          placeholder={dict.menuItems.placeholders.slug}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Description</label>
+        <label className="mb-1 block font-medium">{dict.common.description}</label>
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
-          placeholder="Menu item description"
+          placeholder={dict.menuItems.placeholders.description}
           rows={4}
         />
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Category</label>
+        <label className="mb-1 block font-medium">{dict.common.category}</label>
         <select
           value={categoryId}
           onChange={(e) => setCategoryId(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
         >
           {categories.length === 0 ? (
-            <option value="">No categories yet</option>
+            <option value="">{dict.common.noCategories}</option>
           ) : (
             categories.map((category) => (
               <option key={category.id} value={category.id}>
@@ -129,10 +132,14 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
         </select>
       </div>
 
-      <MenuItemImageUpload value={imageUrl} onChange={setImageUrl} />
+      <MenuItemImageUpload
+        value={imageUrl}
+        onChange={setImageUrl}
+        folder={CLOUDINARY_FOLDERS.menuItems}
+      />
 
       <div>
-        <label className="mb-1 block font-medium">Price</label>
+        <label className="mb-1 block font-medium">{dict.common.price}</label>
         <input
           type="number"
           step="0.01"
@@ -144,7 +151,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">Sort Order</label>
+        <label className="mb-1 block font-medium">{dict.common.sortOrder}</label>
         <input
           type="number"
           value={sortOrder}
@@ -162,7 +169,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
           onChange={(e) => setIsActive(e.target.checked)}
         />
         <label htmlFor="isActive" className="font-medium">
-          Active menu item
+          {dict.menuItems.activeItem}
         </label>
       </div>
 
@@ -174,7 +181,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
           onChange={(e) => setIsFeatured(e.target.checked)}
         />
         <label htmlFor="isFeatured" className="font-medium">
-          Featured item
+          {dict.menuItems.featuredItem}
         </label>
       </div>
 
@@ -186,7 +193,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
           disabled={loading}
           className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
         >
-          {loading ? "Saving..." : "Create Menu Item"}
+          {loading ? dict.common.saving : dict.menuItems.create}
         </button>
       </div>
     </form>
