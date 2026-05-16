@@ -69,7 +69,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
         return;
       }
 
-      router.push("/dashboard/menu-items");
+      router.push("/dashboard/menu-items?success=created");
       router.refresh();
     } catch {
       setMessage(dict.menuItems.createError);

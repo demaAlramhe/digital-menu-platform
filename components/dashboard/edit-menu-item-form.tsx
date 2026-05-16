@@ -82,7 +82,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
         return;
       }
 
-      router.push("/dashboard/menu-items");
+      router.push("/dashboard/menu-items?success=updated");
       router.refresh();
     } catch {
       setMessage(dict.menuItems.updateError);

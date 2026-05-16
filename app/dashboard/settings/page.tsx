@@ -1,34 +1,21 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { StoreSettingsForm } from "@/components/dashboard/store-settings-form";
+import {
+  getOwnerStoreAdminClient,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 export default async function DashboardSettingsPage() {
-  const current = await getCurrentProfile();
+  const storeId = await requireOwnerStoreId();
+  const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
-
-  if (!current) {
-    redirect("/auth/login");
-  }
-
-  if (!current.profile?.store_id) {
-    return (
-      <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
-        <p>{dict.common.noStore}</p>
-      </main>
-    );
-  }
-
-  const supabase = await createClient();
 
   const { data: store, error } = await supabase
     .from("stores")
     .select("*")
-    .eq("id", current.profile.store_id)
+    .eq("id", storeId)
     .single();
 
   if (error || !store) {

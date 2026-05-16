@@ -20,5 +20,9 @@ export async function requireStoreOwner() {
     redirect("/auth/login");
   }
 
+  if (!current.profile.store_id) {
+    redirect("/auth/login?error=no_store");
+  }
+
   return current;
 }

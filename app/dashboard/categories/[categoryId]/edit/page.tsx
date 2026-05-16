@@ -1,8 +1,10 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { notFound } from "next/navigation";
 import { EditCategoryForm } from "@/components/dashboard/edit-category-form";
+import {
+  getOwnerStoreAdminClient,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -12,30 +14,16 @@ type EditCategoryPageProps = {
 };
 
 export default async function EditCategoryPage({ params }: EditCategoryPageProps) {
-  const current = await getCurrentProfile();
+  const storeId = await requireOwnerStoreId();
   const { dict } = await getTranslations();
-
-  if (!current) {
-    redirect("/auth/login");
-  }
-
-  if (!current.profile?.store_id) {
-    return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.categories.editTitle}</h1>
-        <p>{dict.common.noStore}</p>
-      </main>
-    );
-  }
-
   const { categoryId } = await params;
-  const supabase = await createClient();
+  const supabase = getOwnerStoreAdminClient();
 
   const { data: category, error } = await supabase
     .from("menu_categories")
     .select("*")
     .eq("id", categoryId)
-    .eq("store_id", current.profile.store_id)
+    .eq("store_id", storeId)
     .single();
 
   if (error || !category) {

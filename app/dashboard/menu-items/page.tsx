@@ -1,34 +1,37 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { DeleteMenuItemButton } from "@/components/dashboard/delete-menu-item-button";
-import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { SuccessBanner } from "@/components/dashboard/success-banner";
+import {
+  getOwnerStoreAdminClient,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardMenuItemsPage() {
-  const supabase = await createClient();
-  const current = await getCurrentProfile();
+type DashboardMenuItemsPageProps = {
+  searchParams: Promise<{ success?: string }>;
+};
+
+export default async function DashboardMenuItemsPage({
+  searchParams,
+}: DashboardMenuItemsPageProps) {
+  const { success } = await searchParams;
+  const storeId = await requireOwnerStoreId();
+  const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
 
-  if (!current) {
-    redirect("/auth/login");
-  }
-
-  if (!current.profile?.store_id) {
-    return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
-        <p>{dict.common.noStore}</p>
-      </main>
-    );
-  }
+  const successMessage =
+    success === "created"
+      ? dict.menuItems.createSuccess
+      : success === "updated"
+        ? dict.menuItems.updateSuccess
+        : null;
 
   const { data: store, error: storeError } = await supabase
     .from("stores")
     .select("id, name, slug")
-    .eq("id", current.profile.store_id)
+    .eq("id", storeId)
     .single();
 
   if (storeError || !store) {
@@ -59,6 +62,8 @@ export default async function DashboardMenuItemsPage() {
 
   return (
     <main className="p-8">
+      {successMessage && <SuccessBanner message={successMessage} />}
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">

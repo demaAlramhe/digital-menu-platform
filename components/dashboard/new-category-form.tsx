@@ -48,7 +48,7 @@ export function NewCategoryForm() {
         return;
       }
 
-      router.push("/dashboard/categories");
+      router.push("/dashboard/categories?success=created");
       router.refresh();
     } catch {
       setMessage(dict.menuItems.createError);

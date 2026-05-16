@@ -59,7 +59,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
         return;
       }
 
-      router.push("/dashboard/categories");
+      router.push("/dashboard/categories?success=updated");
       router.refresh();
     } catch {
       setMessage(dict.menuItems.updateError);

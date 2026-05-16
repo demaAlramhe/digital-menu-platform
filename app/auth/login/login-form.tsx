@@ -22,10 +22,17 @@ export function LoginForm() {
     const error = searchParams.get("error");
     if (error === "no_profile") {
       setMessage(dict.auth.noProfileError);
+    } else if (error === "no_store") {
+      setMessage(dict.common.noStore);
     } else if (error === "unsupported_role") {
       setMessage(dict.auth.unsupportedRoleError);
     }
-  }, [searchParams, dict.auth.noProfileError, dict.auth.unsupportedRoleError]);
+  }, [
+    searchParams,
+    dict.auth.noProfileError,
+    dict.auth.unsupportedRoleError,
+    dict.common.noStore,
+  ]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

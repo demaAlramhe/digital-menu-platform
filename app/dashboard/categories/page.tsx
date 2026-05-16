@@ -1,34 +1,37 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { DeleteCategoryButton } from "@/components/dashboard/delete-category-button";
-import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { SuccessBanner } from "@/components/dashboard/success-banner";
+import {
+  getOwnerStoreAdminClient,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function DashboardCategoriesPage() {
-  const supabase = await createClient();
-  const current = await getCurrentProfile();
+type DashboardCategoriesPageProps = {
+  searchParams: Promise<{ success?: string }>;
+};
+
+export default async function DashboardCategoriesPage({
+  searchParams,
+}: DashboardCategoriesPageProps) {
+  const { success } = await searchParams;
+  const storeId = await requireOwnerStoreId();
+  const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
 
-  if (!current) {
-    redirect("/auth/login");
-  }
-
-  if (!current.profile?.store_id) {
-    return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.categories.title}</h1>
-        <p>{dict.common.noStore}</p>
-      </main>
-    );
-  }
+  const successMessage =
+    success === "created"
+      ? dict.categories.createSuccess
+      : success === "updated"
+        ? dict.categories.updateSuccess
+        : null;
 
   const { data: categories, error } = await supabase
     .from("menu_categories")
     .select("*")
-    .eq("store_id", current.profile.store_id)
+    .eq("store_id", storeId)
     .order("sort_order", { ascending: true });
 
   if (error) {
@@ -43,6 +46,8 @@ export default async function DashboardCategoriesPage() {
 
   return (
     <main className="p-8">
+      {successMessage && <SuccessBanner message={successMessage} />}
+
       <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
         <h1 className="text-3xl font-bold">{dict.categories.title}</h1>
 

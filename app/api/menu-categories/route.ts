@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createClient } from "@/lib/supabase/server";
+import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 export async function POST(req: Request) {
@@ -26,28 +26,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const userSupabase = await createClient();
-
-    const {
-      data: { user },
-      error: userError,
-    } = await userSupabase.auth.getUser();
-
-    if (userError || !user) {
-      return NextResponse.json({ error: "Unauthorized." }, { status: 401 });
-    }
-
-    const { data: profile, error: profileError } = await userSupabase
-      .from("profiles")
-      .select("store_id")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile?.store_id) {
-      return NextResponse.json(
-        { error: "No store is linked to this account." },
-        { status: 403 }
-      );
+    const { storeId, errorResponse } = await resolveOwnerStoreIdForApi();
+    if (errorResponse) {
+      return errorResponse;
     }
 
     const supabase = createAdminClient();
@@ -55,7 +36,7 @@ export async function POST(req: Request) {
     const { data: category, error: categoryError } = await supabase
       .from("menu_categories")
       .insert({
-        store_id: profile.store_id,
+        store_id: storeId,
         name: name.trim(),
         slug: normalizeSlug(slug),
         sort_order: sortOrder ?? 0,

@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/lib/auth/get-current-profile";
 import { StoreQrCard } from "@/components/dashboard/store-qr-card";
+import {
+  getOwnerStoreAdminClient,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { buildPublicMenuUrl } from "@/lib/utils/public-menu-url";
 import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
@@ -20,28 +21,14 @@ function storeStatusLabel(
 }
 
 export default async function DashboardQrPage() {
-  const current = await getCurrentProfile();
+  const storeId = await requireOwnerStoreId();
+  const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
-
-  if (!current) {
-    redirect("/auth/login");
-  }
-
-  if (!current.profile?.store_id) {
-    return (
-      <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">{dict.qr.title}</h1>
-        <p>{dict.common.noStore}</p>
-      </main>
-    );
-  }
-
-  const supabase = await createClient();
 
   const { data: store, error } = await supabase
     .from("stores")
     .select("id, name, slug, status")
-    .eq("id", current.profile.store_id)
+    .eq("id", storeId)
     .single();
 
   if (error || !store?.slug) {
