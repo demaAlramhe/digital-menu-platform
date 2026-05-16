@@ -1,22 +1,30 @@
 import Link from "next/link";
 import { DeleteMenuItemButton } from "@/components/dashboard/delete-menu-item-button";
 import { SuccessBanner } from "@/components/dashboard/success-banner";
+import { CategoryFilterBanner } from "@/components/dashboard/ui/category-filter-banner";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { EmptyState } from "@/components/dashboard/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { PrimaryLink } from "@/components/dashboard/ui/buttons";
+import { StatusBadge } from "@/components/dashboard/ui/status-badge";
+import { dash } from "@/components/dashboard/ui/styles";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
+import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 type DashboardMenuItemsPageProps = {
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; categoryId?: string }>;
 };
 
 export default async function DashboardMenuItemsPage({
   searchParams,
 }: DashboardMenuItemsPageProps) {
-  const { success } = await searchParams;
+  const { success, categoryId } = await searchParams;
   const storeId = await requireOwnerStoreId();
   const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
@@ -36,125 +44,163 @@ export default async function DashboardMenuItemsPage({
 
   if (storeError || !store) {
     return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
-        <p>{dict.common.loadStoreError}</p>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.menuItems.title} />
+        <p className="text-stone-600">{dict.common.loadStoreError}</p>
+      </DashboardPage>
     );
   }
 
-  const { data: menuItems, error: menuItemsError } = await supabase
+  let activeCategory: { id: string; name: string } | null = null;
+
+  if (categoryId) {
+    const { data: category } = await supabase
+      .from("menu_categories")
+      .select("id, name")
+      .eq("id", categoryId)
+      .eq("store_id", storeId)
+      .maybeSingle();
+
+    if (category) {
+      activeCategory = category;
+    }
+  }
+
+  let menuItemsQuery = supabase
     .from("menu_items")
     .select("*, menu_categories(name)")
     .eq("store_id", store.id)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
+  if (activeCategory) {
+    menuItemsQuery = menuItemsQuery.eq("category_id", activeCategory.id);
+  }
+
+  const { data: menuItems, error: menuItemsError } = await menuItemsQuery;
+
   if (menuItemsError) {
     return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.menuItems.title}</h1>
-        <p>{dict.menuItems.loadError}</p>
-        <pre>{JSON.stringify(menuItemsError, null, 2)}</pre>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.menuItems.title} />
+        <p className="text-stone-600">{dict.menuItems.loadError}</p>
+      </DashboardPage>
     );
   }
 
+  const isFiltered = Boolean(activeCategory);
+  const emptyTitle = isFiltered ? dict.menuItems.emptyInCategory : dict.menuItems.empty;
+
   return (
-    <main className="p-8">
+    <DashboardPage>
       {successMessage && <SuccessBanner message={successMessage} />}
 
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold">
-            {store.name} — {dict.menuItems.title}
-          </h1>
-          <p className="mt-2 text-slate-600">
-            {dict.menuItems.publicMenu}: /{store.slug}/menu
-          </p>
-        </div>
+      {activeCategory && (
+        <CategoryFilterBanner
+          label={formatMessage(dict.menuItems.filteredBy, {
+            category: activeCategory.name,
+          })}
+          clearLabel={dict.menuItems.clearFilter}
+        />
+      )}
 
-        <Link
-          href="/dashboard/menu-items/new"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-white"
-        >
-          {dict.menuItems.add}
-        </Link>
-      </div>
+      <PageHeader
+        eyebrow={store.name}
+        title={dict.menuItems.title}
+        description={`${dict.menuItems.publicMenu}: /${store.slug}/menu`}
+        action={<PrimaryLink href="/dashboard/menu-items/new">{dict.menuItems.add}</PrimaryLink>}
+      />
 
       {!menuItems || menuItems.length === 0 ? (
-        <p>{dict.menuItems.empty}</p>
+        <EmptyState
+          title={emptyTitle}
+          action={
+            <PrimaryLink href="/dashboard/menu-items/new">{dict.menuItems.add}</PrimaryLink>
+          }
+        />
       ) : (
-        <div className="space-y-4">
+        <ul className="space-y-4">
           {menuItems.map((item) => (
-            <div key={item.id} className="rounded-xl border p-4 shadow-sm">
-              <div className="grid gap-6 md:grid-cols-[180px_1fr]">
-                <div>
+            <li key={item.id} className={`${dash.card} overflow-hidden`}>
+              <div className="flex flex-col gap-5 p-4 sm:flex-row sm:p-5">
+                <div className="shrink-0">
                   {item.image_url ? (
                     <img
                       src={item.image_url}
                       alt={item.name}
-                      className="h-40 w-40 rounded-lg border object-cover"
+                      className="h-28 w-28 rounded-xl object-cover ring-1 ring-stone-200/80 sm:h-32 sm:w-32"
                     />
                   ) : (
-                    <div className="flex h-40 w-40 items-center justify-center rounded-lg border text-sm text-slate-500">
+                    <div className="flex h-28 w-28 items-center justify-center rounded-xl bg-stone-100 text-xs font-medium text-stone-500 ring-1 ring-stone-200/80 sm:h-32 sm:w-32">
                       {dict.common.noImage}
                     </div>
                   )}
                 </div>
 
-                <div>
-                  <div className="grid gap-2 md:grid-cols-2">
-                    <p>
-                      <strong>{dict.common.name}:</strong> {item.name}
-                    </p>
-                    <p>
-                      <strong>{dict.common.slug}:</strong> {item.slug}
-                    </p>
-                    <p>
-                      <strong>{dict.common.price}:</strong> {dict.common.currency}
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-start justify-between gap-3">
+                    <div>
+                      <h2 className="text-lg font-semibold text-stone-900">{item.name}</h2>
+                      <p className="mt-0.5 font-mono text-xs text-stone-500">{item.slug}</p>
+                    </div>
+                    <p className="rounded-full bg-stone-900 px-3 py-1 text-sm font-bold tabular-nums text-white">
+                      {dict.common.currency}
                       {item.price}
-                    </p>
-                    <p>
-                      <strong>{dict.common.category}:</strong>{" "}
-                      {(item.menu_categories as { name?: string } | null)?.name ??
-                        dict.common.uncategorized}
-                    </p>
-                    <p>
-                      <strong>{dict.common.active}:</strong>{" "}
-                      {item.is_active ? dict.common.active : dict.common.inactive}
-                    </p>
-                    <p>
-                      <strong>{dict.common.featured}:</strong>{" "}
-                      {item.is_featured ? dict.common.active : dict.common.inactive}
-                    </p>
-                    <p>
-                      <strong>{dict.common.sortOrder}:</strong> {item.sort_order}
                     </p>
                   </div>
 
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <StatusBadge
+                      active={item.is_active}
+                      activeLabel={dict.common.active}
+                      inactiveLabel={dict.common.inactive}
+                    />
+                    {item.is_featured && (
+                      <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-900 ring-1 ring-amber-200/80">
+                        {dict.common.featured}
+                      </span>
+                    )}
+                  </div>
+
+                  <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">
+                        {dict.common.category}
+                      </dt>
+                      <dd className="mt-0.5 text-stone-800">
+                        {(item.menu_categories as { name?: string } | null)?.name ??
+                          dict.common.uncategorized}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium uppercase tracking-wide text-stone-400">
+                        {dict.common.sortOrder}
+                      </dt>
+                      <dd className="mt-0.5 text-stone-800">{item.sort_order}</dd>
+                    </div>
+                  </dl>
+
                   {item.description && (
-                    <p className="mt-3 text-sm text-slate-600">
+                    <p className="mt-3 line-clamp-2 text-sm leading-relaxed text-stone-600">
                       {item.description}
                     </p>
                   )}
 
-                  <div className="mt-4 flex gap-3">
+                  <div className="mt-5 flex flex-wrap gap-2 border-t border-stone-100 pt-4">
                     <Link
                       href={`/dashboard/menu-items/${item.id}/edit`}
-                      className="rounded-lg border px-4 py-2 font-medium"
+                      className={dash.secondaryBtn}
                     >
                       {dict.common.edit}
                     </Link>
-
                     <DeleteMenuItemButton menuItemId={item.id} />
                   </div>
                 </div>
               </div>
-            </div>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
-    </main>
+    </DashboardPage>
   );
 }

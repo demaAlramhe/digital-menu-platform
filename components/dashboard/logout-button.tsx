@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { createClient } from "@/lib/supabase/client";
+import { dash } from "@/components/dashboard/ui/styles";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export function LogoutButton() {
       type="button"
       onClick={handleLogout}
       disabled={loading}
-      className="rounded-lg border px-4 py-2 font-medium"
+      className={dash.secondaryBtn}
     >
       {loading ? dict.common.loading : dict.common.logout}
     </button>

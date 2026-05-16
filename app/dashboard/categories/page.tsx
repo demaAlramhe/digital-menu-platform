@@ -1,10 +1,17 @@
 import Link from "next/link";
 import { DeleteCategoryButton } from "@/components/dashboard/delete-category-button";
 import { SuccessBanner } from "@/components/dashboard/success-banner";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { EmptyState } from "@/components/dashboard/ui/empty-state";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { PrimaryLink } from "@/components/dashboard/ui/buttons";
+import { StatusBadge } from "@/components/dashboard/ui/status-badge";
+import { dash } from "@/components/dashboard/ui/styles";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
+import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -12,6 +19,19 @@ export const dynamic = "force-dynamic";
 type DashboardCategoriesPageProps = {
   searchParams: Promise<{ success?: string }>;
 };
+
+function buildItemCountByCategory(
+  rows: { category_id: string | null }[] | null
+): Map<string, number> {
+  const counts = new Map<string, number>();
+
+  for (const row of rows ?? []) {
+    if (!row.category_id) continue;
+    counts.set(row.category_id, (counts.get(row.category_id) ?? 0) + 1);
+  }
+
+  return counts;
+}
 
 export default async function DashboardCategoriesPage({
   searchParams,
@@ -28,71 +48,91 @@ export default async function DashboardCategoriesPage({
         ? dict.categories.updateSuccess
         : null;
 
-  const { data: categories, error } = await supabase
-    .from("menu_categories")
-    .select("*")
-    .eq("store_id", storeId)
-    .order("sort_order", { ascending: true });
+  const [{ data: categories, error }, { data: menuItemRows }] = await Promise.all([
+    supabase
+      .from("menu_categories")
+      .select("*")
+      .eq("store_id", storeId)
+      .order("sort_order", { ascending: true }),
+    supabase.from("menu_items").select("category_id").eq("store_id", storeId),
+  ]);
 
   if (error) {
     return (
-      <main className="p-8">
-        <h1 className="mb-4 text-3xl font-bold">{dict.categories.title}</h1>
-        <p>{dict.categories.loadError}</p>
-        <pre>{JSON.stringify(error, null, 2)}</pre>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.categories.title} />
+        <p className="text-stone-600">{dict.categories.loadError}</p>
+      </DashboardPage>
     );
   }
 
+  const itemCountByCategory = buildItemCountByCategory(menuItemRows);
+
   return (
-    <main className="p-8">
+    <DashboardPage>
       {successMessage && <SuccessBanner message={successMessage} />}
 
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">{dict.categories.title}</h1>
-
-        <Link
-          href="/dashboard/categories/new"
-          className="rounded-lg bg-slate-900 px-4 py-2 text-white"
-        >
-          {dict.categories.add}
-        </Link>
-      </div>
+      <PageHeader
+        title={dict.categories.title}
+        action={<PrimaryLink href="/dashboard/categories/new">{dict.categories.add}</PrimaryLink>}
+      />
 
       {!categories || categories.length === 0 ? (
-        <p>{dict.categories.empty}</p>
+        <EmptyState
+          title={dict.categories.empty}
+          action={
+            <PrimaryLink href="/dashboard/categories/new">{dict.categories.add}</PrimaryLink>
+          }
+        />
       ) : (
-        <div className="space-y-4">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="flex flex-wrap items-center justify-between gap-4 rounded-xl border p-4 shadow-sm"
-            >
-              <div>
-                <p className="font-semibold">{category.name}</p>
-                <p className="text-sm text-slate-600">
-                  {dict.common.slug}: {category.slug}
-                </p>
-                <p className="text-sm text-slate-600">
-                  {dict.common.sortOrder}: {category.sort_order} ·{" "}
-                  {category.is_active ? dict.common.active : dict.common.inactive}
-                </p>
-              </div>
+        <ul className="space-y-3">
+          {categories.map((category) => {
+            const itemCount = itemCountByCategory.get(category.id) ?? 0;
 
-              <div className="flex gap-3">
-                <Link
-                  href={`/dashboard/categories/${category.id}/edit`}
-                  className="rounded-lg border px-4 py-2 font-medium"
-                >
-                  {dict.common.edit}
-                </Link>
+            return (
+              <li
+                key={category.id}
+                className={`${dash.card} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5`}
+              >
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h2 className="text-lg font-semibold text-stone-900">{category.name}</h2>
+                    <StatusBadge
+                      active={category.is_active}
+                      activeLabel={dict.common.active}
+                      inactiveLabel={dict.common.inactive}
+                    />
+                  </div>
+                  <p className="mt-1 font-mono text-xs text-stone-500">{category.slug}</p>
+                  <p className="mt-2 text-sm text-stone-600">
+                    {formatMessage(dict.categories.itemsCount, { count: itemCount })}
+                    <span className="mx-2 text-stone-300" aria-hidden>
+                      ·
+                    </span>
+                    {dict.common.sortOrder}: {category.sort_order}
+                  </p>
+                </div>
 
-                <DeleteCategoryButton categoryId={category.id} />
-              </div>
-            </div>
-          ))}
-        </div>
+                <div className="flex shrink-0 flex-wrap gap-2">
+                  <Link
+                    href={`/dashboard/menu-items?categoryId=${category.id}`}
+                    className={dash.secondaryBtn}
+                  >
+                    {dict.categories.viewItems}
+                  </Link>
+                  <Link
+                    href={`/dashboard/categories/${category.id}/edit`}
+                    className={dash.secondaryBtn}
+                  >
+                    {dict.common.edit}
+                  </Link>
+                  <DeleteCategoryButton categoryId={category.id} />
+                </div>
+              </li>
+            );
+          })}
+        </ul>
       )}
-    </main>
+    </DashboardPage>
   );
 }

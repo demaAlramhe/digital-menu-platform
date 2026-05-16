@@ -1,6 +1,8 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { EditMenuItemForm } from "@/components/dashboard/edit-menu-item-form";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { SecondaryLink } from "@/components/dashboard/ui/buttons";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
@@ -38,18 +40,15 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
   }
 
   return (
-    <main className="p-8">
-      <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold">{dict.menuItems.editTitle}</h1>
-
-        <Link
-          href="/dashboard/menu-items"
-          className="rounded-lg border px-4 py-2 font-medium"
-        >
-          {dict.menuItems.backToList}
-        </Link>
-      </div>
-
+    <DashboardPage>
+      <PageHeader
+        title={dict.menuItems.editTitle}
+        action={
+          <SecondaryLink href="/dashboard/menu-items">
+            {dict.menuItems.backToList}
+          </SecondaryLink>
+        }
+      />
       <EditMenuItemForm
         menuItem={{
           id: menuItem.id,
@@ -68,6 +67,6 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
           name: c.name,
         }))}
       />
-    </main>
+    </DashboardPage>
   );
 }

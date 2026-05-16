@@ -1,4 +1,7 @@
 import { NewMenuItemForm } from "@/components/dashboard/new-menu-item-form";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { SecondaryLink } from "@/components/dashboard/ui/buttons";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
@@ -19,14 +22,21 @@ export default async function NewMenuItemPage() {
     .order("sort_order", { ascending: true });
 
   return (
-    <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">{dict.menuItems.addTitle}</h1>
+    <DashboardPage>
+      <PageHeader
+        title={dict.menuItems.addTitle}
+        action={
+          <SecondaryLink href="/dashboard/menu-items">
+            {dict.menuItems.backToList}
+          </SecondaryLink>
+        }
+      />
       <NewMenuItemForm
         categories={(categories ?? []).map((c) => ({
           id: c.id,
           name: c.name,
         }))}
       />
-    </main>
+    </DashboardPage>
   );
 }

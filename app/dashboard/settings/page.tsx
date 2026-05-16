@@ -1,4 +1,6 @@
 import { StoreSettingsForm } from "@/components/dashboard/store-settings-form";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
@@ -20,17 +22,19 @@ export default async function DashboardSettingsPage() {
 
   if (error || !store) {
     return (
-      <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
-        <p>{dict.common.loadStoreError}</p>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.settings.title} />
+        <p className="text-stone-600">{dict.common.loadStoreError}</p>
+      </DashboardPage>
     );
   }
 
   return (
-    <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">{dict.settings.title}</h1>
-
+    <DashboardPage>
+      <PageHeader
+        title={dict.settings.title}
+        description={dict.dashboard.cardSettingsDesc}
+      />
       <StoreSettingsForm
         store={{
           id: store.id,
@@ -44,6 +48,6 @@ export default async function DashboardSettingsPage() {
           address: store.address ?? "",
         }}
       />
-    </main>
+    </DashboardPage>
   );
 }

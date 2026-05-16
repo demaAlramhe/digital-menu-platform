@@ -1,4 +1,7 @@
 import { QrPoster } from "@/components/dashboard/qr-poster";
+import { AlertBanner } from "@/components/dashboard/ui/alert-banner";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
@@ -32,27 +35,26 @@ export default async function DashboardQrPosterPage() {
 
   if (error || !store?.slug) {
     return (
-      <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">{dict.poster.title}</h1>
-        <p>{dict.common.loadStoreError}</p>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.poster.title} />
+        <p className="text-stone-600">{dict.common.loadStoreError}</p>
+      </DashboardPage>
     );
   }
 
   const menuUrl = await buildPublicMenuUrl(store.slug);
 
   return (
-    <main className="p-8 print:p-0">
-      <div className="mb-8 print:hidden">
-        <h1 className="mb-2 text-3xl font-bold">{dict.poster.title}</h1>
-        <p className="text-slate-600">{dict.poster.subtitle}</p>
+    <DashboardPage className="print:max-w-none print:p-0">
+      <div className="print:hidden">
+        <PageHeader title={dict.poster.title} description={dict.poster.subtitle} />
 
         {store.status !== "active" && (
-          <p className="mt-4 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+          <AlertBanner>
             {formatMessage(dict.common.storeInactiveWarning, {
               status: storeStatusLabel(store.status ?? "inactive", dict),
             })}
-          </p>
+          </AlertBanner>
         )}
       </div>
 
@@ -63,6 +65,6 @@ export default async function DashboardQrPosterPage() {
         phone={store.phone}
         primaryColor={store.primary_color ?? "#111827"}
       />
-    </main>
+    </DashboardPage>
   );
 }

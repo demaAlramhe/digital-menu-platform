@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
   buildWhatsAppUrl,
@@ -38,56 +39,67 @@ export function StoreContact({
     return null;
   }
 
+  const items = [
+    hasPhone && {
+      key: "phone",
+      label: dict.common.phone,
+      value: phone!,
+      href: `tel:${normalizePhoneForTel(phone!)}`,
+      icon: <PhoneIcon />,
+    },
+    hasEmail && {
+      key: "email",
+      label: dict.common.email,
+      value: email!,
+      href: `mailto:${email}`,
+      icon: <EmailIcon />,
+    },
+    hasAddress && {
+      key: "address",
+      label: dict.common.address,
+      value: address!,
+      href: null as string | null,
+      icon: <LocationIcon />,
+    },
+  ].filter(Boolean) as Array<{
+    key: string;
+    label: string;
+    value: string;
+    href: string | null;
+    icon: ReactNode;
+  }>;
+
   return (
     <section
-      className={`rounded-2xl border border-slate-200 bg-white shadow-sm ${
+      className={`overflow-hidden rounded-2xl bg-white shadow-[0_8px_32px_rgba(15,23,42,0.07)] ring-1 ring-stone-200/70 ${
         compact ? "p-4" : "p-5 sm:p-6"
       }`}
     >
-      <h2
-        className="text-lg font-semibold sm:text-xl"
-        style={{ color: primaryColor }}
-      >
-        {dict.store.contactTitle}
-      </h2>
+      <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+        <span
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-sm"
+          style={{ backgroundColor: primaryColor }}
+          aria-hidden
+        >
+          <ContactIcon />
+        </span>
+        <h2 className="text-lg font-semibold tracking-tight text-stone-900 sm:text-xl">
+          {dict.store.contactTitle}
+        </h2>
+      </div>
 
-      <ul className="mt-4 space-y-3 text-[15px] leading-relaxed text-slate-700">
-        {hasPhone && (
-          <li>
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              {dict.common.phone}
-            </span>
-            <a
-              href={`tel:${normalizePhoneForTel(phone!)}`}
-              className="mt-0.5 inline-block font-medium text-slate-900 underline-offset-2 hover:underline"
-            >
-              {phone}
-            </a>
+      <ul className="mt-4 space-y-3">
+        {items.map((item) => (
+          <li key={item.key}>
+            <ContactRow
+              label={item.label}
+              value={item.value}
+              href={item.href}
+              icon={item.icon}
+              primaryColor={primaryColor}
+            />
           </li>
-        )}
-
-        {hasEmail && (
-          <li>
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              {dict.common.email}
-            </span>
-            <a
-              href={`mailto:${email}`}
-              className="mt-0.5 inline-block break-all font-medium text-slate-900 underline-offset-2 hover:underline"
-            >
-              {email}
-            </a>
-          </li>
-        )}
-
-        {hasAddress && (
-          <li>
-            <span className="block text-xs font-medium uppercase tracking-wide text-slate-500">
-              {dict.common.address}
-            </span>
-            <p className="mt-0.5 text-slate-800">{address}</p>
-          </li>
-        )}
+        ))}
       </ul>
 
       {whatsAppUrl && (
@@ -95,13 +107,95 @@ export function StoreContact({
           href={whatsAppUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-5 flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-4 py-3 text-base font-semibold text-white shadow-sm transition active:scale-[0.98]"
+          className="mt-5 flex min-h-12 w-full items-center justify-center gap-2.5 rounded-xl bg-gradient-to-r from-[#25D366] to-[#1ebe57] px-4 py-3.5 text-base font-semibold text-white shadow-[0_8px_20px_rgba(37,211,102,0.35)] transition active:scale-[0.98]"
         >
           <WhatsAppIcon />
           {dict.menu.messageOnWhatsApp}
         </a>
       )}
     </section>
+  );
+}
+
+function ContactRow({
+  label,
+  value,
+  href,
+  icon,
+  primaryColor,
+}: {
+  label: string;
+  value: string;
+  href: string | null;
+  icon: ReactNode;
+  primaryColor: string;
+}) {
+  const content = (
+    <>
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+        style={{ backgroundColor: `${primaryColor}12`, color: primaryColor }}
+      >
+        {icon}
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+          {label}
+        </span>
+        <span className="mt-0.5 block text-[15px] font-medium leading-snug text-stone-900">
+          {value}
+        </span>
+      </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className="flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-3.5 py-3 transition hover:border-stone-200 hover:bg-white active:scale-[0.99]"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <div className="flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-3.5 py-3">
+      {content}
+    </div>
+  );
+}
+
+function ContactIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-5 w-5">
+      <path d="M3 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4Zm2-.5A.5.5 0 0 0 4.5 4v.379l5.5 3.437 5.5-3.437V4a.5.5 0 0 0-.5-.5h-9Z" />
+    </svg>
+  );
+}
+
+function PhoneIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+      <path fillRule="evenodd" d="M2 3.5A1.5 1.5 0 0 1 3.5 2h1.148a1.5 1.5 0 0 1 1.465 1.175l.716 3.223a1.5 1.5 0 0 1-1.052 1.79l-.933.312a11.042 11.042 0 0 0 5.516 5.516l.312-.933a1.5 1.5 0 0 1 1.79-1.052l3.223.716A1.5 1.5 0 0 1 18 15.352V16.5a1.5 1.5 0 0 1-1.5 1.5H15c-6.627 0-12-5.373-12-12V4.5A1.5 1.5 0 0 1 3.5 3H2Z" clipRule="evenodd" />
+    </svg>
+  );
+}
+
+function EmailIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+      <path d="M3 4a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H3Zm0 2.236V6h14v.236l-7 4.472-7-4.472Z" />
+    </svg>
+  );
+}
+
+function LocationIcon() {
+  return (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="h-4 w-4">
+      <path fillRule="evenodd" d="m9.69 18.933.003.001C9.89 19.02 10 19 10 19s.11.02.308-.066l.002-.001.006-.003.018-.008a5.741 5.741 0 0 0 .281-.145c.24-.13.547-.311.916-.518a14.416 14.416 0 0 0 1.872-1.244c1.243-.96 2.49-2.27 3.323-4.024C17.577 9.364 18 7.594 18 6c0-3.314-2.686-6-6-6S6 2.686 6 6c0 1.594.423 3.364 1.272 5.096.833 1.754 2.08 3.064 3.323 4.024a14.417 14.417 0 0 0 1.872 1.244 11.86 11.86 0 0 0 .916.518 6.03 6.03 0 0 0 .299.153l.006.003ZM10 8.25a2.25 2.25 0 1 0 0-4.5 2.25 2.25 0 0 0 0 4.5Z" clipRule="evenodd" />
+    </svg>
   );
 }
 

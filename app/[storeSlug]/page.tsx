@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
+import { getActiveStoreBySlug } from "@/lib/data/public-store";
 import { StoreContact } from "@/components/storefront/store-contact";
 import { StoreLocaleBar } from "@/components/storefront/store-locale-bar";
 import { StoreMenuHeader } from "@/components/storefront/store-menu-header";
@@ -15,15 +15,10 @@ type StorePageProps = {
 export default async function StorePage({ params }: StorePageProps) {
   const { storeSlug } = await params;
   const { dict } = await getTranslations();
-  const supabase = await createClient();
 
-  const { data: store, error } = await supabase
-    .from("stores")
-    .select("*")
-    .eq("slug", storeSlug)
-    .single();
+  const { store, error } = await getActiveStoreBySlug(storeSlug);
 
-  if (error || !store || store.status !== "active") {
+  if (error || !store) {
     notFound();
   }
 

@@ -7,7 +7,7 @@ export default async function DashboardLayout({
   await requireStoreOwner();
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="dashboard-shell min-h-screen bg-gradient-to-b from-stone-100 via-stone-50/90 to-white">
       <DashboardNav />
       {children}
     </div>

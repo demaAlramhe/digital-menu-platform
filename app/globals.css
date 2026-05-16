@@ -9,6 +9,12 @@ body {
   background: #f8fafc;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+.menu-page {
+  font-feature-settings: "kern" 1, "liga" 1;
 }
 
 .scrollbar-none {

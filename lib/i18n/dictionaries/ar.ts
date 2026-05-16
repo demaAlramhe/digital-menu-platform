@@ -162,6 +162,9 @@ export const ar: Dictionary = {
     publicMenu: "عرض القائمة العامة",
     add: "إضافة عنصر",
     empty: "لا توجد عناصر في القائمة بعد.",
+    emptyInCategory: "لا توجد عناصر في هذه الفئة بعد.",
+    filteredBy: "عرض عناصر الفئة: {category}",
+    clearFilter: "إزالة التصفية",
     loadError: "تعذر تحميل عناصر القائمة.",
     addTitle: "إضافة عنصر قائمة",
     editTitle: "تعديل عنصر قائمة",
@@ -197,6 +200,8 @@ export const ar: Dictionary = {
     updateSuccess: "تم تحديث الفئة بنجاح.",
     activeCategory: "فئة نشطة",
     deleteConfirm: "حذف الفئة؟",
+    viewItems: "عرض العناصر",
+    itemsCount: "{count} عناصر",
     requiredFields: "الاسم والمعرّف مطلوبان.",
     placeholders: {
       name: "اسم الفئة",

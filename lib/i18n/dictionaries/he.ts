@@ -160,6 +160,9 @@ export const he = {
     publicMenu: "צפייה בתפריט הציבורי",
     add: "הוספת פריט",
     empty: "עדיין אין פריטים בתפריט.",
+    emptyInCategory: "אין פריטים בקטגוריה זו עדיין.",
+    filteredBy: "מציג פריטים בקטגוריה: {category}",
+    clearFilter: "ניקוי סינון",
     loadError: "לא ניתן לטעון פריטי תפריט.",
     addTitle: "הוספת פריט תפריט",
     editTitle: "עריכת פריט תפריט",
@@ -195,6 +198,8 @@ export const he = {
     updateSuccess: "הקטגוריה עודכנה בהצלחה.",
     activeCategory: "קטגוריה פעילה",
     deleteConfirm: "למחוק את הקטגוריה?",
+    viewItems: "צפייה בפריטים",
+    itemsCount: "{count} פריטים",
     requiredFields: "נדרשים שם ומזהה.",
     placeholders: {
       name: "שם הקטגוריה",

@@ -1,9 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { QRCodeCanvas } from "qrcode.react";
 import { useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
+import {
+  PrimaryButton,
+  SecondaryLink,
+} from "@/components/dashboard/ui/buttons";
+import { dash } from "@/components/dashboard/ui/styles";
 import { normalizePhoneForTel } from "@/lib/utils/whatsapp";
 
 export type PosterStyle = "a4" | "compact";
@@ -36,23 +40,14 @@ export function QrPoster({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center gap-3 print:hidden">
-        <button
-          type="button"
-          onClick={handlePrint}
-          className="rounded-lg bg-slate-900 px-5 py-2.5 font-medium text-white"
-        >
+      <div className={`${dash.card} flex flex-wrap items-center gap-3 p-3 print:hidden`}>
+        <PrimaryButton type="button" onClick={handlePrint}>
           {dict.poster.print}
-        </button>
+        </PrimaryButton>
 
-        <Link
-          href="/dashboard/qr"
-          className="rounded-lg border px-5 py-2.5 font-medium"
-        >
-          {dict.poster.backToQr}
-        </Link>
+        <SecondaryLink href="/dashboard/qr">{dict.poster.backToQr}</SecondaryLink>
 
-        <div className="ml-auto flex rounded-lg border bg-white p-1 text-sm">
+        <div className="ms-auto flex rounded-xl border border-stone-200 bg-stone-50 p-1 text-sm">
           <StyleToggle
             active={style === "a4"}
             label={dict.poster.a4}
@@ -66,14 +61,14 @@ export function QrPoster({
         </div>
       </div>
 
-      <p className="text-sm text-slate-600 print:hidden">{dict.poster.previewHint}</p>
+      <p className="text-sm text-stone-600 print:hidden">{dict.poster.previewHint}</p>
 
       <div
         id="qr-poster-print"
-        className={`mx-auto bg-white text-slate-900 ${
+        className={`mx-auto bg-white text-stone-900 ${
           style === "a4"
-            ? "flex min-h-[calc(100vh-12rem)] max-w-[210mm] flex-col items-center justify-center border border-slate-200 px-8 py-12 shadow-sm print:min-h-0 print:max-w-none print:border-0 print:shadow-none print:py-0"
-            : "max-w-md rounded-2xl border border-slate-200 px-6 py-8 shadow-sm print:max-w-none print:rounded-none print:border-0 print:shadow-none"
+            ? `flex min-h-[calc(100vh-12rem)] max-w-[210mm] flex-col items-center justify-center ${dash.card} px-8 py-12 print:min-h-0 print:max-w-none print:border-0 print:shadow-none print:ring-0 print:py-0`
+            : `max-w-md ${dash.card} px-6 py-8 print:max-w-none print:rounded-none print:border-0 print:shadow-none print:ring-0`
         }`}
       >
         <PosterContent
@@ -219,8 +214,8 @@ function StyleToggle({
       onClick={onClick}
       className={`rounded-md px-3 py-1.5 font-medium transition ${
         active
-          ? "bg-slate-900 text-white"
-          : "text-slate-600 hover:bg-slate-50"
+          ? "bg-stone-900 text-white shadow-sm"
+          : "text-stone-600 hover:bg-white"
       }`}
     >
       {label}

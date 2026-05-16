@@ -1,5 +1,8 @@
-import Link from "next/link";
 import { StoreQrCard } from "@/components/dashboard/store-qr-card";
+import { AlertBanner } from "@/components/dashboard/ui/alert-banner";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { SecondaryLink } from "@/components/dashboard/ui/buttons";
 import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
@@ -33,42 +36,38 @@ export default async function DashboardQrPage() {
 
   if (error || !store?.slug) {
     return (
-      <main className="p-8">
-        <h1 className="mb-6 text-3xl font-bold">{dict.qr.title}</h1>
-        <p>{dict.common.loadStoreError}</p>
-      </main>
+      <DashboardPage>
+        <PageHeader title={dict.qr.title} />
+        <p className="text-stone-600">{dict.common.loadStoreError}</p>
+      </DashboardPage>
     );
   }
 
   const menuUrl = await buildPublicMenuUrl(store.slug);
 
   return (
-    <main className="p-8">
-      <h1 className="mb-2 text-3xl font-bold">{dict.qr.title}</h1>
-      <p className="mb-8 text-slate-600">{dict.qr.subtitle}</p>
+    <DashboardPage>
+      <PageHeader
+        title={dict.qr.title}
+        description={dict.qr.subtitle}
+        action={
+          <SecondaryLink href="/dashboard/qr/poster">{dict.qr.printPoster}</SecondaryLink>
+        }
+      />
 
       {store.status !== "active" && (
-        <p className="mb-6 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+        <AlertBanner>
           {formatMessage(dict.common.storeInactiveWarning, {
             status: storeStatusLabel(store.status ?? "inactive", dict),
           })}
-        </p>
+        </AlertBanner>
       )}
-
-      <div className="mb-6">
-        <Link
-          href="/dashboard/qr/poster"
-          className="inline-flex rounded-lg border border-slate-300 bg-white px-4 py-2.5 font-medium text-slate-900 shadow-sm transition hover:bg-slate-50"
-        >
-          {dict.qr.printPoster}
-        </Link>
-      </div>
 
       <StoreQrCard
         storeName={store.name ?? dict.qr.store}
         storeSlug={store.slug}
         menuUrl={menuUrl}
       />
-    </main>
+    </DashboardPage>
   );
 }

@@ -1,5 +1,8 @@
-import { requireStoreOwner } from "@/lib/auth/require-store-owner";
 import { NewCategoryForm } from "@/components/dashboard/new-category-form";
+import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
+import { PageHeader } from "@/components/dashboard/ui/page-header";
+import { SecondaryLink } from "@/components/dashboard/ui/buttons";
+import { requireStoreOwner } from "@/lib/auth/require-store-owner";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -9,9 +12,16 @@ export default async function NewCategoryPage() {
   const { dict } = await getTranslations();
 
   return (
-    <main className="p-8">
-      <h1 className="mb-6 text-3xl font-bold">{dict.categories.addTitle}</h1>
+    <DashboardPage>
+      <PageHeader
+        title={dict.categories.addTitle}
+        action={
+          <SecondaryLink href="/dashboard/categories">
+            {dict.categories.backToList}
+          </SecondaryLink>
+        }
+      />
       <NewCategoryForm />
-    </main>
+    </DashboardPage>
   );
 }

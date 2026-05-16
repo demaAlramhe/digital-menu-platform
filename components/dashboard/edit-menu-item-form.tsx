@@ -1,17 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import { PrimarySubmitButton, SecondaryLink } from "@/components/dashboard/ui/buttons";
+import {
+  CheckboxField,
+  FormActions,
+  FormField,
+  FormInput,
+  FormMessage,
+  FormSection,
+  FormSelect,
+  FormShell,
+  FormTextarea,
+} from "@/components/dashboard/ui/form";
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { normalizeSlug } from "@/lib/utils/slug";
 
-type CategoryOption = {
-  id: string;
-  name: string;
-};
+type CategoryOption = { id: string; name: string };
 
 type EditMenuItemFormProps = {
   menuItem: {
@@ -56,12 +64,9 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
 
     try {
       setLoading(true);
-
       const response = await fetch(`/api/menu-items/${menuItem.id}`, {
         method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
           slug: normalizeSlug(slug),
@@ -74,14 +79,11 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           imageUrl,
         }),
       });
-
       const result = await response.json();
-
       if (!response.ok) {
         setMessage(result.error || dict.menuItems.updateError);
         return;
       }
-
       router.push("/dashboard/menu-items?success=updated");
       router.refresh();
     } catch {
@@ -92,125 +94,55 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
   }
 
   return (
-    <form onSubmit={handleSubmit} className="max-w-2xl space-y-4">
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.name}</label>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-        />
-      </div>
+    <FormShell onSubmit={handleSubmit}>
+      <FormSection title={dict.menuItems.editTitle}>
+        <FormField label={dict.common.name}>
+          <FormInput value={name} onChange={(e) => setName(e.target.value)} />
+        </FormField>
+        <FormField label={dict.common.slug}>
+          <FormInput value={slug} onChange={(e) => setSlug(e.target.value)} />
+        </FormField>
+        <FormField label={dict.common.description}>
+          <FormTextarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />
+        </FormField>
+        <FormField label={dict.common.category}>
+          <FormSelect value={categoryId} onChange={(e) => setCategoryId(e.target.value)}>
+            {categories.length === 0 ? (
+              <option value="">{dict.common.noCategories}</option>
+            ) : (
+              categories.map((c) => (
+                <option key={c.id} value={c.id}>{c.name}</option>
+              ))
+            )}
+          </FormSelect>
+        </FormField>
+      </FormSection>
 
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.slug}</label>
-        <input
-          type="text"
-          value={slug}
-          onChange={(e) => setSlug(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-        />
-      </div>
+      <FormSection>
+        <MenuItemImageUpload value={imageUrl} onChange={setImageUrl} folder={CLOUDINARY_FOLDERS.menuItems} />
+      </FormSection>
 
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.description}</label>
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-          rows={4}
-        />
-      </div>
+      <FormSection>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <FormField label={dict.common.price}>
+            <FormInput type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+          </FormField>
+          <FormField label={dict.common.sortOrder}>
+            <FormInput type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} />
+          </FormField>
+        </div>
+        <CheckboxField id="editIsActive" label={dict.menuItems.activeItem} checked={isActive} onChange={setIsActive} />
+        <CheckboxField id="editIsFeatured" label={dict.menuItems.featuredItem} checked={isFeatured} onChange={setIsFeatured} />
+      </FormSection>
 
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.category}</label>
-        <select
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-        >
-          {categories.length === 0 ? (
-            <option value="">{dict.common.noCategories}</option>
-          ) : (
-            categories.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.name}
-              </option>
-            ))
-          )}
-        </select>
-      </div>
+      <FormMessage message={message} variant={message ? "error" : "muted"} />
 
-      <MenuItemImageUpload
-        value={imageUrl}
-        onChange={setImageUrl}
-        folder={CLOUDINARY_FOLDERS.menuItems}
-      />
-
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.price}</label>
-        <input
-          type="number"
-          step="0.01"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-        />
-      </div>
-
-      <div>
-        <label className="mb-1 block font-medium">{dict.common.sortOrder}</label>
-        <input
-          type="number"
-          value={sortOrder}
-          onChange={(e) => setSortOrder(e.target.value)}
-          className="w-full rounded-lg border px-3 py-2"
-        />
-      </div>
-
-      <div className="flex items-center gap-2">
-        <input
-          id="editIsActive"
-          type="checkbox"
-          checked={isActive}
-          onChange={(e) => setIsActive(e.target.checked)}
-        />
-        <label htmlFor="editIsActive" className="font-medium">
-          {dict.menuItems.activeItem}
-        </label>
-      </div>
-
-      <div className="flex items-center gap-2">
-        <input
-          id="editIsFeatured"
-          type="checkbox"
-          checked={isFeatured}
-          onChange={(e) => setIsFeatured(e.target.checked)}
-        />
-        <label htmlFor="editIsFeatured" className="font-medium">
-          {dict.menuItems.featuredItem}
-        </label>
-      </div>
-
-      {message && <p className="text-sm text-slate-600">{message}</p>}
-
-      <div className="flex gap-3">
-        <button
-          type="submit"
-          disabled={loading}
-          className="rounded-lg bg-slate-900 px-4 py-2 text-white disabled:opacity-50"
-        >
+      <FormActions>
+        <PrimarySubmitButton disabled={loading}>
           {loading ? dict.common.saving : dict.menuItems.saveChanges}
-        </button>
-
-        <Link
-          href="/dashboard/menu-items"
-          className="rounded-lg border px-4 py-2 font-medium"
-        >
-          {dict.common.cancel}
-        </Link>
-      </div>
-    </form>
+        </PrimarySubmitButton>
+        <SecondaryLink href="/dashboard/menu-items">{dict.common.cancel}</SecondaryLink>
+      </FormActions>
+    </FormShell>
   );
 }
