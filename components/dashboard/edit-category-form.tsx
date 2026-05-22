@@ -13,6 +13,8 @@ import {
   FormSection,
   FormShell,
 } from "@/components/dashboard/ui/form";
+import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
+import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type EditCategoryFormProps = {
@@ -62,7 +64,12 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
         setMessage(result.error || dict.menuItems.updateError);
         return;
       }
-      router.push("/dashboard/categories?success=updated");
+      router.push(
+        `/dashboard/categories?${buildSuccessQuery(
+          "updated",
+          getTranslationStatusFromResponse(result)
+        )}`
+      );
       router.refresh();
     } catch {
       setMessage(dict.menuItems.updateError);
@@ -95,7 +102,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
 
       <FormActions>
         <PrimarySubmitButton disabled={loading}>
-          {loading ? dict.common.saving : dict.menuItems.saveChanges}
+          {loading ? dict.common.translating : dict.menuItems.saveChanges}
         </PrimarySubmitButton>
         <SecondaryLink href="/dashboard/categories">{dict.common.cancel}</SecondaryLink>
       </FormActions>

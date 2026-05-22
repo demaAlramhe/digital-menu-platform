@@ -17,6 +17,8 @@ import {
   FormTextarea,
 } from "@/components/dashboard/ui/form";
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
+import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
+import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = { id: string; name: string };
@@ -84,7 +86,12 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
         setMessage(result.error || dict.menuItems.updateError);
         return;
       }
-      router.push("/dashboard/menu-items?success=updated");
+      router.push(
+        `/dashboard/menu-items?${buildSuccessQuery(
+          "updated",
+          getTranslationStatusFromResponse(result)
+        )}`
+      );
       router.refresh();
     } catch {
       setMessage(dict.menuItems.updateError);
@@ -139,7 +146,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
 
       <FormActions>
         <PrimarySubmitButton disabled={loading}>
-          {loading ? dict.common.saving : dict.menuItems.saveChanges}
+          {loading ? dict.common.translating : dict.menuItems.saveChanges}
         </PrimarySubmitButton>
         <SecondaryLink href="/dashboard/menu-items">{dict.common.cancel}</SecondaryLink>
       </FormActions>

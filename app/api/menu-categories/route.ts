@@ -4,29 +4,17 @@ import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { normalizeSlug } from "@/lib/utils/slug";
 import { translateContentFields } from "@/lib/ai/translate-content";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
+import { parseJsonBody } from "@/lib/api/validation";
+import { menuCategoryPostSchema } from "@/lib/api/schemas";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-
-    const {
-      name,
-      slug,
-      sortOrder,
-      isActive,
-    }: {
-      name?: string;
-      slug?: string;
-      sortOrder?: number;
-      isActive?: boolean;
-    } = body;
-
-    if (!name || !slug) {
-      return NextResponse.json(
-        { error: "Name and slug are required." },
-        { status: 400 }
-      );
+    const parsed = await parseJsonBody(req, menuCategoryPostSchema);
+    if (parsed.error) {
+      return parsed.error;
     }
+
+    const { name, slug, sortOrder, isActive } = parsed.data;
 
     const { storeId, errorResponse } = await resolveOwnerStoreIdForApi();
     if (errorResponse) {
@@ -36,9 +24,10 @@ export async function POST(req: Request) {
     const sourceLocale = await getStoreDefaultContentLanguage(storeId);
     const nameTrimmed = name.trim();
 
-    const translations = await translateContentFields(sourceLocale, [
-      { key: "name", text: nameTrimmed, kind: "category_name" },
-    ]);
+    const { translations, status: translationStatus } =
+      await translateContentFields(sourceLocale, [
+        { key: "name", text: nameTrimmed, kind: "category_name" },
+      ]);
 
     const nameT = translations.name;
     const supabase = createAdminClient();
@@ -68,6 +57,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       category,
+      translation: { status: translationStatus },
     });
   } catch (error) {
     return NextResponse.json(

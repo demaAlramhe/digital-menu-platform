@@ -14,6 +14,7 @@ import {
   getSourceLocaleFromStore,
   resolvePublicCategories,
   resolvePublicMenuItems,
+  type MenuCategoryRow,
   type ResolvedMenuItem,
 } from "@/lib/content/resolve-public-menu";
 import { getTranslations } from "@/lib/i18n/server";
@@ -23,16 +24,6 @@ export const dynamic = "force-dynamic";
 
 type MenuPageProps = {
   params: Promise<{ storeSlug: string }>;
-};
-
-type CategoryRow = {
-  id: string;
-  name: string;
-  slug: string;
-  sort_order: number;
-  name_ar?: string | null;
-  name_he?: string | null;
-  name_en?: string | null;
 };
 
 const FEATURED_SECTION_ID = "featured";
@@ -100,7 +91,12 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
   }
 
   const sourceLocale = getSourceLocaleFromStore(store);
-  const { categories, menuItems } = await getPublicMenuForStore(store.id);
+  const { categories, menuItems, error: menuLoadError } =
+    await getPublicMenuForStore(store.id);
+
+  if (menuLoadError) {
+    console.error("[public-menu] load failed:", menuLoadError);
+  }
 
   const items = resolvePublicMenuItems(
     menuItems as Parameters<typeof resolvePublicMenuItems>[0],
@@ -108,18 +104,20 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
     sourceLocale
   );
   const cats = resolvePublicCategories(
-    categories as CategoryRow[],
+    categories as MenuCategoryRow[],
     locale,
     sourceLocale
   );
 
+  const activeCategoryIds = new Set(cats.map((c) => c.id));
   const featuredItems = items.filter((item) => item.is_featured);
+  const nonFeatured = items.filter((item) => !item.is_featured);
 
   const itemsByCategory = new Map<string, ResolvedMenuItem[]>();
   const uncategorized: ResolvedMenuItem[] = [];
 
-  for (const item of items) {
-    if (item.category_id) {
+  for (const item of nonFeatured) {
+    if (item.category_id && activeCategoryIds.has(item.category_id)) {
       const list = itemsByCategory.get(item.category_id) ?? [];
       list.push(item);
       itemsByCategory.set(item.category_id, list);

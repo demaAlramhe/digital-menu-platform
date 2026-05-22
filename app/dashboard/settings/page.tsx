@@ -1,4 +1,6 @@
+import { PublicLinkActions } from "@/components/dashboard/public-link-actions";
 import { StoreSettingsForm } from "@/components/dashboard/store-settings-form";
+import { getOwnerPublicUrls } from "@/lib/data/owner-public-urls";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { PageHeader } from "@/components/dashboard/ui/page-header";
 import {
@@ -29,12 +31,24 @@ export default async function DashboardSettingsPage() {
     );
   }
 
+  const publicUrls = store.slug
+    ? await getOwnerPublicUrls(store.slug)
+    : null;
+
   return (
     <DashboardPage>
       <PageHeader
         title={dict.settings.title}
         description={dict.dashboard.cardSettingsDesc}
       />
+      {publicUrls && (
+        <div className="mb-6">
+          <PublicLinkActions
+            entryUrl={publicUrls.entryUrl}
+            menuUrl={publicUrls.menuUrl}
+          />
+        </div>
+      )}
       <StoreSettingsForm
         store={{
           id: store.id,
@@ -44,8 +58,6 @@ export default async function DashboardSettingsPage() {
           heroImageUrl: store.hero_image_url ?? "",
           welcomeTitle: store.welcome_title ?? "",
           welcomeSubtitle: store.welcome_subtitle ?? "",
-          welcomeButtonText: store.welcome_button_text ?? "",
-          showWelcomeScreen: store.show_welcome_screen === true,
           defaultContentLanguage: store.default_content_language ?? "ar",
           primaryColor: store.primary_color ?? "#111827",
           secondaryColor: store.secondary_color ?? "#f59e0b",

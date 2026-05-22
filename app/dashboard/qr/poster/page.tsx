@@ -3,10 +3,10 @@ import { AlertBanner } from "@/components/dashboard/ui/alert-banner";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { PageHeader } from "@/components/dashboard/ui/page-header";
 import {
-  getOwnerStoreAdminClient,
+  loadOwnerStoreForQr,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
-import { buildPublicStoreUrl } from "@/lib/utils/public-menu-url";
+import { getOwnerPublicUrls } from "@/lib/data/owner-public-urls";
 import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
@@ -24,14 +24,9 @@ function storeStatusLabel(
 
 export default async function DashboardQrPosterPage() {
   const storeId = await requireOwnerStoreId();
-  const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
 
-  const { data: store, error } = await supabase
-    .from("stores")
-    .select("id, name, slug, logo_url, phone, primary_color, status")
-    .eq("id", storeId)
-    .single();
+  const { store, error } = await loadOwnerStoreForQr(storeId);
 
   if (error || !store?.slug) {
     return (
@@ -42,7 +37,7 @@ export default async function DashboardQrPosterPage() {
     );
   }
 
-  const menuUrl = await buildPublicStoreUrl(store.slug);
+  const { entryUrl: menuUrl } = await getOwnerPublicUrls(store.slug);
 
   return (
     <DashboardPage className="print:max-w-none print:p-0">

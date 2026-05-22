@@ -1,32 +1,29 @@
 import { NextResponse } from "next/server";
+import { requireApiStoreOwner } from "@/lib/auth/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizeSlug } from "@/lib/utils/slug";
 import { translateContentFields } from "@/lib/ai/translate-content";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
-
-type PatchBody = {
-  name?: string;
-  slug?: string;
-  sortOrder?: number;
-  isActive?: boolean;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { menuCategoryPatchSchema } from "@/lib/api/schemas";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
-    const { categoryId } = await params;
-    const body: PatchBody = await req.json();
-
-    const { name, slug, sortOrder, isActive } = body;
-
-    if (!name || !slug) {
-      return NextResponse.json(
-        { error: "Name and slug are required." },
-        { status: 400 }
-      );
+    const auth = await requireApiStoreOwner();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
     }
+
+    const parsed = await parseJsonBody(req, menuCategoryPatchSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
+    const { categoryId } = await params;
+    const { name, slug, sortOrder, isActive } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -36,16 +33,17 @@ export async function PATCH(
       .eq("id", categoryId)
       .maybeSingle();
 
-    if (!existing?.store_id) {
+    if (!existing?.store_id || existing.store_id !== auth.storeId) {
       return NextResponse.json({ error: "Category not found." }, { status: 404 });
     }
 
     const sourceLocale = await getStoreDefaultContentLanguage(existing.store_id);
     const nameTrimmed = name.trim();
 
-    const translations = await translateContentFields(sourceLocale, [
-      { key: "name", text: nameTrimmed, kind: "category_name" },
-    ]);
+    const { translations, status: translationStatus } =
+      await translateContentFields(sourceLocale, [
+        { key: "name", text: nameTrimmed, kind: "category_name" },
+      ]);
 
     const nameT = translations.name;
 
@@ -74,6 +72,7 @@ export async function PATCH(
     return NextResponse.json({
       success: true,
       category: updatedCategory,
+      translation: { status: translationStatus },
     });
   } catch (error) {
     return NextResponse.json(
@@ -88,13 +87,29 @@ export async function DELETE(
   { params }: { params: Promise<{ categoryId: string }> }
 ) {
   try {
+    const auth = await requireApiStoreOwner();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
+
     const { categoryId } = await params;
     const supabase = createAdminClient();
+
+    const { data: existing } = await supabase
+      .from("menu_categories")
+      .select("store_id")
+      .eq("id", categoryId)
+      .maybeSingle();
+
+    if (!existing?.store_id || existing.store_id !== auth.storeId) {
+      return NextResponse.json({ error: "Category not found." }, { status: 404 });
+    }
 
     const { error } = await supabase
       .from("menu_categories")
       .delete()
-      .eq("id", categoryId);
+      .eq("id", categoryId)
+      .eq("store_id", auth.storeId);
 
     if (error) {
       return NextResponse.json(

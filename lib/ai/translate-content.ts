@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { ContentLocale } from "@/lib/content/pick-localized";
+import type { TranslationStatus } from "@/lib/i18n/translation-status";
 
 const CONTENT_LOCALES: ContentLocale[] = ["ar", "he", "en"];
 
@@ -48,6 +49,29 @@ function fallbackFromSource(
   return out;
 }
 
+export type TranslateFieldsResult = {
+  translations: Record<string, TrilingualResult>;
+  status: TranslationStatus;
+};
+
+function isPartialTranslation(
+  sourceLocale: ContentLocale,
+  inputs: TranslateFieldInput[],
+  translations: Record<string, TrilingualResult>
+): boolean {
+  for (const field of inputs) {
+    const row = translations[field.key];
+    if (!row) continue;
+    for (const locale of CONTENT_LOCALES) {
+      if (locale === sourceLocale) continue;
+      if (!row[locale]?.trim()) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 /**
  * Translates owner-entered content into ar / he / en once on save.
  * Requires OPENAI_API_KEY; without it, only the source locale is stored.
@@ -55,15 +79,18 @@ function fallbackFromSource(
 export async function translateContentFields(
   sourceLocale: ContentLocale,
   fields: TranslateFieldInput[]
-): Promise<Record<string, TrilingualResult>> {
+): Promise<TranslateFieldsResult> {
   const inputs = fields.filter((f) => f.text.trim());
   if (inputs.length === 0) {
-    return {};
+    return { translations: {}, status: "translated" };
   }
 
   const apiKey = process.env.OPENAI_API_KEY?.trim();
   if (!apiKey) {
-    return fallbackFromSource(sourceLocale, inputs);
+    return {
+      translations: fallbackFromSource(sourceLocale, inputs),
+      status: "source_only_no_key",
+    };
   }
 
   try {
@@ -75,10 +102,16 @@ export async function translateContentFields(
     for (const field of inputs) {
       translated[field.key][sourceLocale] = field.text.trim();
     }
-    return translated;
+    const status = isPartialTranslation(sourceLocale, inputs, translated)
+      ? "partial"
+      : "translated";
+    return { translations: translated, status };
   } catch (error) {
     console.error("[translate-content]", error);
-    return fallbackFromSource(sourceLocale, inputs);
+    return {
+      translations: fallbackFromSource(sourceLocale, inputs),
+      status: "source_only_error",
+    };
   }
 }
 

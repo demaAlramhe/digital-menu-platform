@@ -1,7 +1,9 @@
 import { notFound } from "next/navigation";
 import { getActiveStoreBySlug } from "@/lib/data/public-store";
 import { StoreWelcomeScreen } from "@/components/storefront/store-welcome-screen";
+import { storeRowToWelcomeSource } from "@/lib/types/mappers";
 import { resolveWelcomeContent } from "@/lib/store/welcome-content";
+import { withPublicLangParam } from "@/lib/i18n/public-locale-url";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -20,15 +22,18 @@ export default async function StorePage({ params }: StorePageProps) {
     notFound();
   }
 
-  const storeName = store.name ?? dict.menu.digitalMenu;
-  const content = resolveWelcomeContent(store, dict, locale);
+  const content = resolveWelcomeContent(
+    storeRowToWelcomeSource(store),
+    dict,
+    locale
+  );
 
   return (
     <StoreWelcomeScreen
       storeSlug={storeSlug}
-      storeName={storeName}
       logoUrl={store.logo_url}
       content={content}
+      menuHref={withPublicLangParam(`/${storeSlug}/menu`, locale)}
     />
   );
 }

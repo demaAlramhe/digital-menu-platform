@@ -9,6 +9,10 @@ import {
 export type StoreWelcomeSource = {
   name: string;
   default_content_language?: string | null;
+  welcome_title?: string | null;
+  welcome_title_ar?: string | null;
+  welcome_title_he?: string | null;
+  welcome_title_en?: string | null;
   welcome_subtitle?: string | null;
   welcome_button_text?: string | null;
   welcome_subtitle_ar?: string | null;
@@ -22,6 +26,7 @@ export type StoreWelcomeSource = {
 };
 
 export type ResolvedWelcomeContent = {
+  headline: string;
   welcomeMessage: string;
   buttonText: string;
   backgroundImageUrl: string | null;
@@ -35,6 +40,19 @@ export function resolveWelcomeContent(
   const sourceLocale: ContentLocale =
     parseContentLocale(store.default_content_language) ?? "ar";
 
+  const storeName = store.name?.trim() || "";
+
+  const headline = pickLocalizedText(
+    viewerLocale,
+    {
+      ar: store.welcome_title_ar,
+      he: store.welcome_title_he,
+      en: store.welcome_title_en,
+    },
+    sourceLocale,
+    store.welcome_title?.trim() || storeName
+  );
+
   const welcomeMessage = pickLocalizedText(
     viewerLocale,
     {
@@ -43,24 +61,15 @@ export function resolveWelcomeContent(
       en: store.welcome_subtitle_en,
     },
     sourceLocale,
-    store.welcome_subtitle?.trim() || dict.store.welcomeMessage
+    store.welcome_subtitle?.trim() || dict.store.welcomeDefaultSubtitle
   );
 
-  const buttonText = pickLocalizedText(
-    viewerLocale,
-    {
-      ar: store.welcome_button_text_ar,
-      he: store.welcome_button_text_he,
-      en: store.welcome_button_text_en,
-    },
-    sourceLocale,
-    store.welcome_button_text?.trim() || dict.store.welcomeCta
-  );
+  const buttonText = dict.store.welcomeCta;
 
   const backgroundImageUrl =
     store.banner_url?.trim() ||
     store.hero_image_url?.trim() ||
     null;
 
-  return { welcomeMessage, buttonText, backgroundImageUrl };
+  return { headline, welcomeMessage, buttonText, backgroundImageUrl };
 }

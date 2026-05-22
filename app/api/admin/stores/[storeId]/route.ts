@@ -1,18 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
 import { createAdminClient } from "../../../../../lib/supabase/admin";
-
-type PatchBody = {
-  name?: string;
-  slug?: string;
-  logoUrl?: string;
-  bannerUrl?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-  status?: string;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { adminPatchStoreSchema } from "@/lib/api/schemas";
 
 function normalizeSlug(value: string) {
   return value
@@ -26,9 +16,17 @@ export async function PATCH(
   { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const { storeId } = await params;
-    const body: PatchBody = await req.json();
+    const auth = await requireApiSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
 
+    const parsed = await parseJsonBody(req, adminPatchStoreSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
+    const { storeId } = await params;
     const {
       name,
       slug,
@@ -40,14 +38,7 @@ export async function PATCH(
       email,
       address,
       status,
-    } = body;
-
-    if (!name?.trim() || !slug?.trim()) {
-      return NextResponse.json(
-        { error: "Store name and slug are required." },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const supabase = createAdminClient();
 

@@ -8,19 +8,19 @@ const WELCOME_GOLD_DARK = "#9A7B3C";
 
 type StoreWelcomeScreenProps = {
   storeSlug: string;
-  storeName: string;
   logoUrl: string | null;
   content: ResolvedWelcomeContent;
+  menuHref?: string;
 };
 
 export function StoreWelcomeScreen({
   storeSlug,
-  storeName,
   logoUrl,
   content,
+  menuHref: menuHrefProp,
 }: StoreWelcomeScreenProps) {
-  const initial = storeName?.charAt(0)?.toUpperCase() || "M";
-  const menuHref = `/${storeSlug}/menu`;
+  const initial = content.headline?.charAt(0)?.toUpperCase() || "M";
+  const menuHref = menuHrefProp ?? `/${storeSlug}/menu`;
 
   return (
     <main className="relative h-[100dvh] min-h-[100dvh] w-full overflow-hidden bg-[#0c0b0a] text-white">
@@ -80,7 +80,7 @@ export function StoreWelcomeScreen({
               className="text-[1.75rem] font-semibold leading-tight tracking-tight sm:text-[2rem]"
               style={{ color: WELCOME_GOLD_LIGHT }}
             >
-              {storeName}
+              {content.headline}
             </h1>
 
             <p className="mt-4 max-w-[18rem] text-[14px] leading-relaxed text-white/88 sm:text-[15px] sm:leading-relaxed">

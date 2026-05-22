@@ -46,6 +46,13 @@ export const he = {
     currency: "₪",
     search: "חיפוש",
     clear: "ניקוי",
+    translating: "שומר ומתרגם...",
+    translationPartial:
+      "תרגום אוטומטי לא הושלם לכל השפות — נשמרה שפת המקור.",
+    translationSourceOnly:
+      "נשמר בהצלחה. תרגום אוטומטי לא בוצע (נדרש OPENAI_API_KEY בשרת).",
+    translationSourceOnlyError:
+      "נשמר בשפת המקור — שירות התרגום לא זמין כרגע.",
   },
   nav: {
     dashboard: "לוח בקרה",
@@ -153,6 +160,13 @@ export const he = {
   dashboard: {
     welcome: "שלום",
     intro: "כאן מנהלים את התפריט, הקטגוריות והגדרות העסק.",
+    publicLinkTitle: "קישור ציבורי ללקוחות",
+    publicLinkDesc: "תצוגה מקדימה והעתקה של הקישור שמופיע בקוד QR.",
+    previewPublic: "תצוגת דף פתיחה",
+    previewMenu: "תצוגת תפריט",
+    copyPublicLink: "העתקת קישור",
+    entryLinkLabel: "קישור ללקוחות (כמו QR)",
+    menuLinkLabel: "קישור ישיר לתפריט",
     cardMenuItems: "פריטי תפריט",
     cardMenuItemsDesc: "צפו ונהלו את המנות והמשקאות בתפריט.",
     cardCategories: "קטגוריות",
@@ -220,22 +234,23 @@ export const he = {
     logo: "לוגו המסעדה",
     logoDesc: "מוצג במסך הפתיחה ללקוחות",
     banner: "תמונת רקע — מסך פתיחה",
-    bannerDesc: "תמונה במסך מלא behind כרטיס הברכה (סריקת QR)",
+    bannerDesc: "תמונת רקע במסך מלא מאחורי כרטיס הברכה (סריקת QR)",
     primaryColor: "צבע ראשי",
     secondaryColor: "צבע משני",
     saveSettings: "שמירת הגדרות",
     savedSuccess: "ההגדרות נשמרו בהצלחה.",
     welcomeSection: "מסך פתיחה ללקוחות",
     welcomeSectionDesc:
-      "דף הפתיחה בכתובת העסק — לפני כניסה לתפריט. מתאים לסריקת QR.",
-    showWelcomeScreen: "הצגת מסך פתיחה ממותג",
-    heroImage: "תמונת רקע (מסך פתיחה)",
+      "הלקוחות רואים דף זה ראשון בקישור או בסריקת QR, ואז לוחצים «התחל עכשיו» לבחירת קטגוריות.",
+    heroImage: "רקע חלופי (אופציונלי)",
+    heroImageDesc:
+      "משמש רק אם לא הועלתה תמונת רקע לעיל. עדיף להשתמש בתמונת הרקע הראשית.",
     welcomeTitle: "כותרת ברוכים הבאים",
-    welcomeSubtitle: "תת-כותרת",
-    welcomeButtonText: "טקסט כפתור (למשל: התחילו עכשיו)",
+    welcomeSubtitle: "הודעת ברכה",
+    welcomeCtaNote:
+      "כפתור «התחל עכשיו» מוצג אוטומטית בערבית, עברית ואנגלית.",
     welcomeTitlePlaceholder: "ברוכים הבאים",
     welcomeSubtitlePlaceholder: "גלו את התפריט שלנו",
-    welcomeButtonPlaceholder: "לצפייה בתפריט",
     defaultContentLanguage: "שפת תוכן (שפה שבה אתם כותבים)",
     defaultContentLanguageHint:
       "הזינו קטגוריות, מנות וטקסט פתיחה בשפה זו — המערכת תתרגם אוטומטית לשאר השפות.",

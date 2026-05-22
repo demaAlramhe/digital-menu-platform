@@ -48,6 +48,13 @@ export const ar: Dictionary = {
     currency: "₪",
     search: "بحث",
     clear: "مسح",
+    translating: "جارٍ الحفظ والترجمة...",
+    translationPartial:
+      "لم يكتمل الترجمة التلقائية لجميع اللغات — تم حفظ لغة المصدر.",
+    translationSourceOnly:
+      "تم الحفظ بنجاح. لم تُنفَّذ ترجمة تلقائية (يلزم OPENAI_API_KEY على الخادم).",
+    translationSourceOnlyError:
+      "تم الحفظ بلغة المصدر — خدمة الترجمة غير متاحة حالياً.",
   },
   nav: {
     dashboard: "لوحة التحكم",
@@ -156,6 +163,13 @@ export const ar: Dictionary = {
   dashboard: {
     welcome: "مرحباً",
     intro: "هنا تدير القائمة والفئات وإعدادات المتجر.",
+    publicLinkTitle: "رابط عام للعملاء",
+    publicLinkDesc: "معاينة ونسخ الرابط الذي يظهر في رمز QR.",
+    previewPublic: "معاينة صفحة الترحيب",
+    previewMenu: "معاينة القائمة",
+    copyPublicLink: "نسخ الرابط",
+    entryLinkLabel: "رابط العملاء (مثل QR)",
+    menuLinkLabel: "رابط مباشر للقائمة",
     cardMenuItems: "عناصر القائمة",
     cardMenuItemsDesc: "اعرض وأدر الأطباق والمشروبات في القائمة.",
     cardCategories: "الفئات",
@@ -230,15 +244,16 @@ export const ar: Dictionary = {
     savedSuccess: "تم حفظ الإعدادات بنجاح.",
     welcomeSection: "شاشة ترحيب للعملاء",
     welcomeSectionDesc:
-      "صفحة الافتتاح على رابط المتجر — قبل الدخول للقائمة. مناسبة لمسح QR.",
-    showWelcomeScreen: "عرض شاشة ترحيب مميزة",
-    heroImage: "صورة الخلفية (شاشة الترحيب)",
+      "يرى العملاء هذه الصفحة أولاً عبر الرابط أو مسح QR، ثم يضغطون «ابدأ الآن» لاختيار الفئات.",
+    heroImage: "خلفية بديلة (اختياري)",
+    heroImageDesc:
+      "تُستخدم فقط إذا لم تُرفع خلفية الترحيب أعلاه. يُفضّل استخدام صورة الخلفية الرئيسية.",
     welcomeTitle: "عنوان الترحيب",
-    welcomeSubtitle: "العنوان الفرعي",
-    welcomeButtonText: "نص الزر (مثلاً: ابدأوا الآن)",
+    welcomeSubtitle: "رسالة الترحيب",
+    welcomeCtaNote:
+      "زر «ابدأ الآن» يظهر تلقائياً بالعربية والعبرية والإنجليزية.",
     welcomeTitlePlaceholder: "أهلاً بكم",
     welcomeSubtitlePlaceholder: "اكتشفوا قائمتنا",
-    welcomeButtonPlaceholder: "تصفح القائمة",
     defaultContentLanguage: "لغة المحتوى (لغة الإدخال)",
     defaultContentLanguageHint:
       "أدخل الفئات والأطباق ونص الترحيب بهذه اللغة — النظام يترجم تلقائياً للغات الأخرى.",

@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { isLocale, LOCALE_COOKIE } from "@/lib/i18n/types";
+import {
+  applyPublicLocaleFromQuery,
+  setLocaleCookieOnResponse,
+} from "@/lib/middleware/public-locale";
+import { isLocale } from "@/lib/i18n/types";
 import { getSupabaseUrl } from "@/lib/supabase/url";
 
 type CookieToSet = {
@@ -18,17 +22,30 @@ type CookieToSet = {
 };
 
 export async function middleware(request: NextRequest) {
-  const langParam = request.nextUrl.searchParams.get("lang");
-  let response = NextResponse.next({
+  const localeRedirect = applyPublicLocaleFromQuery(
     request,
-  });
+    NextResponse.next({ request })
+  );
+  if (localeRedirect) {
+    return localeRedirect;
+  }
 
+  let response = NextResponse.next({ request });
+
+  const langParam = request.nextUrl.searchParams.get("lang");
   if (isLocale(langParam)) {
-    response.cookies.set(LOCALE_COOKIE, langParam, {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-    });
+    setLocaleCookieOnResponse(langParam, response);
+  }
+
+  const pathname = request.nextUrl.pathname;
+  const isDashboardRoute = pathname.startsWith("/dashboard");
+  const isAdminRoute = pathname.startsWith("/admin");
+  const isLoginRoute = pathname.startsWith("/auth/login");
+  const needsAuth =
+    isDashboardRoute || isAdminRoute || isLoginRoute || pathname === "/auth/redirect";
+
+  if (!needsAuth) {
+    return response;
   }
 
   const supabase = createServerClient(
@@ -52,17 +69,12 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isDashboardRoute = request.nextUrl.pathname.startsWith("/dashboard");
-  const isAdminRoute = request.nextUrl.pathname.startsWith("/admin");
-  const isLoginRoute = request.nextUrl.pathname.startsWith("/auth/login");
-
   if ((isDashboardRoute || isAdminRoute) && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/login";
     return NextResponse.redirect(url);
   }
 
-  // Only auto-forward from login when there is no error flag (avoids redirect loops).
   if (isLoginRoute && user && !request.nextUrl.searchParams.has("error")) {
     const url = request.nextUrl.clone();
     url.pathname = "/auth/redirect";
@@ -74,5 +86,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*", "/auth/login", "/auth/redirect"],
+  matcher: [
+    "/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)",
+  ],
 };

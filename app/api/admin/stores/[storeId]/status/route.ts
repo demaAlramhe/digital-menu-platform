@@ -1,24 +1,26 @@
 import { NextResponse } from "next/server";
+import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
-
-type Body = {
-  status?: string;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { adminStoreStatusSchema } from "@/lib/api/schemas";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ storeId: string }> }
 ) {
   try {
-    const { storeId } = await params;
-    const body: Body = await req.json();
-
-    if (!body.status || !["active", "inactive", "archived"].includes(body.status)) {
-      return NextResponse.json(
-        { error: "Invalid status value." },
-        { status: 400 }
-      );
+    const auth = await requireApiSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
     }
+
+    const parsed = await parseJsonBody(req, adminStoreStatusSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
+    const { storeId } = await params;
+    const { status } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -48,7 +50,7 @@ export async function PATCH(
     const { data: updatedStore, error: updateError } = await supabase
       .from("stores")
       .update({
-        status: body.status,
+        status,
       })
       .eq("id", storeId)
       .select()

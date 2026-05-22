@@ -5,33 +5,9 @@ import {
   parseContentLocale,
   type ContentLocale,
 } from "@/lib/content/pick-localized";
+import type { MenuCategoryRow, MenuItemRow, StoreRow } from "@/types/rows";
 
-type CategoryRow = {
-  id: string;
-  name: string;
-  slug: string;
-  sort_order: number;
-  name_ar?: string | null;
-  name_he?: string | null;
-  name_en?: string | null;
-};
-
-type MenuItemRow = {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  image_url: string | null;
-  is_featured: boolean;
-  sort_order: number;
-  category_id: string | null;
-  name_ar?: string | null;
-  name_he?: string | null;
-  name_en?: string | null;
-  description_ar?: string | null;
-  description_he?: string | null;
-  description_en?: string | null;
-};
+export type { MenuCategoryRow, MenuItemRow };
 
 export type ResolvedCategory = {
   id: string;
@@ -52,7 +28,7 @@ export type ResolvedMenuItem = {
 };
 
 export function resolvePublicCategories(
-  categories: CategoryRow[],
+  categories: MenuCategoryRow[],
   viewerLocale: Locale,
   sourceLocale: ContentLocale
 ): ResolvedCategory[] {
@@ -105,7 +81,7 @@ export function resolvePublicMenuItems(
 }
 
 export function getSourceLocaleFromStore(
-  store: { default_content_language?: string | null } | null
+  store: Pick<StoreRow, "default_content_language"> | null
 ): ContentLocale {
   return parseContentLocale(store?.default_content_language) ?? "ar";
 }

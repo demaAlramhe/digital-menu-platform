@@ -1,17 +1,26 @@
 import { NextResponse } from "next/server";
+import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
-
-type Body = {
-  storeId?: string | null;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { adminUserStoreSchema } from "@/lib/api/schemas";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ userId: string }> }
 ) {
   try {
+    const auth = await requireApiSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
+
+    const parsed = await parseJsonBody(req, adminUserStoreSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
     const { userId } = await params;
-    const body: Body = await req.json();
+    const { storeId } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -45,11 +54,11 @@ export async function PATCH(
       );
     }
 
-    if (body.storeId) {
+    if (storeId) {
       const { data: existingStore, error: storeError } = await supabase
         .from("stores")
         .select("id")
-        .eq("id", body.storeId)
+        .eq("id", storeId)
         .maybeSingle();
 
       if (storeError) {
@@ -73,7 +82,7 @@ export async function PATCH(
     const { data: updatedProfile, error: updateError } = await supabase
       .from("profiles")
       .update({
-        store_id: body.storeId || null,
+        store_id: storeId,
       })
       .eq("id", userId)
       .select()

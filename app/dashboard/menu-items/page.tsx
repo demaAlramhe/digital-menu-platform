@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { PublicLinkActions } from "@/components/dashboard/public-link-actions";
 import { DeleteMenuItemButton } from "@/components/dashboard/delete-menu-item-button";
+import { getOwnerPublicUrls } from "@/lib/data/owner-public-urls";
 import { SuccessBanner } from "@/components/dashboard/success-banner";
 import { CategoryFilterBanner } from "@/components/dashboard/ui/category-filter-banner";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
@@ -10,37 +12,48 @@ import { StatusBadge } from "@/components/dashboard/ui/status-badge";
 import { dash } from "@/components/dashboard/ui/styles";
 import {
   getOwnerStoreAdminClient,
+  loadOwnerStoreBasic,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
+import { appendTranslationNote } from "@/lib/dashboard/translation-feedback";
 import { formatMessage } from "@/lib/i18n";
+import { isTranslationStatus } from "@/lib/i18n/translation-status";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 type DashboardMenuItemsPageProps = {
-  searchParams: Promise<{ success?: string; categoryId?: string }>;
+  searchParams: Promise<{
+    success?: string;
+    categoryId?: string;
+    translation?: string;
+  }>;
 };
 
 export default async function DashboardMenuItemsPage({
   searchParams,
 }: DashboardMenuItemsPageProps) {
-  const { success, categoryId } = await searchParams;
+  const { success, categoryId, translation } = await searchParams;
   const storeId = await requireOwnerStoreId();
   const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
 
-  const successMessage =
+  const baseSuccessMessage =
     success === "created"
       ? dict.menuItems.createSuccess
       : success === "updated"
         ? dict.menuItems.updateSuccess
         : null;
 
-  const { data: store, error: storeError } = await supabase
-    .from("stores")
-    .select("id, name, slug")
-    .eq("id", storeId)
-    .single();
+  const successMessage = baseSuccessMessage
+    ? appendTranslationNote(
+        dict,
+        baseSuccessMessage,
+        isTranslationStatus(translation) ? translation : null
+      )
+    : null;
+
+  const { store, error: storeError } = await loadOwnerStoreBasic(storeId);
 
   if (storeError || !store) {
     return (
@@ -91,6 +104,10 @@ export default async function DashboardMenuItemsPage({
   const isFiltered = Boolean(activeCategory);
   const emptyTitle = isFiltered ? dict.menuItems.emptyInCategory : dict.menuItems.empty;
 
+  const publicUrls = store.slug
+    ? await getOwnerPublicUrls(store.slug)
+    : null;
+
   return (
     <DashboardPage>
       {successMessage && <SuccessBanner message={successMessage} />}
@@ -105,11 +122,21 @@ export default async function DashboardMenuItemsPage({
       )}
 
       <PageHeader
-        eyebrow={store.name}
+        eyebrow={store.name ?? undefined}
         title={dict.menuItems.title}
-        description={`${dict.menuItems.publicMenu}: /${store.slug}/menu`}
+        description={dict.menuItems.publicMenu}
         action={<PrimaryLink href="/dashboard/menu-items/new">{dict.menuItems.add}</PrimaryLink>}
       />
+
+      {publicUrls && (
+        <div className="mb-6">
+          <PublicLinkActions
+            entryUrl={publicUrls.entryUrl}
+            menuUrl={publicUrls.menuUrl}
+            compact
+          />
+        </div>
+      )}
 
       {!menuItems || menuItems.length === 0 ? (
         <EmptyState

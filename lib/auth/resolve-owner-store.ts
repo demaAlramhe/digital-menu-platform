@@ -1,26 +1,18 @@
 import { NextResponse } from "next/server";
-import { getOwnerStoreId } from "@/lib/auth/get-current-profile";
+import { requireApiStoreOwner } from "@/lib/auth/api-auth";
 
 /**
  * Resolves the authenticated store owner's store_id for API routes.
- * Uses the same profile loading path as dashboard pages (incl. admin fallback).
+ * Requires role `store_owner` with a linked `store_id`.
  */
-export async function resolveOwnerStoreIdForApi():
-  Promise<
-    | { storeId: string; errorResponse: null }
-    | { storeId: null; errorResponse: NextResponse }
-  > {
-  const storeId = await getOwnerStoreId();
-
-  if (!storeId) {
-    return {
-      storeId: null,
-      errorResponse: NextResponse.json(
-        { error: "No store is linked to this account." },
-        { status: 403 }
-      ),
-    };
+export async function resolveOwnerStoreIdForApi(): Promise<
+  | { storeId: string; errorResponse: null }
+  | { storeId: null; errorResponse: NextResponse }
+> {
+  const auth = await requireApiStoreOwner();
+  if (auth.errorResponse) {
+    return { storeId: null, errorResponse: auth.errorResponse };
   }
 
-  return { storeId, errorResponse: null };
+  return { storeId: auth.storeId, errorResponse: null };
 }

@@ -16,6 +16,8 @@ import {
   FormTextarea,
 } from "@/components/dashboard/ui/form";
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
+import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
+import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = {
@@ -78,7 +80,12 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
         return;
       }
 
-      router.push("/dashboard/menu-items?success=created");
+      router.push(
+        `/dashboard/menu-items?${buildSuccessQuery(
+          "created",
+          getTranslationStatusFromResponse(result)
+        )}`
+      );
       router.refresh();
     } catch {
       setMessage(dict.menuItems.createError);
@@ -183,7 +190,7 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
       <FormMessage message={message} variant={message ? "error" : "muted"} />
 
       <PrimarySubmitButton disabled={loading}>
-        {loading ? dict.common.saving : dict.menuItems.create}
+        {loading ? dict.common.translating : dict.menuItems.create}
       </PrimarySubmitButton>
     </FormShell>
   );

@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { requireApiStoreOwner } from "@/lib/auth/api-auth";
+import { categoryBelongsToStore } from "@/lib/auth/verify-store-resource";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizeSlug } from "@/lib/utils/slug";
 import {
@@ -6,27 +8,25 @@ import {
   type TranslateFieldInput,
 } from "@/lib/ai/translate-content";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
-
-type PatchBody = {
-  name?: string;
-  slug?: string;
-  description?: string;
-  price?: number;
-  isActive?: boolean;
-  isFeatured?: boolean;
-  sortOrder?: number;
-  imageUrl?: string;
-  categoryId?: string | null;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { menuItemPatchSchema } from "@/lib/api/schemas";
 
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ menuItemId: string }> }
 ) {
   try {
-    const { menuItemId } = await params;
-    const body: PatchBody = await req.json();
+    const auth = await requireApiStoreOwner();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
 
+    const parsed = await parseJsonBody(req, menuItemPatchSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
+    const { menuItemId } = await params;
     const {
       name,
       slug,
@@ -37,14 +37,7 @@ export async function PATCH(
       sortOrder,
       imageUrl,
       categoryId,
-    } = body;
-
-    if (!name || !slug || price === undefined || price === null) {
-      return NextResponse.json(
-        { error: "Name, slug, and price are required." },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const supabase = createAdminClient();
 
@@ -54,8 +47,18 @@ export async function PATCH(
       .eq("id", menuItemId)
       .maybeSingle();
 
-    if (!existing?.store_id) {
+    if (!existing?.store_id || existing.store_id !== auth.storeId) {
       return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
+    }
+
+    if (categoryId) {
+      const validCategory = await categoryBelongsToStore(categoryId, auth.storeId);
+      if (!validCategory) {
+        return NextResponse.json(
+          { error: "Category does not belong to this store." },
+          { status: 400 }
+        );
+      }
     }
 
     const sourceLocale = await getStoreDefaultContentLanguage(existing.store_id);
@@ -73,10 +76,8 @@ export async function PATCH(
       });
     }
 
-    const translations = await translateContentFields(
-      sourceLocale,
-      translateInputs
-    );
+    const { translations, status: translationStatus } =
+      await translateContentFields(sourceLocale, translateInputs);
 
     const nameT = translations.name;
     const descT = translations.description;
@@ -101,6 +102,7 @@ export async function PATCH(
         category_id: categoryId ?? null,
       })
       .eq("id", menuItemId)
+      .eq("store_id", auth.storeId)
       .select()
       .single();
 
@@ -114,6 +116,7 @@ export async function PATCH(
     return NextResponse.json({
       success: true,
       menuItem: updatedMenuItem,
+      translation: { status: translationStatus },
     });
   } catch (error) {
     return NextResponse.json(
@@ -128,13 +131,29 @@ export async function DELETE(
   { params }: { params: Promise<{ menuItemId: string }> }
 ) {
   try {
+    const auth = await requireApiStoreOwner();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
+
     const { menuItemId } = await params;
     const supabase = createAdminClient();
+
+    const { data: existing } = await supabase
+      .from("menu_items")
+      .select("store_id")
+      .eq("id", menuItemId)
+      .maybeSingle();
+
+    if (!existing?.store_id || existing.store_id !== auth.storeId) {
+      return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
+    }
 
     const { error } = await supabase
       .from("menu_items")
       .delete()
-      .eq("id", menuItemId);
+      .eq("id", menuItemId)
+      .eq("store_id", auth.storeId);
 
     if (error) {
       return NextResponse.json(

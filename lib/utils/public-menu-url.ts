@@ -38,3 +38,8 @@ export async function buildPublicMenuUrl(storeSlug: string): Promise<string> {
 
   return origin ? `${origin}${path}` : path;
 }
+
+/** QR / share link: always opens the welcome intro at /{storeSlug}. */
+export async function buildPublicEntryUrl(storeSlug: string): Promise<string> {
+  return buildPublicStoreUrl(storeSlug);
+}

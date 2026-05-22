@@ -6,10 +6,10 @@ ALTER TABLE stores
   ADD COLUMN IF NOT EXISTS welcome_title text,
   ADD COLUMN IF NOT EXISTS welcome_subtitle text,
   ADD COLUMN IF NOT EXISTS welcome_button_text text,
-  ADD COLUMN IF NOT EXISTS show_welcome_screen boolean NOT NULL DEFAULT false;
+  ADD COLUMN IF NOT EXISTS show_welcome_screen boolean NOT NULL DEFAULT true;
 
-COMMENT ON COLUMN stores.hero_image_url IS 'Full-screen hero background for welcome intro (Cloudinary URL)';
-COMMENT ON COLUMN stores.welcome_title IS 'Headline on welcome intro screen';
-COMMENT ON COLUMN stores.welcome_subtitle IS 'Subheadline on welcome intro screen';
-COMMENT ON COLUMN stores.welcome_button_text IS 'CTA label on welcome intro screen';
-COMMENT ON COLUMN stores.show_welcome_screen IS 'When true, /{slug} shows premium welcome before menu';
+COMMENT ON COLUMN stores.hero_image_url IS 'Alternate full-screen background if banner_url is empty';
+COMMENT ON COLUMN stores.welcome_title IS 'Headline on welcome intro at /{slug}';
+COMMENT ON COLUMN stores.welcome_subtitle IS 'Welcome message on intro screen';
+COMMENT ON COLUMN stores.welcome_button_text IS 'Legacy custom CTA (app uses fixed Start Now labels)';
+COMMENT ON COLUMN stores.show_welcome_screen IS 'Legacy flag; public /{slug} always shows welcome intro';

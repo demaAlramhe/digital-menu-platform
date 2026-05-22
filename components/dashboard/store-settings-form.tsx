@@ -29,6 +29,8 @@ import {
 } from "@/components/dashboard/ui/form";
 
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
+import { appendTranslationNote } from "@/lib/dashboard/translation-feedback";
+import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
 
 
 
@@ -49,10 +51,6 @@ type StoreSettingsFormProps = {
     welcomeTitle: string;
 
     welcomeSubtitle: string;
-
-    welcomeButtonText: string;
-
-    showWelcomeScreen: boolean;
 
     defaultContentLanguage: string;
 
@@ -91,18 +89,6 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   const [welcomeTitle, setWelcomeTitle] = useState(store.welcomeTitle);
 
   const [welcomeSubtitle, setWelcomeSubtitle] = useState(store.welcomeSubtitle);
-
-  const [welcomeButtonText, setWelcomeButtonText] = useState(
-
-    store.welcomeButtonText
-
-  );
-
-  const [showWelcomeScreen, setShowWelcomeScreen] = useState(
-
-    store.showWelcomeScreen
-
-  );
 
   const [defaultContentLanguage, setDefaultContentLanguage] = useState(
 
@@ -168,9 +154,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
           welcomeSubtitle,
 
-          welcomeButtonText,
-
-          showWelcomeScreen,
+          showWelcomeScreen: true,
 
           defaultContentLanguage,
 
@@ -198,7 +182,13 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
       }
 
-      setMessage(dict.settings.savedSuccess);
+      setMessage(
+        appendTranslationNote(
+          dict,
+          dict.settings.savedSuccess,
+          getTranslationStatusFromResponse(result)
+        )
+      );
 
       router.refresh();
 
@@ -260,45 +250,23 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
 
 
-      <FormSection title={`${dict.settings.logo} & ${dict.settings.banner}`}>
+      <FormSection title={dict.settings.logo}>
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="max-w-md rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
 
-          <div className="rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
+          <MenuItemImageUpload
 
-            <MenuItemImageUpload
+            value={logoUrl}
 
-              value={logoUrl}
+            onChange={setLogoUrl}
 
-              onChange={setLogoUrl}
+            folder={CLOUDINARY_FOLDERS.storeLogos}
 
-              folder={CLOUDINARY_FOLDERS.storeLogos}
+            label={dict.settings.logo}
 
-              label={dict.settings.logo}
+          />
 
-            />
-
-            <p className="mt-2 text-xs text-stone-500">{dict.settings.logoDesc}</p>
-
-          </div>
-
-          <div className="rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
-
-            <MenuItemImageUpload
-
-              value={bannerUrl}
-
-              onChange={setBannerUrl}
-
-              folder={CLOUDINARY_FOLDERS.storeBanners}
-
-              label={dict.settings.banner}
-
-            />
-
-            <p className="mt-2 text-xs text-stone-500">{dict.settings.bannerDesc}</p>
-
-          </div>
+          <p className="mt-2 text-xs text-stone-500">{dict.settings.logoDesc}</p>
 
         </div>
 
@@ -320,78 +288,62 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
         </p>
 
-        <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3.5">
+        <div className="grid gap-4 md:grid-cols-2">
 
-          <input
+          <div className="rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
 
-            type="checkbox"
+            <MenuItemImageUpload
 
-            checked={showWelcomeScreen}
+              value={bannerUrl}
 
-            onChange={(e) => setShowWelcomeScreen(e.target.checked)}
+              onChange={setBannerUrl}
 
-            className="mt-1 h-4 w-4 shrink-0 rounded border-stone-300"
+              folder={CLOUDINARY_FOLDERS.storeBanners}
 
-          />
+              label={dict.settings.banner}
 
-          <span className="text-sm font-medium text-stone-800">
+            />
 
-            {dict.settings.showWelcomeScreen}
+            <p className="mt-2 text-xs text-stone-500">{dict.settings.bannerDesc}</p>
 
-          </span>
+          </div>
 
-        </label>
+          <div className="rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
 
+            <MenuItemImageUpload
 
+              value={heroImageUrl}
 
-        <div className="mt-4 rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
+              onChange={setHeroImageUrl}
 
-          <MenuItemImageUpload
+              folder={CLOUDINARY_FOLDERS.storeHero}
 
-            value={heroImageUrl}
+              label={dict.settings.heroImage}
 
-            onChange={setHeroImageUrl}
+            />
 
-            folder={CLOUDINARY_FOLDERS.storeHero}
+            <p className="mt-2 text-xs text-stone-500">{dict.settings.heroImageDesc}</p>
 
-            label={dict.settings.heroImage}
-
-          />
+          </div>
 
         </div>
 
 
 
-        <div className="mt-4 grid gap-4 md:grid-cols-2">
+        <div className="mt-4">
+        <FormField label={dict.settings.welcomeTitle}>
 
-          <FormField label={dict.settings.welcomeTitle}>
+          <FormInput
 
-            <FormInput
+            value={welcomeTitle}
 
-              value={welcomeTitle}
+            onChange={(e) => setWelcomeTitle(e.target.value)}
 
-              onChange={(e) => setWelcomeTitle(e.target.value)}
+            placeholder={dict.settings.welcomeTitlePlaceholder}
 
-              placeholder={dict.settings.welcomeTitlePlaceholder}
+          />
 
-            />
-
-          </FormField>
-
-          <FormField label={dict.settings.welcomeButtonText}>
-
-            <FormInput
-
-              value={welcomeButtonText}
-
-              onChange={(e) => setWelcomeButtonText(e.target.value)}
-
-              placeholder={dict.settings.welcomeButtonPlaceholder}
-
-            />
-
-          </FormField>
-
+        </FormField>
         </div>
 
         <FormField label={dict.settings.welcomeSubtitle}>
@@ -409,6 +361,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
           />
 
         </FormField>
+
+        <p className="text-xs text-stone-500">{dict.settings.welcomeCtaNote}</p>
 
       </FormSection>
 
@@ -500,7 +454,13 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
         message={message}
 
-        variant={message === dict.settings.savedSuccess ? "success" : message ? "error" : "muted"}
+        variant={
+          message.startsWith(dict.settings.savedSuccess)
+            ? "success"
+            : message
+              ? "error"
+              : "muted"
+        }
 
       />
 
@@ -508,7 +468,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
       <PrimarySubmitButton disabled={loading}>
 
-        {loading ? dict.common.saving : dict.settings.saveSettings}
+        {loading ? dict.common.translating : dict.settings.saveSettings}
 
       </PrimarySubmitButton>
 

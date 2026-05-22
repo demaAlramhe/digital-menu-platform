@@ -1,18 +1,22 @@
 import { NextResponse } from "next/server";
 import crypto from "crypto";
-import { isAllowedCloudinaryFolder } from "@/lib/cloudinary/folders";
+import { requireApiStoreOwnerOrSuperAdmin } from "@/lib/auth/api-auth";
+import { parseJsonBody } from "@/lib/api/validation";
+import { cloudinarySignSchema } from "@/lib/api/schemas";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const folder = body.folder;
-
-    if (!folder || typeof folder !== "string" || !isAllowedCloudinaryFolder(folder)) {
-      return NextResponse.json(
-        { error: "Invalid or missing Cloudinary upload folder." },
-        { status: 400 }
-      );
+    const auth = await requireApiStoreOwnerOrSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
     }
+
+    const parsed = await parseJsonBody(req, cloudinarySignSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
+
+    const { folder } = parsed.data;
 
     const timestamp = Math.floor(Date.now() / 1000).toString();
     const apiKey = process.env.CLOUDINARY_API_KEY;

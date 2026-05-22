@@ -1,16 +1,22 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
+import { categoryBelongsToStore } from "@/lib/auth/verify-store-resource";
 import { normalizeSlug } from "@/lib/utils/slug";
 import {
   translateContentFields,
   type TranslateFieldInput,
 } from "@/lib/ai/translate-content";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
+import { parseJsonBody } from "@/lib/api/validation";
+import { menuItemPostSchema } from "@/lib/api/schemas";
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const parsed = await parseJsonBody(req, menuItemPostSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
 
     const {
       name,
@@ -22,24 +28,7 @@ export async function POST(req: Request) {
       sortOrder,
       imageUrl,
       categoryId,
-    }: {
-      name?: string;
-      slug?: string;
-      description?: string;
-      price?: number;
-      isActive?: boolean;
-      isFeatured?: boolean;
-      sortOrder?: number;
-      imageUrl?: string;
-      categoryId?: string | null;
-    } = body;
-
-    if (!name || !slug || price === undefined || price === null) {
-      return NextResponse.json(
-        { error: "Name, slug, and price are required." },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const { storeId, errorResponse } = await resolveOwnerStoreIdForApi();
     if (errorResponse) {
@@ -61,10 +50,8 @@ export async function POST(req: Request) {
       });
     }
 
-    const translations = await translateContentFields(
-      sourceLocale,
-      translateInputs
-    );
+    const { translations, status: translationStatus } =
+      await translateContentFields(sourceLocale, translateInputs);
 
     const nameT = translations.name;
     const descT = translations.description;
@@ -72,6 +59,16 @@ export async function POST(req: Request) {
     const supabase = createAdminClient();
 
     let resolvedCategoryId = categoryId ?? null;
+
+    if (resolvedCategoryId) {
+      const valid = await categoryBelongsToStore(resolvedCategoryId, storeId);
+      if (!valid) {
+        return NextResponse.json(
+          { error: "Category does not belong to this store." },
+          { status: 400 }
+        );
+      }
+    }
 
     if (!resolvedCategoryId) {
       const { data: category } = await supabase
@@ -117,6 +114,7 @@ export async function POST(req: Request) {
     return NextResponse.json({
       success: true,
       menuItem,
+      translation: { status: translationStatus },
     });
   } catch (error) {
     return NextResponse.json(

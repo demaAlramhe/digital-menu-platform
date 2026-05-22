@@ -2,31 +2,19 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { translateContentFields } from "@/lib/ai/translate-content";
+import { parseJsonBody } from "@/lib/api/validation";
+import { storeSettingsPatchSchema } from "@/lib/api/schemas";
 import {
   parseContentLocale,
   type ContentLocale,
 } from "@/lib/content/pick-localized";
 
-type PatchBody = {
-  name?: string;
-  logoUrl?: string;
-  bannerUrl?: string;
-  heroImageUrl?: string;
-  welcomeTitle?: string;
-  welcomeSubtitle?: string;
-  welcomeButtonText?: string;
-  showWelcomeScreen?: boolean;
-  defaultContentLanguage?: string;
-  primaryColor?: string;
-  secondaryColor?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-};
-
 export async function PATCH(req: Request) {
   try {
-    const body: PatchBody = await req.json();
+    const parsed = await parseJsonBody(req, storeSettingsPatchSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
 
     const {
       name,
@@ -43,14 +31,7 @@ export async function PATCH(req: Request) {
       phone,
       email,
       address,
-    } = body;
-
-    if (!name?.trim()) {
-      return NextResponse.json(
-        { error: "Store name is required." },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const { storeId, errorResponse } = await resolveOwnerStoreIdForApi();
     if (errorResponse) {
@@ -87,10 +68,8 @@ export async function PATCH(req: Request) {
       });
     }
 
-    const translations = await translateContentFields(
-      sourceLocale,
-      translateInputs
-    );
+    const { translations, status: translationStatus } =
+      await translateContentFields(sourceLocale, translateInputs);
 
     const titleT = translations.welcome_title;
     const subtitleT = translations.welcome_subtitle;
@@ -118,7 +97,7 @@ export async function PATCH(req: Request) {
         welcome_button_text_ar: buttonT?.ar || null,
         welcome_button_text_he: buttonT?.he || null,
         welcome_button_text_en: buttonT?.en || null,
-        show_welcome_screen: showWelcomeScreen === true,
+        show_welcome_screen: showWelcomeScreen !== false,
         primary_color: primaryColor || "#111827",
         secondary_color: secondaryColor || "#f59e0b",
         phone: phone || null,
@@ -139,6 +118,7 @@ export async function PATCH(req: Request) {
     return NextResponse.json({
       success: true,
       store: updatedStore,
+      translation: { status: translationStatus },
     });
   } catch (error) {
     return NextResponse.json(

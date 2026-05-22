@@ -2,7 +2,10 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { dash } from "@/components/dashboard/ui/styles";
+import { PublicLinkActions } from "@/components/dashboard/public-link-actions";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { getOwnerPublicUrls } from "@/lib/data/owner-public-urls";
+import { loadOwnerStoreBasic, requireOwnerStoreId } from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 const QUICK_LINKS = [
@@ -51,6 +54,13 @@ export default async function DashboardHomePage() {
     redirect("/auth/login");
   }
 
+  const storeId = await requireOwnerStoreId();
+  const { store } = await loadOwnerStoreBasic(storeId);
+
+  const publicUrls = store?.slug
+    ? await getOwnerPublicUrls(store.slug)
+    : null;
+
   const displayName = current.profile?.full_name || current.user.email;
 
   return (
@@ -72,6 +82,15 @@ export default async function DashboardHomePage() {
           {dict.dashboard.intro}
         </p>
       </section>
+
+      {publicUrls && (
+        <div className="mt-6">
+          <PublicLinkActions
+            entryUrl={publicUrls.entryUrl}
+            menuUrl={publicUrls.menuUrl}
+          />
+        </div>
+      )}
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {QUICK_LINKS.map((item) => {

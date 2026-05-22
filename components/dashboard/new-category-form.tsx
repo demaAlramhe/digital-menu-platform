@@ -12,6 +12,8 @@ import {
   FormSection,
   FormShell,
 } from "@/components/dashboard/ui/form";
+import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
+import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
 import { normalizeSlug } from "@/lib/utils/slug";
 
 export function NewCategoryForm() {
@@ -51,7 +53,12 @@ export function NewCategoryForm() {
         setMessage(result.error || dict.menuItems.createError);
         return;
       }
-      router.push("/dashboard/categories?success=created");
+      router.push(
+        `/dashboard/categories?${buildSuccessQuery(
+          "created",
+          getTranslationStatusFromResponse(result)
+        )}`
+      );
       router.refresh();
     } catch {
       setMessage(dict.menuItems.createError);
@@ -96,7 +103,7 @@ export function NewCategoryForm() {
       <FormMessage message={message} variant={message ? "error" : "muted"} />
 
       <PrimarySubmitButton disabled={loading}>
-        {loading ? dict.common.saving : dict.categories.create}
+        {loading ? dict.common.translating : dict.categories.create}
       </PrimarySubmitButton>
     </FormShell>
   );

@@ -9,15 +9,18 @@ import { StatusBadge } from "@/components/dashboard/ui/status-badge";
 import { dash } from "@/components/dashboard/ui/styles";
 import {
   getOwnerStoreAdminClient,
+  loadOwnerStoreBasic,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
+import { appendTranslationNote } from "@/lib/dashboard/translation-feedback";
 import { formatMessage } from "@/lib/i18n";
+import { isTranslationStatus } from "@/lib/i18n/translation-status";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
 type DashboardCategoriesPageProps = {
-  searchParams: Promise<{ success?: string }>;
+  searchParams: Promise<{ success?: string; translation?: string }>;
 };
 
 function buildItemCountByCategory(
@@ -36,17 +39,25 @@ function buildItemCountByCategory(
 export default async function DashboardCategoriesPage({
   searchParams,
 }: DashboardCategoriesPageProps) {
-  const { success } = await searchParams;
+  const { success, translation } = await searchParams;
   const storeId = await requireOwnerStoreId();
   const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
 
-  const successMessage =
+  const baseSuccessMessage =
     success === "created"
       ? dict.categories.createSuccess
       : success === "updated"
         ? dict.categories.updateSuccess
         : null;
+
+  const successMessage = baseSuccessMessage
+    ? appendTranslationNote(
+        dict,
+        baseSuccessMessage,
+        isTranslationStatus(translation) ? translation : null
+      )
+    : null;
 
   const [{ data: categories, error }, { data: menuItemRows }] = await Promise.all([
     supabase
@@ -54,8 +65,14 @@ export default async function DashboardCategoriesPage({
       .select("*")
       .eq("store_id", storeId)
       .order("sort_order", { ascending: true }),
-    supabase.from("menu_items").select("category_id").eq("store_id", storeId),
+    supabase
+      .from("menu_items")
+      .select("category_id")
+      .eq("store_id", storeId)
+      .eq("is_active", true),
   ]);
+
+  const { store: ownerStore } = await loadOwnerStoreBasic(storeId);
 
   if (error) {
     return (
@@ -73,7 +90,13 @@ export default async function DashboardCategoriesPage({
       {successMessage && <SuccessBanner message={successMessage} />}
 
       <PageHeader
+        eyebrow={ownerStore?.slug ? `/${ownerStore.slug}/menu` : undefined}
         title={dict.categories.title}
+        description={
+          ownerStore?.slug
+            ? `${dict.menuItems.publicMenu}: /${ownerStore.slug}/menu`
+            : undefined
+        }
         action={<PrimaryLink href="/dashboard/categories/new">{dict.categories.add}</PrimaryLink>}
       />
 

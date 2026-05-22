@@ -1,16 +1,8 @@
 import { NextResponse } from "next/server";
+import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
 import { createAdminClient } from "../../../../lib/supabase/admin";
-
-type Body = {
-  storeName?: string;
-  storeSlug?: string;
-  ownerEmail?: string;
-  ownerPassword?: string;
-  ownerFullName?: string;
-  phone?: string;
-  email?: string;
-  address?: string;
-};
+import { parseJsonBody } from "@/lib/api/validation";
+import { adminCreateStoreSchema } from "@/lib/api/schemas";
 
 function normalizeSlug(value: string) {
   return value
@@ -21,7 +13,15 @@ function normalizeSlug(value: string) {
 
 export async function POST(req: Request) {
   try {
-    const body: Body = await req.json();
+    const auth = await requireApiSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
+
+    const parsed = await parseJsonBody(req, adminCreateStoreSchema);
+    if (parsed.error) {
+      return parsed.error;
+    }
 
     const {
       storeName,
@@ -32,20 +32,7 @@ export async function POST(req: Request) {
       phone,
       email,
       address,
-    } = body;
-
-    if (
-      !storeName?.trim() ||
-      !storeSlug?.trim() ||
-      !ownerEmail?.trim() ||
-      !ownerPassword?.trim() ||
-      !ownerFullName?.trim()
-    ) {
-      return NextResponse.json(
-        { error: "Missing required fields." },
-        { status: 400 }
-      );
-    }
+    } = parsed.data;
 
     const supabase = createAdminClient();
 
