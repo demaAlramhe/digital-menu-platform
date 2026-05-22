@@ -30,14 +30,16 @@ export async function getPublicMenuForStore(storeId: string) {
     await Promise.all([
       supabase
         .from("menu_categories")
-        .select("id, name, slug, sort_order")
+        .select(
+          "id, name, name_ar, name_he, name_en, slug, sort_order"
+        )
         .eq("store_id", storeId)
         .eq("is_active", true)
         .order("sort_order", { ascending: true }),
       supabase
         .from("menu_items")
         .select(
-          "id, name, description, price, image_url, is_featured, sort_order, category_id"
+          "id, name, name_ar, name_he, name_en, description, description_ar, description_he, description_en, price, image_url, is_featured, sort_order, category_id"
         )
         .eq("store_id", storeId)
         .eq("is_active", true)

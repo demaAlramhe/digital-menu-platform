@@ -1,17 +1,27 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { dash } from "./styles";
 
+/** default: narrow forms (menu items, categories). wide/full: settings & wide layouts. */
+const formShellWidthClass: Record<"default" | "wide" | "full", string> = {
+  default: "w-full max-w-2xl sm:max-w-3xl",
+  wide: "w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl",
+  full: "w-full max-w-none",
+};
+
 export function FormShell({
   children,
   onSubmit,
+  width = "default",
 }: {
   children: ReactNode;
   onSubmit: (e: React.FormEvent) => void;
+  /** Use "full" to match dashboard container width (e.g. store settings). */
+  width?: keyof typeof formShellWidthClass;
 }) {
   return (
     <form
       onSubmit={onSubmit}
-      className={`${dash.card} max-w-2xl p-5 sm:max-w-3xl sm:p-6 lg:p-8`}
+      className={`${dash.card} p-5 sm:p-6 lg:p-8 ${formShellWidthClass[width]}`}
     >
       <div className="space-y-8">{children}</div>
     </form>

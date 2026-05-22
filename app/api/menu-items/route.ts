@@ -2,6 +2,11 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { normalizeSlug } from "@/lib/utils/slug";
+import {
+  translateContentFields,
+  type TranslateFieldInput,
+} from "@/lib/ai/translate-content";
+import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 
 export async function POST(req: Request) {
   try {
@@ -41,6 +46,29 @@ export async function POST(req: Request) {
       return errorResponse;
     }
 
+    const sourceLocale = await getStoreDefaultContentLanguage(storeId);
+    const nameTrimmed = name.trim();
+    const descriptionTrimmed = description?.trim() ?? "";
+
+    const translateInputs: TranslateFieldInput[] = [
+      { key: "name", text: nameTrimmed, kind: "menu_item_name" },
+    ];
+    if (descriptionTrimmed) {
+      translateInputs.push({
+        key: "description",
+        text: descriptionTrimmed,
+        kind: "menu_item_description",
+      });
+    }
+
+    const translations = await translateContentFields(
+      sourceLocale,
+      translateInputs
+    );
+
+    const nameT = translations.name;
+    const descT = translations.description;
+
     const supabase = createAdminClient();
 
     let resolvedCategoryId = categoryId ?? null;
@@ -61,9 +89,15 @@ export async function POST(req: Request) {
       .insert({
         store_id: storeId,
         category_id: resolvedCategoryId,
-        name: name.trim(),
+        name: nameTrimmed,
+        name_ar: nameT?.ar || null,
+        name_he: nameT?.he || null,
+        name_en: nameT?.en || null,
         slug: normalizeSlug(slug),
-        description: description || null,
+        description: descriptionTrimmed || null,
+        description_ar: descT?.ar || null,
+        description_he: descT?.he || null,
+        description_en: descT?.en || null,
         image_url: imageUrl || null,
         price,
         is_active: isActive ?? true,

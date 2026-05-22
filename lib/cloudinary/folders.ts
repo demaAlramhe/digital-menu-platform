@@ -1,6 +1,7 @@
 export const CLOUDINARY_FOLDERS = {
   storeLogos: "digital-menu-platform/store-logos",
   storeBanners: "digital-menu-platform/store-banners",
+  storeHero: "digital-menu-platform/store-hero",
   menuItems: "digital-menu-platform/menu-items",
 } as const;
 

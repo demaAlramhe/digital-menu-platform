@@ -6,7 +6,7 @@ import {
   getOwnerStoreAdminClient,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
-import { buildPublicMenuUrl } from "@/lib/utils/public-menu-url";
+import { buildPublicStoreUrl } from "@/lib/utils/public-menu-url";
 import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
@@ -42,7 +42,7 @@ export default async function DashboardQrPosterPage() {
     );
   }
 
-  const menuUrl = await buildPublicMenuUrl(store.slug);
+  const menuUrl = await buildPublicStoreUrl(store.slug);
 
   return (
     <DashboardPage className="print:max-w-none print:p-0">

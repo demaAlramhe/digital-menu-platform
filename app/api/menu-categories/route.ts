@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { normalizeSlug } from "@/lib/utils/slug";
+import { translateContentFields } from "@/lib/ai/translate-content";
+import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 
 export async function POST(req: Request) {
   try {
@@ -31,13 +33,24 @@ export async function POST(req: Request) {
       return errorResponse;
     }
 
+    const sourceLocale = await getStoreDefaultContentLanguage(storeId);
+    const nameTrimmed = name.trim();
+
+    const translations = await translateContentFields(sourceLocale, [
+      { key: "name", text: nameTrimmed, kind: "category_name" },
+    ]);
+
+    const nameT = translations.name;
     const supabase = createAdminClient();
 
     const { data: category, error: categoryError } = await supabase
       .from("menu_categories")
       .insert({
         store_id: storeId,
-        name: name.trim(),
+        name: nameTrimmed,
+        name_ar: nameT?.ar || null,
+        name_he: nameT?.he || null,
+        name_en: nameT?.en || null,
         slug: normalizeSlug(slug),
         sort_order: sortOrder ?? 0,
         is_active: isActive ?? true,

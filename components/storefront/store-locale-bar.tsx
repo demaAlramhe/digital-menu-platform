@@ -20,7 +20,7 @@ export function StoreLocaleBar({ variant = "default" }: StoreLocaleBarProps) {
       }
       aria-label={dict.lang.label}
     >
-      <div className="mx-auto flex max-w-2xl justify-end">
+      <div className="mx-auto flex max-w-6xl justify-end xl:max-w-7xl">
         <div
           className={
             isOverlay

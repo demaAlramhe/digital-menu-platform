@@ -7,6 +7,11 @@ export type Store = {
   secondaryColor: string | null;
   logoUrl: string | null;
   bannerUrl: string | null;
+  heroImageUrl: string | null;
+  welcomeTitle: string | null;
+  welcomeSubtitle: string | null;
+  welcomeButtonText: string | null;
+  showWelcomeScreen: boolean;
   email: string | null;
   phone: string | null;
   address: string | null;

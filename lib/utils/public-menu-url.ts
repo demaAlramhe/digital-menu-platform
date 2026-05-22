@@ -1,5 +1,9 @@
 import { headers } from "next/headers";
 
+export function buildStorePath(storeSlug: string) {
+  return `/${storeSlug}`;
+}
+
 export function buildMenuPath(storeSlug: string) {
   return `/${storeSlug}/menu`;
 }
@@ -19,6 +23,13 @@ export async function getSiteOrigin(): Promise<string> {
 
   const protocol = headersList.get("x-forwarded-proto") ?? "http";
   return `${protocol}://${host}`;
+}
+
+export async function buildPublicStoreUrl(storeSlug: string): Promise<string> {
+  const origin = await getSiteOrigin();
+  const path = buildStorePath(storeSlug);
+
+  return origin ? `${origin}${path}` : path;
 }
 
 export async function buildPublicMenuUrl(storeSlug: string): Promise<string> {

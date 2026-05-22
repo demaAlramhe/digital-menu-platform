@@ -4,7 +4,10 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { Card } from "@/components/ui/card";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { AdminEditStoreForm } from "@/components/admin/admin-edit-store-form";
-import { buildPublicMenuUrl } from "@/lib/utils/public-menu-url";
+import {
+  buildPublicMenuUrl,
+  buildPublicStoreUrl,
+} from "@/lib/utils/public-menu-url";
 import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
@@ -30,6 +33,7 @@ export default async function AdminStorePage({ params }: AdminStorePageProps) {
     notFound();
   }
 
+  const storeUrl = store.slug ? await buildPublicStoreUrl(store.slug) : null;
   const menuUrl = store.slug ? await buildPublicMenuUrl(store.slug) : null;
 
   return (
@@ -37,23 +41,41 @@ export default async function AdminStorePage({ params }: AdminStorePageProps) {
       title={`${dict.admin.storePageTitle}: ${store.name}`}
       subtitle={dict.admin.storePageSubtitle}
     >
-      {menuUrl && (
+      {storeUrl && menuUrl && (
         <Card>
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-slate-700">
-              {dict.admin.publicMenuUrl}
-            </p>
-            <a
-              href={menuUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="break-all font-mono text-sm text-blue-700 underline"
-            >
-              {menuUrl}
-            </a>
-            <p className="text-xs text-slate-500">
-              {dict.admin.qrTarget}: /{store.slug}/menu
-            </p>
+          <div className="space-y-3">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-slate-700">
+                {dict.qr.publicUrl}
+              </p>
+              <a
+                href={storeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all font-mono text-sm text-blue-700 underline"
+              >
+                {storeUrl}
+              </a>
+              <p className="text-xs text-slate-500">
+                {dict.admin.qrTarget}: /{store.slug}
+              </p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-slate-700">
+                {dict.admin.publicMenuUrl}
+              </p>
+              <a
+                href={menuUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="break-all font-mono text-sm text-blue-700 underline"
+              >
+                {menuUrl}
+              </a>
+              <p className="text-xs text-slate-500">
+                {dict.admin.qrTarget}: /{store.slug}/menu
+              </p>
+            </div>
           </div>
         </Card>
       )}

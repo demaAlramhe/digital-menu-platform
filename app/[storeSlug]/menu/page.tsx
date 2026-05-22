@@ -4,12 +4,18 @@ import {
   getActiveStoreBySlug,
   getPublicMenuForStore,
 } from "@/lib/data/public-store";
-import { MenuCategoryNav } from "@/components/storefront/menu-category-nav";
-import { MenuItemCard } from "@/components/storefront/menu-item-card";
-import { MenuSectionHeading } from "@/components/storefront/menu-section-heading";
-import { StoreContact } from "@/components/storefront/store-contact";
+import {
+  PublicMenuBrowser,
+  type MenuBrowseSection,
+} from "@/components/storefront/public-menu-browser";
+import type { MenuItemDisplay } from "@/components/storefront/menu-item-card";
 import { StoreLocaleBar } from "@/components/storefront/store-locale-bar";
-import { StoreMenuHeader } from "@/components/storefront/store-menu-header";
+import {
+  getSourceLocaleFromStore,
+  resolvePublicCategories,
+  resolvePublicMenuItems,
+  type ResolvedMenuItem,
+} from "@/lib/content/resolve-public-menu";
 import { getTranslations } from "@/lib/i18n/server";
 import type { Dictionary } from "@/lib/i18n";
 
@@ -19,29 +25,73 @@ type MenuPageProps = {
   params: Promise<{ storeSlug: string }>;
 };
 
-type MenuItemRow = {
-  id: string;
-  name: string;
-  description: string | null;
-  price: number;
-  image_url: string | null;
-  is_featured: boolean;
-  sort_order: number;
-  category_id: string | null;
-};
-
 type CategoryRow = {
   id: string;
   name: string;
   slug: string;
   sort_order: number;
+  name_ar?: string | null;
+  name_he?: string | null;
+  name_en?: string | null;
 };
 
-const SECTION_SCROLL_CLASS = "scroll-mt-[8.75rem]";
+const FEATURED_SECTION_ID = "featured";
+const UNCATEGORIZED_SECTION_ID = "other";
+
+function toMenuItemDisplay(item: ResolvedMenuItem): MenuItemDisplay {
+  return {
+    id: item.id,
+    name: item.name,
+    description: item.description,
+    price: item.price,
+    image_url: item.image_url,
+    is_featured: item.is_featured,
+  };
+}
+
+function buildMenuSections(
+  cats: { id: string; name: string; slug: string; sort_order: number }[],
+  featuredItems: ResolvedMenuItem[],
+  uncategorized: ResolvedMenuItem[],
+  itemsByCategory: Map<string, ResolvedMenuItem[]>,
+  dict: Dictionary
+): MenuBrowseSection[] {
+  const sections: MenuBrowseSection[] = [];
+
+  if (featuredItems.length > 0) {
+    sections.push({
+      id: FEATURED_SECTION_ID,
+      name: dict.menu.featured,
+      items: featuredItems.map(toMenuItemDisplay),
+      isFeatured: true,
+    });
+  }
+
+  for (const category of cats) {
+    const categoryItems = itemsByCategory.get(category.id) ?? [];
+    if (categoryItems.length === 0) continue;
+
+    sections.push({
+      id: category.id,
+      name: category.name,
+      items: categoryItems.map(toMenuItemDisplay),
+    });
+  }
+
+  if (uncategorized.length > 0) {
+    sections.push({
+      id: UNCATEGORIZED_SECTION_ID,
+      name: dict.common.uncategorized,
+      items: uncategorized.map(toMenuItemDisplay),
+    });
+  }
+
+  return sections;
+}
 
 export default async function StoreMenuPage({ params }: MenuPageProps) {
   const { storeSlug } = await params;
-  const { dict } = await getTranslations();
+  const { dict, locale } = await getTranslations();
 
   const { store, error: storeError } = await getActiveStoreBySlug(storeSlug);
 
@@ -49,15 +99,24 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
     notFound();
   }
 
+  const sourceLocale = getSourceLocaleFromStore(store);
   const { categories, menuItems } = await getPublicMenuForStore(store.id);
 
-  const items = menuItems as MenuItemRow[];
-  const cats = categories as CategoryRow[];
+  const items = resolvePublicMenuItems(
+    menuItems as Parameters<typeof resolvePublicMenuItems>[0],
+    locale,
+    sourceLocale
+  );
+  const cats = resolvePublicCategories(
+    categories as CategoryRow[],
+    locale,
+    sourceLocale
+  );
 
   const featuredItems = items.filter((item) => item.is_featured);
 
-  const itemsByCategory = new Map<string, MenuItemRow[]>();
-  const uncategorized: MenuItemRow[] = [];
+  const itemsByCategory = new Map<string, ResolvedMenuItem[]>();
+  const uncategorized: ResolvedMenuItem[] = [];
 
   for (const item of items) {
     if (item.category_id) {
@@ -69,23 +128,22 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
     }
   }
 
-  const navCategories = cats
-    .filter((category) => (itemsByCategory.get(category.id) ?? []).length > 0)
-    .map((category) => ({ id: category.id, name: category.name }));
-
-  if (uncategorized.length > 0) {
-    navCategories.push({ id: "other", name: dict.common.uncategorized });
-  }
+  const menuSections = buildMenuSections(
+    cats,
+    featuredItems,
+    uncategorized,
+    itemsByCategory,
+    dict
+  );
 
   const primaryColor = store.primary_color || "#111827";
   const secondaryColor = store.secondary_color || "#f59e0b";
-  const isEmpty = cats.length === 0 && items.length === 0;
+  const isEmpty = menuSections.length === 0;
   const storeName = store.name ?? dict.menu.digitalMenu;
-  const hasBanner = Boolean(store.banner_url);
 
   return (
     <main
-      className="menu-page min-h-screen bg-gradient-to-b from-stone-100 via-stone-50 to-white pb-12"
+      className="menu-page min-h-screen bg-[#f7f6f4] pb-10"
       style={
         {
           "--menu-primary": primaryColor,
@@ -93,123 +151,22 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
         } as CSSProperties
       }
     >
-      <div className="relative">
-        {hasBanner ? <StoreLocaleBar variant="overlay" /> : <StoreLocaleBar />}
-        <StoreMenuHeader
-          storeSlug={storeSlug}
-          storeName={storeName}
-          logoUrl={store.logo_url}
-          bannerUrl={store.banner_url}
-          primaryColor={primaryColor}
-          secondaryColor={secondaryColor}
-          labels={{
-            digitalMenu: dict.menu.digitalMenu,
-            backLinkText: `${dict.common.back} ${storeName}`,
-          }}
-        />
-      </div>
+      <StoreLocaleBar />
 
-      {!isEmpty && (
-        <MenuCategoryNav
-          categories={navCategories}
-          primaryColor={primaryColor}
-          secondaryColor={secondaryColor}
-          showFeatured={featuredItems.length > 0}
-        />
-      )}
-
-      <div className="mx-auto max-w-2xl px-4 py-7 sm:px-5 sm:py-9">
+      <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 sm:py-8 xl:max-w-7xl">
         {isEmpty ? (
           <EmptyMenuState primaryColor={primaryColor} dict={dict} />
         ) : (
-          <div className="space-y-12 sm:space-y-14">
-            {featuredItems.length > 0 && (
-              <section
-                id="menu-featured"
-                className={`${SECTION_SCROLL_CLASS} rounded-3xl border border-white/80 bg-white/90 p-4 shadow-[0_12px_40px_rgba(15,23,42,0.07)] ring-1 ring-stone-200/60 sm:p-5`}
-              >
-                <MenuSectionHeading
-                  title={dict.menu.featured}
-                  subtitle={dict.menu.featuredSubtitle}
-                  primaryColor={primaryColor}
-                  accent="featured"
-                />
-                <ul className="space-y-4">
-                  {featuredItems.map((item) => (
-                    <li key={item.id}>
-                      <MenuItemCard
-                        item={item}
-                        primaryColor={primaryColor}
-                        secondaryColor={secondaryColor}
-                        variant="featured"
-                        showFeaturedBadge
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-
-            {cats.map((category) => {
-              const categoryItems = itemsByCategory.get(category.id) ?? [];
-              if (categoryItems.length === 0) return null;
-
-              return (
-                <section
-                  key={category.id}
-                  id={`category-${category.id}`}
-                  className={SECTION_SCROLL_CLASS}
-                >
-                  <MenuSectionHeading
-                    title={category.name}
-                    primaryColor={primaryColor}
-                  />
-                  <ul className="space-y-3.5 sm:space-y-4">
-                    {categoryItems.map((item) => (
-                      <li key={item.id}>
-                        <MenuItemCard
-                          item={item}
-                          primaryColor={primaryColor}
-                          secondaryColor={secondaryColor}
-                        />
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              );
-            })}
-
-            {uncategorized.length > 0 && (
-              <section id="category-other" className={SECTION_SCROLL_CLASS}>
-                <MenuSectionHeading
-                  title={dict.common.uncategorized}
-                  primaryColor={primaryColor}
-                />
-                <ul className="space-y-3.5 sm:space-y-4">
-                  {uncategorized.map((item) => (
-                    <li key={item.id}>
-                      <MenuItemCard
-                        item={item}
-                        primaryColor={primaryColor}
-                        secondaryColor={secondaryColor}
-                      />
-                    </li>
-                  ))}
-                </ul>
-              </section>
-            )}
-          </div>
-        )}
-
-        <div className="mt-12 sm:mt-14">
-          <StoreContact
+          <PublicMenuBrowser
+            sections={menuSections}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
             storeName={storeName}
             phone={store.phone}
             email={store.email}
             address={store.address}
-            primaryColor={primaryColor}
           />
-        </div>
+        )}
       </div>
     </main>
   );
@@ -223,7 +180,7 @@ function EmptyMenuState({
   dict: Dictionary;
 }) {
   return (
-    <div className="rounded-3xl border border-dashed border-stone-300/90 bg-white/90 px-6 py-16 text-center shadow-[0_8px_32px_rgba(15,23,42,0.06)]">
+    <div className="mx-auto max-w-md rounded-3xl border border-dashed border-stone-300/90 bg-white px-6 py-16 text-center shadow-[0_8px_32px_rgba(15,23,42,0.06)]">
       <div
         className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-2xl text-2xl shadow-inner"
         style={{ backgroundColor: `${primaryColor}14`, color: primaryColor }}

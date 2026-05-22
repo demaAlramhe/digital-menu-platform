@@ -21,7 +21,10 @@ Multi-tenant digital menu SaaS for restaurants and cafes. Built with Next.js App
 ## Multi-Tenant Notes
 
 - Tables: `stores`, `profiles`, `menu_categories`, `menu_items`
+- Public store landing (welcome intro): `/{storeSlug}` — enable in dashboard settings
 - Public menu URL per store: `/{storeSlug}/menu`
+- QR codes point to `/{storeSlug}` so customers see the welcome screen first (when enabled)
+- Run `supabase/store-welcome-columns.sql` in Supabase to add welcome-screen columns
 - Use Supabase RLS so store owners only access rows matching their `store_id`
 - Restrict `/admin/*` routes to `super_admin`
 - Only `active` stores are publicly accessible

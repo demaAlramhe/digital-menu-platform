@@ -46,16 +46,22 @@ export function LanguageSwitcher({
         </span>
       )}
       <LocaleButton
-        active={locale === "he"}
-        label={dict.lang.he}
-        disabled={loading}
-        onClick={() => switchLocale("he")}
-      />
-      <LocaleButton
         active={locale === "ar"}
         label={dict.lang.ar}
         disabled={loading}
         onClick={() => switchLocale("ar")}
+      />
+      <LocaleButton
+        active={locale === "en"}
+        label={dict.lang.en}
+        disabled={loading}
+        onClick={() => switchLocale("en")}
+      />
+      <LocaleButton
+        active={locale === "he"}
+        label={dict.lang.he}
+        disabled={loading}
+        onClick={() => switchLocale("he")}
       />
     </div>
   );

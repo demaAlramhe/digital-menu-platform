@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizeSlug } from "@/lib/utils/slug";
+import { translateContentFields } from "@/lib/ai/translate-content";
+import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 
 type PatchBody = {
   name?: string;
@@ -28,10 +30,32 @@ export async function PATCH(
 
     const supabase = createAdminClient();
 
+    const { data: existing } = await supabase
+      .from("menu_categories")
+      .select("store_id")
+      .eq("id", categoryId)
+      .maybeSingle();
+
+    if (!existing?.store_id) {
+      return NextResponse.json({ error: "Category not found." }, { status: 404 });
+    }
+
+    const sourceLocale = await getStoreDefaultContentLanguage(existing.store_id);
+    const nameTrimmed = name.trim();
+
+    const translations = await translateContentFields(sourceLocale, [
+      { key: "name", text: nameTrimmed, kind: "category_name" },
+    ]);
+
+    const nameT = translations.name;
+
     const { data: updatedCategory, error } = await supabase
       .from("menu_categories")
       .update({
-        name: name.trim(),
+        name: nameTrimmed,
+        name_ar: nameT?.ar || null,
+        name_he: nameT?.he || null,
+        name_en: nameT?.en || null,
         slug: normalizeSlug(slug),
         sort_order: sortOrder ?? 0,
         is_active: isActive ?? true,

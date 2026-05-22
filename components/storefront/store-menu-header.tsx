@@ -48,7 +48,7 @@ export function StoreMenuHeader({
             aria-hidden
           />
           <div className="absolute inset-x-0 bottom-0 px-4 pb-5 pt-16 sm:pb-6">
-            <div className="mx-auto flex max-w-2xl items-end gap-4">
+            <div className="mx-auto flex max-w-6xl items-end gap-4 xl:max-w-7xl">
               <StoreLogo
                 logoUrl={logoUrl}
                 initial={initial}
@@ -80,7 +80,7 @@ export function StoreMenuHeader({
             }}
             aria-hidden
           />
-          <div className="relative mx-auto flex max-w-2xl items-center gap-4 sm:gap-5">
+          <div className="relative mx-auto flex max-w-6xl items-center gap-4 sm:gap-5 xl:max-w-7xl">
             <StoreLogo
               logoUrl={logoUrl}
               initial={initial}
@@ -107,7 +107,7 @@ export function StoreMenuHeader({
 
       {showBackLink && (
         <div className="border-t border-stone-100/90 bg-stone-50/50 px-4 py-2.5">
-          <div className="mx-auto max-w-2xl">
+          <div className="mx-auto max-w-6xl xl:max-w-7xl">
             <Link
               href={`/${storeSlug}`}
               className="inline-flex min-h-10 items-center gap-1.5 rounded-full border border-stone-200/80 bg-white px-3.5 py-1.5 text-sm font-medium text-stone-600 shadow-sm transition hover:border-stone-300 hover:text-stone-900 active:scale-[0.98]"

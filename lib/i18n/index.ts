@@ -1,4 +1,5 @@
 import { ar } from "./dictionaries/ar";
+import { en } from "./dictionaries/en";
 import { he } from "./dictionaries/he";
 import {
   DEFAULT_LOCALE,
@@ -21,6 +22,7 @@ export {
 const dictionaries: Record<Locale, Dictionary> = {
   he,
   ar,
+  en,
 };
 
 export function getDictionary(locale: Locale): Dictionary {

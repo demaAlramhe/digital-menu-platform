@@ -19,6 +19,7 @@ type MenuItemCardProps = {
   variant?: "default" | "featured";
 };
 
+/** Vertical card for grid layouts (image on top, details below). */
 export function MenuItemCard({
   item,
   primaryColor,
@@ -27,82 +28,78 @@ export function MenuItemCard({
   variant = "default",
 }: MenuItemCardProps) {
   const { dict } = useLocale();
-  const isFeatured = variant === "featured" || showFeaturedBadge || item.is_featured;
+  const isFeatured =
+    variant === "featured" || showFeaturedBadge || item.is_featured;
 
   return (
     <article
-      className={`group overflow-hidden rounded-2xl bg-white transition-shadow duration-300 ${
-        isFeatured
-          ? "shadow-[0_12px_40px_rgba(15,23,42,0.1)] ring-1 ring-stone-200/80"
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-300 ${
+        variant === "featured"
+          ? ""
           : "shadow-[0_4px_20px_rgba(15,23,42,0.06)] ring-1 ring-stone-200/60 hover:shadow-[0_8px_28px_rgba(15,23,42,0.09)]"
       }`}
+      style={
+        variant === "featured"
+          ? {
+              boxShadow: `0 12px 40px rgba(15,23,42,0.1), 0 0 0 2px ${secondaryColor}55`,
+            }
+          : undefined
+      }
     >
-      <div
-        className={`flex gap-0 ${isFeatured ? "flex-col sm:flex-row" : "flex-row"}`}
-      >
-        <div
-          className={`relative shrink-0 overflow-hidden bg-stone-100 ${
-            isFeatured
-              ? "aspect-[16/10] w-full sm:aspect-auto sm:h-40 sm:w-40 md:h-44 md:w-44"
-              : "h-[7.25rem] w-[7.25rem] sm:h-32 sm:w-32"
-          }`}
-        >
-          {item.image_url ? (
-            <img
-              src={item.image_url}
-              alt={item.name}
-              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
-            />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200/80">
-              <PlateIcon className="h-8 w-8 text-stone-400/80" />
-            </div>
-          )}
-          {isFeatured && (
-            <span
-              className="absolute start-3 top-3 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg"
-              style={{ backgroundColor: secondaryColor }}
-            >
-              <StarIcon className="h-3 w-3" />
-              {dict.menu.featured}
-            </span>
-          )}
-        </div>
+      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-stone-100">
+        {item.image_url ? (
+          <img
+            src={item.image_url}
+            alt={item.name}
+            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+          />
+        ) : (
+          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200/80">
+            <PlateIcon className="h-10 w-10 text-stone-400/80" />
+          </div>
+        )}
+        {isFeatured && (
+          <span
+            className="absolute start-2.5 top-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg"
+            style={{ backgroundColor: secondaryColor }}
+          >
+            <StarIcon className="h-3 w-3" />
+            {dict.menu.featured}
+          </span>
+        )}
+      </div>
 
-        <div
-          className={`flex min-w-0 flex-1 flex-col justify-center ${
-            isFeatured ? "gap-2.5 p-4 sm:p-5" : "gap-2 p-3.5 sm:p-4"
-          }`}
-        >
-          <div className="flex items-start justify-between gap-3">
+      <div
+        className={`flex min-h-0 flex-1 flex-col justify-between gap-2 ${
+          variant === "featured" ? "p-4 sm:p-5" : "p-3.5 sm:p-4"
+        }`}
+      >
+        <div className="min-w-0 space-y-2">
+          <div className="flex items-start justify-between gap-2">
             <h3
-              className={`font-semibold leading-snug text-stone-900 ${
-                isFeatured ? "text-lg sm:text-xl" : "text-base sm:text-lg"
+              className={`min-w-0 flex-1 font-semibold leading-snug text-stone-900 ${
+                variant === "featured"
+                  ? "text-base sm:text-lg"
+                  : "text-sm sm:text-base"
               }`}
             >
-              {item.name}
+              <span className="line-clamp-2">{item.name}</span>
             </h3>
             <p
-              className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-sm font-bold tabular-nums sm:text-base"
+              className="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-bold tabular-nums sm:text-sm"
               style={{
                 color: primaryColor,
                 backgroundColor: `${primaryColor}12`,
               }}
             >
-              <span className="text-[11px] font-semibold opacity-80">
+              <span className="text-[10px] font-semibold opacity-80">
                 {dict.common.currency}
               </span>
               {formatPrice(item.price)}
             </p>
           </div>
           {item.description && (
-            <p
-              className={`leading-relaxed text-stone-600 ${
-                isFeatured
-                  ? "line-clamp-3 text-[15px]"
-                  : "line-clamp-2 text-sm sm:line-clamp-3"
-              }`}
-            >
+            <p className="line-clamp-3 text-[13px] leading-relaxed text-stone-600 sm:text-sm">
               {item.description}
             </p>
           )}
