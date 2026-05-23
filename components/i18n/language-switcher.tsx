@@ -36,7 +36,7 @@ export function LanguageSwitcher({
 
   return (
     <div
-      className={`flex items-center gap-1 rounded-lg border border-slate-200 bg-white p-1 text-sm ${className}`}
+      className={`flex items-center gap-0.5 rounded-xl border border-stone-200/90 bg-white/90 p-0.5 text-sm shadow-sm ${className}`}
       role="group"
       aria-label={dict.lang.label}
     >
@@ -84,10 +84,10 @@ function LocaleButton({
       onClick={onClick}
       disabled={disabled}
       suppressHydrationWarning
-      className={`rounded-md px-2.5 py-1.5 font-medium transition disabled:opacity-50 ${
+      className={`rounded-lg px-2.5 py-1.5 font-medium transition disabled:opacity-50 ${
         active
-          ? "bg-slate-900 text-white"
-          : "text-slate-600 hover:bg-slate-50"
+          ? "bg-stone-900 text-white shadow-sm"
+          : "text-stone-600 hover:bg-stone-50"
       }`}
       aria-pressed={active}
     >

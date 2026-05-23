@@ -115,7 +115,7 @@ export default async function DashboardCategoriesPage({
             return (
               <li
                 key={category.id}
-                className={`${dash.card} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5`}
+                className={`${dash.cardHover} flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5`}
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">

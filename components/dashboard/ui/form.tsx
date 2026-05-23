@@ -1,7 +1,6 @@
 import type { InputHTMLAttributes, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from "react";
 import { dash } from "./styles";
 
-/** default: narrow forms (menu items, categories). wide/full: settings & wide layouts. */
 const formShellWidthClass: Record<"default" | "wide" | "full", string> = {
   default: "w-full max-w-2xl sm:max-w-3xl",
   wide: "w-full max-w-4xl lg:max-w-5xl xl:max-w-6xl",
@@ -15,7 +14,6 @@ export function FormShell({
 }: {
   children: ReactNode;
   onSubmit: (e: React.FormEvent) => void;
-  /** Use "full" to match dashboard container width (e.g. store settings). */
   width?: keyof typeof formShellWidthClass;
 }) {
   return (
@@ -23,7 +21,7 @@ export function FormShell({
       onSubmit={onSubmit}
       className={`${dash.card} p-5 sm:p-6 lg:p-8 ${formShellWidthClass[width]}`}
     >
-      <div className="space-y-8">{children}</div>
+      <div className="space-y-9">{children}</div>
     </form>
   );
 }
@@ -40,7 +38,7 @@ export function FormSection({
   return (
     <section className="space-y-4">
       {(title || description) && (
-        <div className="border-b border-stone-100 pb-3">
+        <div className="border-b border-stone-100 pb-4">
           {title && <h2 className={dash.sectionTitle}>{title}</h2>}
           {description && <p className={dash.sectionDesc}>{description}</p>}
         </div>
@@ -62,8 +60,8 @@ export function FormField({
   return (
     <div>
       <label className={dash.label}>{label}</label>
-      <div className="mt-0.5">{children}</div>
-      {hint && <p className="mt-1.5 text-xs text-stone-500">{hint}</p>}
+      <div className="mt-1">{children}</div>
+      {hint && <p className="mt-1.5 text-xs leading-relaxed text-stone-500">{hint}</p>}
     </div>
   );
 }
@@ -80,7 +78,7 @@ export function FormSelect(props: SelectHTMLAttributes<HTMLSelectElement>) {
 }
 
 export function FormTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return <textarea className={dash.input} {...props} />;
+  return <textarea className={`${dash.input} min-h-[5.5rem] resize-y`} {...props} />;
 }
 
 export function CheckboxField({
@@ -97,16 +95,16 @@ export function CheckboxField({
   return (
     <label
       htmlFor={id}
-      className="flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200/80 bg-stone-50/50 px-4 py-3 transition hover:border-stone-300 hover:bg-white"
+      className="flex cursor-pointer items-start gap-3 rounded-xl border border-stone-200/80 bg-gradient-to-b from-stone-50/80 to-white px-4 py-3.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition hover:border-stone-300 hover:shadow-sm"
     >
       <input
         id={id}
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900/20"
+        className="mt-0.5 h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900/15"
       />
-      <span className="text-sm font-medium text-stone-800">{label}</span>
+      <span className="text-sm font-medium leading-snug text-stone-800">{label}</span>
     </label>
   );
 }

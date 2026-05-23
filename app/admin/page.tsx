@@ -1,5 +1,8 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { Card } from "@/components/ui/card";
+import { StatCard } from "@/components/dashboard/ui/stat-card";
+import { PrimaryLink, SecondaryLink } from "@/components/dashboard/ui/buttons";
+import { dash } from "@/components/dashboard/ui/styles";
 import Link from "next/link";
 import { createAdminClient } from "../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
@@ -87,139 +90,95 @@ export default async function AdminPage() {
 
   return (
     <AppShell title={dict.admin.overviewTitle} subtitle={dict.admin.overviewSubtitle}>
-      <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3 xl:grid-cols-6">
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.totalStores}</p>
-              <p className="text-3xl font-bold text-slate-900">{totalStores ?? 0}</p>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <StatCard label={dict.admin.totalStores} value={totalStores ?? 0} />
+        <StatCard
+          label={dict.admin.activeStores}
+          value={activeStores ?? 0}
+          tone="success"
+        />
+        <StatCard
+          label={dict.admin.inactiveStores}
+          value={inactiveStores ?? 0}
+          tone="danger"
+        />
+        <StatCard
+          label={dict.admin.archivedStores}
+          value={archivedStores ?? 0}
+          tone="muted"
+        />
+        <StatCard label={dict.admin.totalUsers} value={totalUsers ?? 0} tone="info" />
+        <StatCard
+          label={dict.admin.menuItems}
+          value={totalMenuItems ?? 0}
+          tone="warning"
+        />
+      </div>
+
+      <div className="grid gap-4 md:grid-cols-2">
+        <StatCard label={dict.admin.menuCategories} value={totalCategories ?? 0} />
+        <Card>
+          <p className={dash.statLabel}>{dict.admin.topByItems}</p>
+          {topStoreByMenuItems ? (
+            <div className="mt-3 space-y-1.5">
+              <p className="text-xl font-semibold tracking-tight text-stone-900">
+                {topStoreByMenuItems.store_name}
+              </p>
+              <p className="text-sm text-stone-600">
+                {formatMessage(dict.admin.itemsCount, {
+                  count: topStoreByMenuItems.menu_items_count,
+                })}
+              </p>
+              <p className="font-mono text-sm text-stone-500">
+                /{topStoreByMenuItems.store_slug}/menu
+              </p>
             </div>
-          </Card>
+          ) : (
+            <p className="mt-3 text-sm text-stone-600">{dict.admin.noData}</p>
+          )}
+        </Card>
+      </div>
 
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.activeStores}</p>
-              <p className="text-3xl font-bold text-green-700">{activeStores ?? 0}</p>
-            </div>
-          </Card>
+      <div className="grid gap-4 md:grid-cols-2">
+        <Card>
+          <h2 className={dash.sectionTitle}>{dict.admin.quickActions}</h2>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <PrimaryLink href="/admin/stores">{dict.admin.manageStores}</PrimaryLink>
+            <SecondaryLink href="/admin/users">{dict.admin.manageUsers}</SecondaryLink>
+          </div>
+        </Card>
 
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.inactiveStores}</p>
-              <p className="text-3xl font-bold text-red-700">{inactiveStores ?? 0}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.archivedStores}</p>
-              <p className="text-3xl font-bold text-slate-700">{archivedStores ?? 0}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.totalUsers}</p>
-              <p className="text-3xl font-bold text-blue-700">{totalUsers ?? 0}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.menuItems}</p>
-              <p className="text-3xl font-bold text-amber-700">{totalMenuItems ?? 0}</p>
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.menuCategories}</p>
-              <p className="text-3xl font-bold text-slate-900">{totalCategories ?? 0}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-2">
-              <p className="text-sm text-slate-500">{dict.admin.topByItems}</p>
-              {topStoreByMenuItems ? (
-                <>
-                  <p className="text-xl font-bold text-slate-900">
-                    {topStoreByMenuItems.store_name}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    {formatMessage(dict.admin.itemsCount, {
-                      count: topStoreByMenuItems.menu_items_count,
-                    })}
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    {dict.admin.publicMenuPath}: /{topStoreByMenuItems.store_slug}/menu
-                  </p>
-                </>
-              ) : (
-                <p className="text-sm text-slate-600">{dict.admin.noData}</p>
-              )}
-            </div>
-          </Card>
-        </div>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          <Card>
-            <div className="space-y-4">
-              <h2 className="text-xl font-semibold">{dict.admin.quickActions}</h2>
-
-              <div className="flex flex-wrap gap-3">
-                <Link
-                  href="/admin/stores"
-                  className="rounded-lg border px-4 py-2 font-medium"
-                >
-                  {dict.admin.manageStores}
-                </Link>
-
-                <Link
-                  href="/admin/users"
-                  className="rounded-lg border px-4 py-2 font-medium"
-                >
-                  {dict.admin.manageUsers}
-                </Link>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-3">
-              <h2 className="text-xl font-semibold">{dict.admin.storesSnapshot}</h2>
-
-              {!storeSummaries.length ? (
-                <p className="text-sm text-slate-600">{dict.admin.noData}</p>
-              ) : (
-                <div className="space-y-3">
-                  {storeSummaries
-                    .sort((a, b) => b.menu_items_count - a.menu_items_count)
-                    .slice(0, 3)
-                    .map((store) => (
-                      <div
-                        key={store.store_id}
-                        className="rounded-lg border border-slate-200 p-3"
-                      >
-                        <p className="font-medium text-slate-900">{store.store_name}</p>
-                        <p className="text-sm text-slate-600">
-                          {formatMessage(dict.admin.categoriesCount, {
-                            items: store.menu_items_count,
-                            categories: store.categories_count,
-                          })}
-                        </p>
-                        <p className="text-sm text-slate-600">
-                          /{store.store_slug}/menu
-                        </p>
-                      </div>
-                    ))}
-                </div>
-              )}
-            </div>
-          </Card>
-        </div>
+        <Card>
+          <h2 className={dash.sectionTitle}>{dict.admin.storesSnapshot}</h2>
+          {!storeSummaries.length ? (
+            <p className="mt-3 text-sm text-stone-600">{dict.admin.noData}</p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {storeSummaries
+                .sort((a, b) => b.menu_items_count - a.menu_items_count)
+                .slice(0, 3)
+                .map((store) => (
+                  <li key={store.store_id} className={`${dash.cardInset} p-3.5`}>
+                    <p className="font-medium text-stone-900">{store.store_name}</p>
+                    <p className="mt-1 text-sm text-stone-600">
+                      {formatMessage(dict.admin.categoriesCount, {
+                        items: store.menu_items_count,
+                        categories: store.categories_count,
+                      })}
+                    </p>
+                    <Link
+                      href={`/${store.store_slug}/menu`}
+                      className="mt-1 inline-block font-mono text-xs text-sky-700 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      /{store.store_slug}/menu
+                    </Link>
+                  </li>
+                ))}
+            </ul>
+          )}
+        </Card>
       </div>
     </AppShell>
   );

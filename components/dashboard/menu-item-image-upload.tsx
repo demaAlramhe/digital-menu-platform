@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { SecondaryButton } from "@/components/dashboard/ui/buttons";
 import { FormField } from "@/components/dashboard/ui/form";
+import { dash } from "@/components/dashboard/ui/styles";
 import type { CloudinaryUploadFolder } from "@/lib/cloudinary/folders";
 
 type MenuItemImageUploadProps = {
@@ -75,7 +76,7 @@ export function MenuItemImageUpload({
 
   return (
     <FormField label={fieldLabel}>
-      <div className="rounded-xl border border-dashed border-stone-300 bg-stone-50/60 p-4">
+      <div className={dash.uploadZone}>
         <input
           type="file"
           accept="image/*"

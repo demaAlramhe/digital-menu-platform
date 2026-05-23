@@ -96,3 +96,12 @@ export const adminUserRoleSchema = z.object({
 export const adminUserStoreSchema = z.object({
   storeId: z.string().uuid().nullable(),
 });
+
+export const adminUserProfilePatchSchema = z.object({
+  fullName: z
+    .string()
+    .trim()
+    .min(1, "Full name is required.")
+    .max(120, "Full name is too long."),
+  email: z.string().trim().email("A valid email is required."),
+});

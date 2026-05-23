@@ -3,11 +3,14 @@ import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { AdminCreateStoreForm } from "@/components/admin/admin-create-store-form";
 import { AdminStoreStatusButton } from "@/components/admin/admin-store-status-button";
+import { PrimaryLink } from "@/components/dashboard/ui/buttons";
+import { StatCard } from "@/components/dashboard/ui/stat-card";
+import { StoreStatusBadge } from "@/components/dashboard/ui/store-status-badge";
+import { dash } from "@/components/dashboard/ui/styles";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { getRoleLabel } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
-import type { Dictionary } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -28,37 +31,6 @@ type StoreWithOwner = {
 type AdminStoresPageProps = {
   searchParams: Promise<{ status?: string; q?: string }>;
 };
-
-function statusLabel(status: string | null, dict: Dictionary) {
-  if (status === "active") return dict.common.statusActive;
-  if (status === "inactive") return dict.common.statusInactive;
-  if (status === "archived") return dict.common.statusArchived;
-  return status ?? "—";
-}
-
-function StatusBadge({
-  status,
-  dict,
-}: {
-  status: string | null;
-  dict: Dictionary;
-}) {
-  const styles =
-    status === "active"
-      ? { backgroundColor: "#dcfce7", color: "#166534" }
-      : status === "inactive"
-      ? { backgroundColor: "#fee2e2", color: "#991b1b" }
-      : { backgroundColor: "#e5e7eb", color: "#374151" };
-
-  return (
-    <span
-      className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-      style={styles}
-    >
-      {statusLabel(status, dict)}
-    </span>
-  );
-}
 
 export default async function AdminStoresPage({
   searchParams,
@@ -179,40 +151,29 @@ export default async function AdminStoresPage({
           </div>
         </Card>
 
-        <div className="grid gap-4 md:grid-cols-4">
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.totalStores}</p>
-              <p className="text-3xl font-bold text-slate-900">{counters.total}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.activeStores}</p>
-              <p className="text-3xl font-bold text-green-700">{counters.active}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.inactiveStores}</p>
-              <p className="text-3xl font-bold text-red-700">{counters.inactive}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.archivedStores}</p>
-              <p className="text-3xl font-bold text-slate-700">{counters.archived}</p>
-            </div>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <StatCard label={dict.admin.totalStores} value={counters.total} />
+          <StatCard
+            label={dict.admin.activeStores}
+            value={counters.active}
+            tone="success"
+          />
+          <StatCard
+            label={dict.admin.inactiveStores}
+            value={counters.inactive}
+            tone="danger"
+          />
+          <StatCard
+            label={dict.admin.archivedStores}
+            value={counters.archived}
+            tone="muted"
+          />
         </div>
 
         <Card>
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold">{dict.admin.storesTitle}</h2>
+              <h2 className={dash.sectionTitle}>{dict.admin.storesTitle}</h2>
 
               <div className="flex flex-wrap gap-2">
                 {FILTERS.map((filter) => {
@@ -233,12 +194,7 @@ export default async function AdminStoresPage({
                     <Link
                       key={filter.value}
                       href={href}
-                      className="rounded-lg px-4 py-2 text-sm font-medium"
-                      style={{
-                        backgroundColor: isActive ? "#111827" : "#ffffff",
-                        color: isActive ? "#ffffff" : "#111827",
-                        border: "1px solid #cbd5e1",
-                      }}
+                      className={isActive ? dash.filterChipActive : dash.filterChip}
                     >
                       {filter.label}
                     </Link>
@@ -247,24 +203,21 @@ export default async function AdminStoresPage({
               </div>
             </div>
 
-            <form action="/admin/stores" className="flex flex-wrap gap-3">
+            <form action="/admin/stores" className="flex flex-wrap gap-2">
               <input type="hidden" name="status" value={selectedStatus === "all" ? "" : selectedStatus} />
               <input
                 type="text"
                 name="q"
                 defaultValue={searchQuery}
                 placeholder={`${dict.common.name}, ${dict.common.slug}...`}
-                className="min-w-[280px] flex-1 rounded-lg border px-3 py-2"
+                className={`${dash.input} min-w-[min(100%,18rem)] flex-1`}
               />
-              <button
-                type="submit"
-                className="rounded-lg bg-slate-900 px-4 py-2 text-white"
-              >
+              <button type="submit" className={dash.primaryBtn}>
                 {dict.common.search}
               </button>
               <Link
                 href={selectedStatus === "all" ? "/admin/stores" : `/admin/stores?status=${selectedStatus}`}
-                className="rounded-lg border px-4 py-2 font-medium"
+                className={dash.secondaryBtn}
               >
                 {dict.common.clear}
               </Link>
@@ -282,62 +235,69 @@ export default async function AdminStoresPage({
             ) : (
               <div className="space-y-4">
                 {finalStores.map((store) => (
-                  <div
-                    key={store.id}
-                    className="rounded-xl border border-slate-200 p-4"
-                  >
-                    <div className="grid gap-2 md:grid-cols-2">
-                      <p>
-                        <strong>{dict.common.name}:</strong> {store.name}
-                      </p>
-                      <p>
-                        <strong>{dict.common.slug}:</strong> {store.slug}
-                      </p>
-                      <p>
-                        <strong>{dict.common.email}:</strong> {store.email ?? "-"}
-                      </p>
-                      <p>
-                        <strong>{dict.common.phone}:</strong> {store.phone ?? "-"}
-                      </p>
-                      <p>
-                        <strong>{dict.common.active}:</strong>{" "}
-                        <StatusBadge status={store.status} dict={dict} />
-                      </p>
-                      <p>
-                        <strong>{dict.roles.createdAt}:</strong>{" "}
-                        {store.created_at
-                          ? new Date(store.created_at).toLocaleString()
-                          : "-"}
-                      </p>
-                      <p className="md:col-span-2">
-                        <strong>{dict.common.address}:</strong> {store.address ?? "-"}
-                      </p>
-                    </div>
-
-                    <div className="mt-4 rounded-lg bg-slate-50 p-4">
-                      <h3 className="mb-2 font-semibold">{dict.roles.ownerSection}</h3>
-                      <div className="grid gap-2 md:grid-cols-2">
-                        <p>
-                          <strong>{dict.common.name}:</strong> {store.owner_name ?? "-"}
-                        </p>
-                        <p>
-                          <strong>{dict.common.email}:</strong> {store.owner_email ?? "-"}
-                        </p>
-                        <p>
-                          <strong>{dict.roles.label}:</strong>{" "}
-                          {getRoleLabel(store.owner_role, dict)}
-                        </p>
+                  <div key={store.id} className={`${dash.card} p-5 sm:p-6`}>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-stone-900">{store.name}</h3>
+                        <p className="mt-0.5 font-mono text-xs text-stone-500">{store.slug}</p>
                       </div>
+                      <StoreStatusBadge
+                        status={store.status}
+                        activeLabel={dict.common.statusActive}
+                        inactiveLabel={dict.common.statusInactive}
+                        archivedLabel={dict.common.statusArchived}
+                      />
                     </div>
 
-                    <div className="mt-4 flex gap-3">
-                      <Link
-                        href={`/admin/stores/${store.id}`}
-                        className="rounded-lg border px-4 py-2 font-medium"
-                      >
-                        {dict.common.edit}
-                      </Link>
+                    <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                      <div>
+                        <dt className={dash.eyebrow}>{dict.common.email}</dt>
+                        <dd className="mt-1 text-stone-800">{store.email ?? "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className={dash.eyebrow}>{dict.common.phone}</dt>
+                        <dd className="mt-1 text-stone-800">{store.phone ?? "—"}</dd>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <dt className={dash.eyebrow}>{dict.common.address}</dt>
+                        <dd className="mt-1 text-stone-800">{store.address ?? "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className={dash.eyebrow}>{dict.roles.createdAt}</dt>
+                        <dd className="mt-1 text-stone-800">
+                          {store.created_at
+                            ? new Date(store.created_at).toLocaleString()
+                            : "—"}
+                        </dd>
+                      </div>
+                    </dl>
 
+                    <div className={`${dash.cardInset} mt-4 p-4`}>
+                      <h4 className="text-sm font-semibold text-stone-900">
+                        {dict.roles.ownerSection}
+                      </h4>
+                      <dl className="mt-3 grid gap-2 text-sm sm:grid-cols-2">
+                        <div>
+                          <dt className="text-xs font-medium text-stone-500">{dict.common.name}</dt>
+                          <dd className="mt-0.5 text-stone-800">{store.owner_name ?? "—"}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-stone-500">{dict.common.email}</dt>
+                          <dd className="mt-0.5 text-stone-800">{store.owner_email ?? "—"}</dd>
+                        </div>
+                        <div>
+                          <dt className="text-xs font-medium text-stone-500">{dict.roles.label}</dt>
+                          <dd className="mt-0.5 text-stone-800">
+                            {getRoleLabel(store.owner_role, dict)}
+                          </dd>
+                        </div>
+                      </dl>
+                    </div>
+
+                    <div className="mt-5 flex flex-wrap gap-2 border-t border-stone-100 pt-4">
+                      <PrimaryLink href={`/admin/stores/${store.id}`}>
+                        {dict.common.edit}
+                      </PrimaryLink>
                       <AdminStoreStatusButton
                         storeId={store.id}
                         currentStatus={store.status}

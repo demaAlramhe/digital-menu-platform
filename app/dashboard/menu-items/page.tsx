@@ -173,7 +173,7 @@ export default async function DashboardMenuItemsPage({
                       <h2 className="text-lg font-semibold text-stone-900">{item.name}</h2>
                       <p className="mt-0.5 font-mono text-xs text-stone-500">{item.slug}</p>
                     </div>
-                    <p className="rounded-full bg-stone-900 px-3 py-1 text-sm font-bold tabular-nums text-white">
+                    <p className={dash.priceBadge}>
                       {dict.common.currency}
                       {item.price}
                     </p>

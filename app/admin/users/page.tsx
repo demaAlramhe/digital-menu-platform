@@ -5,9 +5,11 @@ import { createAdminClient } from "../../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
 import { AdminUserStoreSelect } from "@/components/admin/admin-user-store-select";
-import { getRoleLabel } from "@/lib/i18n";
+import { AdminUserProfileEdit } from "@/components/admin/admin-user-profile-edit";
+import { StatCard } from "@/components/dashboard/ui/stat-card";
+import { RoleBadge } from "@/components/dashboard/ui/role-badge";
+import { dash } from "@/components/dashboard/ui/styles";
 import { getTranslations } from "@/lib/i18n/server";
-import type { Dictionary } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -30,30 +32,6 @@ type StoreOption = {
 type AdminUsersPageProps = {
   searchParams: Promise<{ role?: string; q?: string }>;
 };
-
-function RoleBadge({
-  role,
-  dict,
-}: {
-  role: string | null;
-  dict: Dictionary;
-}) {
-  const styles =
-    role === "super_admin"
-      ? { backgroundColor: "#dbeafe", color: "#1d4ed8" }
-      : role === "store_owner"
-      ? { backgroundColor: "#dcfce7", color: "#166534" }
-      : { backgroundColor: "#e5e7eb", color: "#374151" };
-
-  return (
-    <span
-      className="inline-flex rounded-full px-3 py-1 text-xs font-semibold"
-      style={styles}
-    >
-      {getRoleLabel(role, dict)}
-    </span>
-  );
-}
 
 export default async function AdminUsersPage({
   searchParams,
@@ -160,37 +138,24 @@ export default async function AdminUsersPage({
   return (
     <AppShell title={dict.admin.manageUsers} subtitle={dict.admin.usersTitle}>
       <div className="space-y-6">
-        <div className="grid gap-4 md:grid-cols-3">
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.admin.totalUsers}</p>
-              <p className="text-3xl font-bold text-slate-900">{counters.total}</p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.roles.superAdmin}</p>
-              <p className="text-3xl font-bold text-blue-700">
-                {counters.super_admin}
-              </p>
-            </div>
-          </Card>
-
-          <Card>
-            <div className="space-y-1">
-              <p className="text-sm text-slate-500">{dict.roles.storeOwner}</p>
-              <p className="text-3xl font-bold text-green-700">
-                {counters.store_owner}
-              </p>
-            </div>
-          </Card>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <StatCard label={dict.admin.totalUsers} value={counters.total} />
+          <StatCard
+            label={dict.roles.superAdmin}
+            value={counters.super_admin}
+            tone="info"
+          />
+          <StatCard
+            label={dict.roles.storeOwner}
+            value={counters.store_owner}
+            tone="success"
+          />
         </div>
 
         <Card>
           <div className="space-y-4">
             <div className="flex flex-wrap items-center justify-between gap-4">
-              <h2 className="text-xl font-semibold">{dict.admin.usersTitle}</h2>
+              <h2 className={dash.sectionTitle}>{dict.admin.usersTitle}</h2>
 
               <div className="flex flex-wrap gap-2">
                 {ROLE_FILTERS.map((filter) => {
@@ -211,12 +176,7 @@ export default async function AdminUsersPage({
                     <Link
                       key={filter.value}
                       href={href}
-                      className="rounded-lg px-4 py-2 text-sm font-medium"
-                      style={{
-                        backgroundColor: isActive ? "#111827" : "#ffffff",
-                        color: isActive ? "#ffffff" : "#111827",
-                        border: "1px solid #cbd5e1",
-                      }}
+                      className={isActive ? dash.filterChipActive : dash.filterChip}
                     >
                       {filter.label}
                     </Link>
@@ -225,7 +185,7 @@ export default async function AdminUsersPage({
               </div>
             </div>
 
-            <form action="/admin/users" className="flex flex-wrap gap-3">
+            <form action="/admin/users" className="flex flex-wrap gap-2">
               <input
                 type="hidden"
                 name="role"
@@ -236,17 +196,14 @@ export default async function AdminUsersPage({
                 name="q"
                 defaultValue={searchQuery}
                 placeholder={`${dict.common.name}, ${dict.common.email}...`}
-                className="min-w-[280px] flex-1 rounded-lg border px-3 py-2"
+                className={`${dash.input} min-w-[min(100%,18rem)] flex-1`}
               />
-              <button
-                type="submit"
-                className="rounded-lg bg-slate-900 px-4 py-2 text-white"
-              >
+              <button type="submit" className={dash.primaryBtn}>
                 {dict.common.search}
               </button>
               <Link
                 href={selectedRole === "all" ? "/admin/users" : `/admin/users?role=${selectedRole}`}
-                className="rounded-lg border px-4 py-2 font-medium"
+                className={dash.secondaryBtn}
               >
                 {dict.common.clear}
               </Link>
@@ -264,41 +221,50 @@ export default async function AdminUsersPage({
             ) : (
               <div className="space-y-4">
                 {finalUsers.map((user) => (
-                  <div
-                    key={user.id}
-                    className="rounded-xl border border-slate-200 p-4"
-                  >
-                    <div className="grid gap-2 md:grid-cols-2">
-                      <p>
-                        <strong>{dict.common.name}:</strong> {user.full_name ?? "-"}
-                      </p>
-                      <p>
-                        <strong>{dict.common.email}:</strong> {user.email ?? "-"}
-                      </p>
-                      <div className="flex items-center gap-2">
-                        <strong>{dict.roles.label}:</strong>
+                  <div key={user.id} className={`${dash.card} p-5 sm:p-6`}>
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <h3 className="text-lg font-semibold text-stone-900">
+                          {user.full_name ?? user.email ?? "—"}
+                        </h3>
+                        <p className="mt-0.5 text-sm text-stone-600">{user.email ?? "—"}</p>
+                      </div>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <AdminUserProfileEdit
+                          userId={user.id}
+                          initialFullName={user.full_name}
+                          initialEmail={user.email}
+                        />
                         <RoleBadge role={user.role} dict={dict} />
                       </div>
-                      <p>
-                        <strong>{dict.roles.userId}:</strong> {user.id}
-                      </p>
-                      <p>
-                        <strong>{dict.qr.store}:</strong> {user.store_name ?? "-"}
-                      </p>
-                      <p>
-                        <strong>{dict.common.slug}:</strong> {user.store_slug ?? "-"}
-                      </p>
                     </div>
 
+                    <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                      <div>
+                        <dt className={dash.eyebrow}>{dict.qr.store}</dt>
+                        <dd className="mt-1 text-stone-800">{user.store_name ?? "—"}</dd>
+                      </div>
+                      <div>
+                        <dt className={dash.eyebrow}>{dict.common.slug}</dt>
+                        <dd className="mt-1 font-mono text-xs text-stone-600">
+                          {user.store_slug ?? "—"}
+                        </dd>
+                      </div>
+                      <div className="sm:col-span-2">
+                        <dt className={dash.eyebrow}>{dict.roles.userId}</dt>
+                        <dd className="mt-1 font-mono text-xs text-stone-600">{user.id}</dd>
+                      </div>
+                    </dl>
+
                     {user.role === "store_owner" && !user.store_id && (
-                      <div className="mt-4 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-800">
+                      <div className="mt-4 rounded-xl border border-amber-200/90 bg-amber-50/90 px-4 py-3 text-sm text-amber-900">
                         {dict.roles.unassignedWarning}
                       </div>
                     )}
 
-                    <div className="mt-4 grid gap-4 md:grid-cols-2">
+                    <div className={`${dash.cardInset} mt-4 grid gap-4 p-4 md:grid-cols-2`}>
                       <div>
-                        <p className="mb-2 text-sm font-medium text-slate-700">
+                        <p className="mb-2 text-sm font-medium text-stone-700">
                           {dict.roles.changeRole}
                         </p>
                         <AdminUserRoleSelect

@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { LogoutButton } from "@/components/dashboard/logout-button";
+import { dash } from "@/components/dashboard/ui/styles";
 
 const NAV_ITEMS = [
   { href: "/dashboard", labelKey: "dashboard" as const, exact: true },
@@ -30,13 +31,10 @@ export function DashboardNav() {
   }
 
   return (
-    <header className="sticky top-0 z-40 border-b border-stone-200/80 bg-white/90 shadow-[0_1px_0_0_rgba(15,23,42,0.04)] backdrop-blur-xl print:hidden">
+    <header className="sticky top-0 z-40 border-b border-stone-200/70 bg-white/85 shadow-[0_1px_0_0_rgba(15,23,42,0.04)] backdrop-blur-xl print:hidden">
       <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
         <div className="flex items-center justify-between gap-3">
-          <Link
-            href="/dashboard"
-            className="shrink-0 text-sm font-semibold tracking-tight text-stone-900 sm:text-base"
-          >
+          <Link href="/dashboard" className={dash.navBrand}>
             {dict.common.brand}
           </Link>
 
@@ -52,11 +50,7 @@ export function DashboardNav() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-lg px-3 py-2 text-sm font-medium transition ${
-                    active
-                      ? "bg-stone-900 text-white shadow-sm"
-                      : "text-stone-600 hover:bg-stone-100 hover:text-stone-900"
-                  }`}
+                  className={active ? dash.navLinkActive : dash.navLink}
                   aria-current={active ? "page" : undefined}
                 >
                   {label}
@@ -66,11 +60,13 @@ export function DashboardNav() {
           </nav>
 
           <div className="flex shrink-0 items-center gap-2">
-            <LanguageSwitcher compact />
+            <div className="rounded-xl border border-stone-200/80 bg-white/80 p-0.5 shadow-sm">
+              <LanguageSwitcher compact />
+            </div>
             <LogoutButton />
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-lg border border-stone-200 text-stone-700 transition hover:bg-stone-50 md:hidden"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-stone-200/90 bg-white text-stone-700 shadow-sm transition hover:bg-stone-50 md:hidden"
               aria-expanded={mobileOpen}
               aria-controls="dashboard-mobile-nav"
               aria-label={mobileOpen ? dict.common.dismiss : dict.nav.dashboard}
@@ -101,11 +97,7 @@ export function DashboardNav() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`rounded-xl px-3 py-3 text-center text-sm font-medium transition ${
-                    active
-                      ? "bg-stone-900 text-white shadow-sm"
-                      : "bg-stone-50 text-stone-700 hover:bg-stone-100"
-                  }`}
+                  className={active ? dash.navMobileLinkActive : dash.navMobileLink}
                   aria-current={active ? "page" : undefined}
                 >
                   {label}

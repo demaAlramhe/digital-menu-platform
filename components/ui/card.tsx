@@ -1,10 +1,14 @@
+import type { ReactNode } from "react";
+import { dash } from "@/components/dashboard/ui/styles";
+
 type CardProps = {
-  children: React.ReactNode;
+  children: ReactNode;
+  className?: string;
 };
 
-export function Card({ children }: CardProps) {
+export function Card({ children, className = "" }: CardProps) {
   return (
-    <section className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <section className={`${dash.card} p-5 sm:p-6 ${className}`.trim()}>
       {children}
     </section>
   );

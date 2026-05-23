@@ -53,7 +53,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
 
   return (
     <div className={`${dash.card} w-full max-w-none overflow-hidden`}>
-      <div className="border-b border-stone-100 bg-stone-50/80 px-6 py-5 sm:px-8 sm:py-6">
+      <div className="border-b border-stone-100/80 bg-gradient-to-r from-stone-50/90 to-white px-6 py-5 sm:px-8 sm:py-6">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-stone-400">
           {dict.qr.store}
         </p>
@@ -101,7 +101,7 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
           </div>
 
           <div className="flex justify-center lg:justify-center">
-            <div className="rounded-2xl border border-stone-200/80 bg-white p-6 shadow-inner sm:p-10">
+            <div className="rounded-2xl border border-stone-200/80 bg-white p-6 shadow-[inset_0_2px_12px_rgba(15,23,42,0.04)] ring-1 ring-stone-900/[0.03] sm:p-10">
               <QRCodeCanvas
                 ref={canvasRef}
                 value={menuUrl}

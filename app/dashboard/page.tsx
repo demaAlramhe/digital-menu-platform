@@ -65,16 +65,12 @@ export default async function DashboardHomePage() {
 
   return (
     <DashboardPage>
-      <section
-        className={`${dash.card} relative overflow-hidden p-6 sm:p-8`}
-      >
+      <section className={`${dash.hero}`}>
         <div
-          className="pointer-events-none absolute -end-8 -top-8 h-40 w-40 rounded-full bg-stone-900/[0.04]"
+          className="pointer-events-none absolute -end-12 -top-12 h-48 w-48 rounded-full bg-amber-100/30 blur-2xl"
           aria-hidden
         />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-stone-400">
-          {dict.nav.dashboard}
-        </p>
+        <p className={dash.eyebrow}>{dict.nav.dashboard}</p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
           {dict.dashboard.welcome}, {displayName}
         </h1>
@@ -112,7 +108,10 @@ export default async function DashboardHomePage() {
               <p className="mt-2 flex-1 text-sm leading-relaxed text-stone-600">
                 {dict.dashboard[item.descKey]}
               </p>
-              <span className="mt-4 inline-block text-sm font-medium text-stone-900 opacity-0 transition group-hover:opacity-100 rtl:rotate-180">
+              <span
+                className="mt-4 inline-block text-sm font-medium text-stone-400 transition group-hover:text-stone-800 rtl:rotate-180"
+                aria-hidden
+              >
                 →
               </span>
             </Link>

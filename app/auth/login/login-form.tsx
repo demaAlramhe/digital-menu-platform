@@ -2,10 +2,10 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { AppShell } from "@/components/layout/app-shell";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
-import { Card } from "@/components/ui/card";
+import { InternalAtmosphere } from "@/components/dashboard/ui/internal-atmosphere";
+import { dash } from "@/components/dashboard/ui/styles";
 import { createClient } from "@/lib/supabase/client";
 
 export function LoginForm() {
@@ -65,50 +65,69 @@ export function LoginForm() {
   }
 
   return (
-    <AppShell title={dict.auth.title} subtitle={dict.auth.subtitle}>
-      <div className="mb-4 flex justify-end">
-        <LanguageSwitcher compact />
+    <main className={`${dash.shell} relative flex min-h-screen flex-col`}>
+      <InternalAtmosphere />
+
+      <div className="relative z-10 flex flex-1 flex-col items-center justify-center px-4 py-10 sm:py-12">
+        <div className="mb-6 rounded-xl border border-stone-200/80 bg-white/80 p-0.5 shadow-sm">
+          <LanguageSwitcher compact />
+        </div>
+
+        <div className="w-full max-w-[26rem] text-center">
+          <p className={dash.eyebrow}>{dict.common.brand}</p>
+          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+            {dict.auth.title}
+          </h1>
+          <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-stone-600">
+            {dict.auth.subtitle}
+          </p>
+        </div>
+
+        <div className={`${dash.card} mt-8 w-full max-w-[26rem] p-6 sm:p-8`}>
+          <form onSubmit={handleSubmit} className="mx-auto flex w-full max-w-sm flex-col gap-5">
+            <label className="block w-full text-center">
+              <span className={`mb-1.5 block ${dash.label}`}>{dict.auth.email}</span>
+              <input
+                className={`${dash.input} text-center`}
+                name="email"
+                type="email"
+                autoComplete="email"
+                placeholder="owner@store.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </label>
+
+            <label className="block w-full text-center">
+              <span className={`mb-1.5 block ${dash.label}`}>{dict.auth.password}</span>
+              <input
+                className={`${dash.input} text-center`}
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </label>
+
+            {message && (
+              <p className="text-center text-sm text-red-600" role="alert">
+                {message}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className={`${dash.primaryBtn} w-full`}
+              disabled={loading}
+              suppressHydrationWarning
+            >
+              {loading ? dict.auth.signingIn : dict.auth.signIn}
+            </button>
+          </form>
+        </div>
       </div>
-      <Card>
-        <form onSubmit={handleSubmit} className="grid max-w-md gap-4">
-          <label className="grid gap-1 text-sm">
-            <span>{dict.auth.email}</span>
-            <input
-              className="rounded-md border border-slate-300 bg-white px-3 py-2"
-              name="email"
-              type="email"
-              autoComplete="email"
-              placeholder="owner@store.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </label>
-
-          <label className="grid gap-1 text-sm">
-            <span>{dict.auth.password}</span>
-            <input
-              className="rounded-md border border-slate-300 bg-white px-3 py-2"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-          </label>
-
-          {message && <p className="text-sm text-red-600">{message}</p>}
-
-          <button
-            type="submit"
-            className="rounded-md bg-slate-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
-            disabled={loading}
-            suppressHydrationWarning
-          >
-            {loading ? dict.auth.signingIn : dict.auth.signIn}
-          </button>
-        </form>
-      </Card>
-    </AppShell>
+    </main>
   );
 }
