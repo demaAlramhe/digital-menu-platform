@@ -10,16 +10,26 @@ import { getTranslations } from "@/lib/i18n/server";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewMenuItemPage() {
+type NewMenuItemPageProps = {
+  searchParams: Promise<{ categoryId?: string }>;
+};
+
+export default async function NewMenuItemPage({ searchParams }: NewMenuItemPageProps) {
   const storeId = await requireOwnerStoreId();
   const supabase = getOwnerStoreAdminClient();
   const { dict } = await getTranslations();
+  const { categoryId: categoryIdParam } = await searchParams;
 
   const { data: categories } = await supabase
     .from("menu_categories")
     .select("id, name")
     .eq("store_id", storeId)
     .order("sort_order", { ascending: true });
+
+  const categoryList = categories ?? [];
+  const defaultCategoryId = categoryList.some((c) => c.id === categoryIdParam)
+    ? categoryIdParam
+    : undefined;
 
   return (
     <DashboardPage>
@@ -32,10 +42,11 @@ export default async function NewMenuItemPage() {
         }
       />
       <NewMenuItemForm
-        categories={(categories ?? []).map((c) => ({
+        categories={categoryList.map((c) => ({
           id: c.id,
           name: c.name,
         }))}
+        defaultCategoryId={defaultCategoryId}
       />
     </DashboardPage>
   );

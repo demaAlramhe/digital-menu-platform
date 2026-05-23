@@ -250,6 +250,12 @@ export const en = {
     welcomeSubtitle: "Welcome message",
     welcomeCtaNote:
       "The Start Now button is shown automatically in Arabic, Hebrew, and English.",
+    menuSection: "Menu page",
+    menuSectionDesc:
+      "Background shown on the categories page after customers tap Start Now (/{slug}/menu).",
+    menuBackground: "Menu page background",
+    menuBackgroundDesc:
+      "Full-screen background behind category tiles on the menu page.",
     welcomeTitlePlaceholder: "Welcome",
     welcomeSubtitlePlaceholder: "Explore our menu",
     defaultContentLanguage: "Content language (what you write in)",

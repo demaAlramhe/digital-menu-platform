@@ -7,12 +7,16 @@ import { getDictionary } from "@/lib/i18n";
 import { getLocale } from "@/lib/i18n/server";
 import type { StoreRow } from "@/types/rows";
 
-function pickOgImage(store: StoreRow): string | undefined {
-  const candidate =
-    store.banner_url?.trim() ||
-    store.hero_image_url?.trim() ||
-    store.logo_url?.trim();
-  return candidate || undefined;
+function pickOgImage(store: StoreRow, page: "welcome" | "menu"): string | undefined {
+  const menuBg = store.menu_background_url?.trim();
+  const welcomeBg =
+    store.banner_url?.trim() || store.hero_image_url?.trim() || store.logo_url?.trim();
+
+  if (page === "menu") {
+    return menuBg || welcomeBg || undefined;
+  }
+
+  return welcomeBg || undefined;
 }
 
 export async function buildStorePublicMetadata(
@@ -50,7 +54,7 @@ export async function buildStorePublicMetadata(
   const origin = await getSiteOrigin();
   const path = page === "menu" ? `/${storeSlug}/menu` : `/${storeSlug}`;
   const canonical = origin ? `${origin}${path}` : path;
-  const ogImage = pickOgImage(store);
+  const ogImage = pickOgImage(store, page);
 
   return {
     title,

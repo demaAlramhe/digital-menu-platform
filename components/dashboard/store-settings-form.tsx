@@ -48,6 +48,8 @@ type StoreSettingsFormProps = {
 
     heroImageUrl: string;
 
+    menuBackgroundUrl: string;
+
     welcomeTitle: string;
 
     welcomeSubtitle: string;
@@ -85,6 +87,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   const [bannerUrl, setBannerUrl] = useState(store.bannerUrl);
 
   const [heroImageUrl, setHeroImageUrl] = useState(store.heroImageUrl);
+
+  const [menuBackgroundUrl, setMenuBackgroundUrl] = useState(store.menuBackgroundUrl);
 
   const [welcomeTitle, setWelcomeTitle] = useState(store.welcomeTitle);
 
@@ -150,6 +154,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
           heroImageUrl,
 
+          menuBackgroundUrl,
+
           welcomeTitle,
 
           welcomeSubtitle,
@@ -182,12 +188,15 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
       }
 
+      const baseMessage = appendTranslationNote(
+        dict,
+        dict.settings.savedSuccess,
+        getTranslationStatusFromResponse(result)
+      );
       setMessage(
-        appendTranslationNote(
-          dict,
-          dict.settings.savedSuccess,
-          getTranslationStatusFromResponse(result)
-        )
+        typeof result.migrationWarning === "string"
+          ? `${baseMessage} ${result.migrationWarning}`
+          : baseMessage
       );
 
       router.refresh();
@@ -363,6 +372,36 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
         </FormField>
 
         <p className="text-xs text-stone-500">{dict.settings.welcomeCtaNote}</p>
+
+      </FormSection>
+
+
+
+      <FormSection
+
+        title={dict.settings.menuSection}
+
+        description={dict.settings.menuSectionDesc}
+
+      >
+
+        <div className="max-w-md rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
+
+          <MenuItemImageUpload
+
+            value={menuBackgroundUrl}
+
+            onChange={setMenuBackgroundUrl}
+
+            folder={CLOUDINARY_FOLDERS.storeMenuBackgrounds}
+
+            label={dict.settings.menuBackground}
+
+          />
+
+          <p className="mt-2 text-xs text-stone-500">{dict.settings.menuBackgroundDesc}</p>
+
+        </div>
 
       </FormSection>
 

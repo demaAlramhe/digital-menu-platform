@@ -12,10 +12,11 @@ Run each script in the **Supabase SQL Editor** (or `psql`) in this order:
 |------|------|---------|
 | 0 | *(external)* | Base tables: `stores`, `profiles`, `menu_categories`, `menu_items`, auth users |
 | 1 | `store-welcome-columns.sql` | Welcome screen columns (`show_welcome_screen`, `welcome_*`, `hero_image_url`) |
-| 2 | `multilingual-content-columns.sql` | Localized `*_ar` / `*_he` / `*_en` columns + `default_content_language` |
-| 3 | `profiles-rls.sql` | Profile row policies |
-| 4 | `store-owner-rls.sql` | Owner-scoped policies on menu tables |
-| 5 | `public-menu-rls.sql` | Public read policies (if used alongside anon client) |
+| 2 | `store-menu-background.sql` | Menu page background (`menu_background_url`) |
+| 3 | `multilingual-content-columns.sql` | Localized `*_ar` / `*_he` / `*_en` columns + `default_content_language` |
+| 4 | `profiles-rls.sql` | Profile row policies |
+| 5 | `store-owner-rls.sql` | Owner-scoped policies on menu tables |
+| 6 | `public-menu-rls.sql` | Public read policies (if used alongside anon client) |
 
 Scripts are idempotent where possible (`ADD COLUMN IF NOT EXISTS`).
 

@@ -103,6 +103,9 @@ export default async function DashboardMenuItemsPage({
 
   const isFiltered = Boolean(activeCategory);
   const emptyTitle = isFiltered ? dict.menuItems.emptyInCategory : dict.menuItems.empty;
+  const newItemHref = activeCategory
+    ? `/dashboard/menu-items/new?categoryId=${activeCategory.id}`
+    : "/dashboard/menu-items/new";
 
   const publicUrls = store.slug
     ? await getOwnerPublicUrls(store.slug)
@@ -125,7 +128,7 @@ export default async function DashboardMenuItemsPage({
         eyebrow={store.name ?? undefined}
         title={dict.menuItems.title}
         description={dict.menuItems.publicMenu}
-        action={<PrimaryLink href="/dashboard/menu-items/new">{dict.menuItems.add}</PrimaryLink>}
+        action={<PrimaryLink href={newItemHref}>{dict.menuItems.add}</PrimaryLink>}
       />
 
       {publicUrls && (
@@ -142,7 +145,7 @@ export default async function DashboardMenuItemsPage({
         <EmptyState
           title={emptyTitle}
           action={
-            <PrimaryLink href="/dashboard/menu-items/new">{dict.menuItems.add}</PrimaryLink>
+            <PrimaryLink href={newItemHref}>{dict.menuItems.add}</PrimaryLink>
           }
         />
       ) : (

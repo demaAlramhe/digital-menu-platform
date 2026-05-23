@@ -56,6 +56,7 @@ export default async function DashboardSettingsPage() {
           logoUrl: store.logo_url ?? "",
           bannerUrl: store.banner_url ?? "",
           heroImageUrl: store.hero_image_url ?? "",
+          menuBackgroundUrl: store.menu_background_url ?? "",
           welcomeTitle: store.welcome_title ?? "",
           welcomeSubtitle: store.welcome_subtitle ?? "",
           defaultContentLanguage: store.default_content_language ?? "ar",

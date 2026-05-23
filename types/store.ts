@@ -20,6 +20,7 @@ export type Store = {
   logoUrl: string | null;
   bannerUrl: string | null;
   heroImageUrl: string | null;
+  menuBackgroundUrl: string | null;
   welcomeTitle: TrilingualField;
   welcomeSubtitle: TrilingualField;
   welcomeButtonText: TrilingualField;

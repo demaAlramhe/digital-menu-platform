@@ -12,6 +12,7 @@ export type Database = {
           logo_url: string | null;
           banner_url: string | null;
           hero_image_url: string | null;
+          menu_background_url: string | null;
           welcome_title: string | null;
           welcome_subtitle: string | null;
           welcome_button_text: string | null;
@@ -41,6 +42,7 @@ export type Database = {
           logo_url?: string | null;
           banner_url?: string | null;
           hero_image_url?: string | null;
+          menu_background_url?: string | null;
           welcome_title?: string | null;
           welcome_subtitle?: string | null;
           welcome_button_text?: string | null;

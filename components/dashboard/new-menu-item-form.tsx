@@ -27,9 +27,13 @@ type CategoryOption = {
 
 type NewMenuItemFormProps = {
   categories: CategoryOption[];
+  defaultCategoryId?: string;
 };
 
-export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
+export function NewMenuItemForm({
+  categories,
+  defaultCategoryId,
+}: NewMenuItemFormProps) {
   const router = useRouter();
   const { dict } = useLocale();
 
@@ -38,7 +42,11 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [sortOrder, setSortOrder] = useState("0");
-  const [categoryId, setCategoryId] = useState(categories[0]?.id ?? "");
+  const initialCategoryId =
+    defaultCategoryId && categories.some((c) => c.id === defaultCategoryId)
+      ? defaultCategoryId
+      : (categories[0]?.id ?? "");
+  const [categoryId, setCategoryId] = useState(initialCategoryId);
   const [isActive, setIsActive] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
@@ -80,12 +88,14 @@ export function NewMenuItemForm({ categories }: NewMenuItemFormProps) {
         return;
       }
 
-      router.push(
-        `/dashboard/menu-items?${buildSuccessQuery(
-          "created",
-          getTranslationStatusFromResponse(result)
-        )}`
+      const successQuery = buildSuccessQuery(
+        "created",
+        getTranslationStatusFromResponse(result)
       );
+      const listQuery = defaultCategoryId
+        ? `${successQuery}&categoryId=${defaultCategoryId}`
+        : successQuery;
+      router.push(`/dashboard/menu-items?${listQuery}`);
       router.refresh();
     } catch {
       setMessage(dict.menuItems.createError);

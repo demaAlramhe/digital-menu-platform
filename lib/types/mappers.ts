@@ -46,6 +46,7 @@ export function mapStoreFromRow(row: StoreRow): Store {
     logoUrl: row.logo_url,
     bannerUrl: row.banner_url,
     heroImageUrl: row.hero_image_url,
+    menuBackgroundUrl: row.menu_background_url,
     welcomeTitle: trilingual(
       row.welcome_title,
       row.welcome_title_ar,

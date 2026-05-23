@@ -1,6 +1,11 @@
 "use client";
 
 import { useLocale } from "@/components/i18n/locale-provider";
+import {
+  premiumGlassTileStyle,
+  STOREFRONT_GOLD,
+  STOREFRONT_GOLD_LIGHT,
+} from "@/lib/storefront/premium-theme";
 
 export type MenuItemDisplay = {
   id: string;
@@ -17,6 +22,7 @@ type MenuItemCardProps = {
   secondaryColor: string;
   showFeaturedBadge?: boolean;
   variant?: "default" | "featured";
+  theme?: "default" | "premium";
 };
 
 /** Vertical card for grid layouts (image on top, details below). */
@@ -26,27 +32,48 @@ export function MenuItemCard({
   secondaryColor,
   showFeaturedBadge = false,
   variant = "default",
+  theme = "default",
 }: MenuItemCardProps) {
   const { dict } = useLocale();
   const isFeatured =
     variant === "featured" || showFeaturedBadge || item.is_featured;
+  const isPremium = theme === "premium";
 
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl bg-white transition-shadow duration-300 ${
-        variant === "featured"
-          ? ""
-          : "shadow-[0_4px_20px_rgba(15,23,42,0.06)] ring-1 ring-stone-200/60 hover:shadow-[0_8px_28px_rgba(15,23,42,0.09)]"
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition-shadow duration-300 ${
+        isPremium
+          ? "border border-[#d4b87a]/35"
+          : `bg-white ${
+              variant === "featured"
+                ? ""
+                : "shadow-[0_4px_20px_rgba(15,23,42,0.06)] ring-1 ring-stone-200/60 hover:shadow-[0_8px_28px_rgba(15,23,42,0.09)]"
+            }`
       }`}
       style={
-        variant === "featured"
+        isPremium
           ? {
-              boxShadow: `0 12px 40px rgba(15,23,42,0.1), 0 0 0 2px ${secondaryColor}55`,
+              ...premiumGlassTileStyle,
+              ...(isFeatured
+                ? {
+                    border: `1px solid ${STOREFRONT_GOLD}`,
+                    boxShadow:
+                      "0 16px 48px rgba(201,169,98,0.22), inset 0 1px 0 rgba(255,255,255,0.08)",
+                  }
+                : {}),
             }
-          : undefined
+          : variant === "featured"
+            ? {
+                boxShadow: `0 12px 40px rgba(15,23,42,0.1), 0 0 0 2px ${secondaryColor}55`,
+              }
+            : undefined
       }
     >
-      <div className="relative aspect-[4/3] w-full shrink-0 overflow-hidden bg-stone-100">
+      <div
+        className={`relative aspect-[4/3] w-full shrink-0 overflow-hidden ${
+          isPremium ? "bg-black/40" : "bg-stone-100"
+        }`}
+      >
         {item.image_url ? (
           <img
             src={item.image_url}
@@ -54,14 +81,25 @@ export function MenuItemCard({
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-stone-100 to-stone-200/80">
-            <PlateIcon className="h-10 w-10 text-stone-400/80" />
+          <div
+            className={`flex h-full w-full items-center justify-center ${
+              isPremium
+                ? "bg-gradient-to-br from-black/50 to-black/30"
+                : "bg-gradient-to-br from-stone-100 to-stone-200/80"
+            }`}
+          >
+            <PlateIcon
+              className={`h-10 w-10 ${isPremium ? "text-[#d4b87a]/60" : "text-stone-400/80"}`}
+            />
           </div>
         )}
         {isFeatured && (
           <span
             className="absolute start-2.5 top-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg"
-            style={{ backgroundColor: secondaryColor }}
+            style={{
+              backgroundColor: isPremium ? STOREFRONT_GOLD : secondaryColor,
+              color: isPremium ? "#1a1408" : undefined,
+            }}
           >
             <StarIcon className="h-3 w-3" />
             {dict.menu.featured}
@@ -77,20 +115,30 @@ export function MenuItemCard({
         <div className="min-w-0 space-y-2">
           <div className="flex items-start justify-between gap-2">
             <h3
-              className={`min-w-0 flex-1 font-semibold leading-snug text-stone-900 ${
+              className={`min-w-0 flex-1 font-semibold leading-snug ${
+                isPremium ? "" : "text-stone-900"
+              } ${
                 variant === "featured"
                   ? "text-base sm:text-lg"
                   : "text-sm sm:text-base"
               }`}
+              style={isPremium ? { color: STOREFRONT_GOLD_LIGHT } : undefined}
             >
               <span className="line-clamp-2">{item.name}</span>
             </h3>
             <p
               className="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-bold tabular-nums sm:text-sm"
-              style={{
-                color: primaryColor,
-                backgroundColor: `${primaryColor}12`,
-              }}
+              style={
+                isPremium
+                  ? {
+                      color: "#1a1408",
+                      backgroundColor: STOREFRONT_GOLD,
+                    }
+                  : {
+                      color: primaryColor,
+                      backgroundColor: `${primaryColor}12`,
+                    }
+              }
             >
               <span className="text-[10px] font-semibold opacity-80">
                 {dict.common.currency}
@@ -99,7 +147,11 @@ export function MenuItemCard({
             </p>
           </div>
           {item.description && (
-            <p className="line-clamp-3 text-[13px] leading-relaxed text-stone-600 sm:text-sm">
+            <p
+              className={`line-clamp-3 text-[13px] leading-relaxed sm:text-sm ${
+                isPremium ? "text-white/70" : "text-stone-600"
+              }`}
+            >
               {item.description}
             </p>
           )}

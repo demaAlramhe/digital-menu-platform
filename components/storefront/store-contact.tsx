@@ -6,6 +6,10 @@ import {
   buildWhatsAppUrl,
   normalizePhoneForTel,
 } from "@/lib/utils/whatsapp";
+import {
+  premiumGlassTileStyle,
+  STOREFRONT_GOLD_LIGHT,
+} from "@/lib/storefront/premium-theme";
 
 type StoreContactProps = {
   phone?: string | null;
@@ -14,6 +18,7 @@ type StoreContactProps = {
   storeName: string;
   primaryColor: string;
   compact?: boolean;
+  theme?: "default" | "premium";
 };
 
 export function StoreContact({
@@ -23,8 +28,10 @@ export function StoreContact({
   storeName,
   primaryColor,
   compact = false,
+  theme = "default",
 }: StoreContactProps) {
   const { dict } = useLocale();
+  const isPremium = theme === "premium";
   const hasPhone = Boolean(phone?.trim());
   const hasEmail = Boolean(email?.trim());
   const hasAddress = Boolean(address?.trim());
@@ -71,19 +78,34 @@ export function StoreContact({
 
   return (
     <section
-      className={`overflow-hidden rounded-2xl bg-white shadow-[0_8px_32px_rgba(15,23,42,0.07)] ring-1 ring-stone-200/70 ${
-        compact ? "p-4" : "p-5 sm:p-6"
-      }`}
+      className={`overflow-hidden rounded-2xl ${
+        isPremium
+          ? "border border-[#d4b87a]/35"
+          : "bg-white shadow-[0_8px_32px_rgba(15,23,42,0.07)] ring-1 ring-stone-200/70"
+      } ${compact ? "p-4" : "p-5 sm:p-6"}`}
+      style={isPremium ? premiumGlassTileStyle : undefined}
     >
-      <div className="flex items-center gap-3 border-b border-stone-100 pb-4">
+      <div
+        className={`flex items-center gap-3 border-b pb-4 ${
+          isPremium ? "border-[#d4b87a]/25" : "border-stone-100"
+        }`}
+      >
         <span
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-white shadow-sm"
-          style={{ backgroundColor: primaryColor }}
+          className="flex h-10 w-10 items-center justify-center rounded-xl text-[#1a1408] shadow-sm"
+          style={{
+            backgroundColor: isPremium ? "#C9A962" : primaryColor,
+            color: isPremium ? "#1a1408" : "white",
+          }}
           aria-hidden
         >
           <ContactIcon />
         </span>
-        <h2 className="text-lg font-semibold tracking-tight text-stone-900 sm:text-xl">
+        <h2
+          className={`text-lg font-semibold tracking-tight sm:text-xl ${
+            isPremium ? "" : "text-stone-900"
+          }`}
+          style={isPremium ? { color: STOREFRONT_GOLD_LIGHT } : undefined}
+        >
           {dict.store.contactTitle}
         </h2>
       </div>
@@ -97,6 +119,7 @@ export function StoreContact({
               href={item.href}
               icon={item.icon}
               primaryColor={primaryColor}
+              theme={theme}
             />
           </li>
         ))}
@@ -123,26 +146,41 @@ function ContactRow({
   href,
   icon,
   primaryColor,
+  theme = "default",
 }: {
   label: string;
   value: string;
   href: string | null;
   icon: ReactNode;
   primaryColor: string;
+  theme?: "default" | "premium";
 }) {
+  const isPremium = theme === "premium";
   const content = (
     <>
       <span
         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
-        style={{ backgroundColor: `${primaryColor}12`, color: primaryColor }}
+        style={
+          isPremium
+            ? { backgroundColor: "rgba(201,169,98,0.2)", color: "#E8D5A8" }
+            : { backgroundColor: `${primaryColor}12`, color: primaryColor }
+        }
       >
         {icon}
       </span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-stone-400">
+        <span
+          className={`block text-[10px] font-semibold uppercase tracking-[0.14em] ${
+            isPremium ? "text-white/45" : "text-stone-400"
+          }`}
+        >
           {label}
         </span>
-        <span className="mt-0.5 block text-[15px] font-medium leading-snug text-stone-900">
+        <span
+          className={`mt-0.5 block text-[15px] font-medium leading-snug ${
+            isPremium ? "text-white/90" : "text-stone-900"
+          }`}
+        >
           {value}
         </span>
       </span>
@@ -153,7 +191,11 @@ function ContactRow({
     return (
       <a
         href={href}
-        className="flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-3.5 py-3 transition hover:border-stone-200 hover:bg-white active:scale-[0.99]"
+        className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 transition active:scale-[0.99] ${
+          isPremium
+            ? "border-[#d4b87a]/20 bg-black/20 hover:border-[#d4b87a]/45 hover:bg-black/30"
+            : "border-stone-100 bg-stone-50/60 hover:border-stone-200 hover:bg-white"
+        }`}
       >
         {content}
       </a>
@@ -161,7 +203,13 @@ function ContactRow({
   }
 
   return (
-    <div className="flex items-center gap-3 rounded-xl border border-stone-100 bg-stone-50/60 px-3.5 py-3">
+    <div
+      className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 ${
+        isPremium
+          ? "border-[#d4b87a]/20 bg-black/20"
+          : "border-stone-100 bg-stone-50/60"
+      }`}
+    >
       {content}
     </div>
   );

@@ -136,7 +136,7 @@ export const ar: Dictionary = {
     welcomeMessage: "أهلًا وسهلًا بكم في مطعمنا، نتمنى لكم تجربة ممتعة!",
     welcomeCta: "ابدأ الآن",
     welcomeDefaultSubtitle:
-      "اكتشفوا قائمتنا — أطباق ومشروبات وعروض خاصة.",
+      "أهلاً وسهلاً بكم، نتمنى لكم تجربة ممتعة!",
     aboutTitle: "نبذة عنا",
     aboutText: "في القائمة الكاملة ستجدون أطباقاً ومشروبات وعروضاً خاصة.",
     viewMenu: "تصفح القائمة",
@@ -252,6 +252,12 @@ export const ar: Dictionary = {
     welcomeSubtitle: "رسالة الترحيب",
     welcomeCtaNote:
       "زر «ابدأ الآن» يظهر تلقائياً بالعربية والعبرية والإنجليزية.",
+    menuSection: "صفحة القائمة",
+    menuSectionDesc:
+      "الخلفية المعروضة في صفحة الفئات بعد الضغط على «ابدأ الآن» (/{slug}/menu).",
+    menuBackground: "خلفية صفحة القائمة",
+    menuBackgroundDesc:
+      "صورة خلفية بملء الشاشة خلف بطاقات الفئات في صفحة القائمة.",
     welcomeTitlePlaceholder: "أهلاً بكم",
     welcomeSubtitlePlaceholder: "اكتشفوا قائمتنا",
     defaultContentLanguage: "لغة المحتوى (لغة الإدخال)",

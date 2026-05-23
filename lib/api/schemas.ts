@@ -12,6 +12,7 @@ export const storeSettingsPatchSchema = z.object({
   logoUrl: optionalUrl,
   bannerUrl: optionalUrl,
   heroImageUrl: optionalUrl,
+  menuBackgroundUrl: optionalUrl,
   welcomeTitle: optionalString,
   welcomeSubtitle: optionalString,
   welcomeButtonText: optionalString,

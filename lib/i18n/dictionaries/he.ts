@@ -249,6 +249,12 @@ export const he = {
     welcomeSubtitle: "הודעת ברכה",
     welcomeCtaNote:
       "כפתור «התחל עכשיו» מוצג אוטומטית בערבית, עברית ואנגלית.",
+    menuSection: "דף התפריט",
+    menuSectionDesc:
+      "רקע שמוצג בדף הקטגוריות אחרי לחיצה על «התחל עכשיו» (/{slug}/menu).",
+    menuBackground: "רקע דף התפריט",
+    menuBackgroundDesc:
+      "תמונת רקע במסך מלא מאחורי כרטיסי הקטגוריות בדף התפריט.",
     welcomeTitlePlaceholder: "ברוכים הבאים",
     welcomeSubtitlePlaceholder: "גלו את התפריט שלנו",
     defaultContentLanguage: "שפת תוכן (שפה שבה אתם כותבים)",
