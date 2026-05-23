@@ -3,9 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { StorePremiumGlass } from "@/components/storefront/store-premium-glass";
 import { useLocale } from "@/components/i18n/locale-provider";
-import { formatMessage } from "@/lib/i18n";
 import {
-  premiumGlassTileStyle,
   STOREFRONT_GOLD,
   STOREFRONT_GOLD_LIGHT,
 } from "@/lib/storefront/premium-theme";
@@ -20,6 +18,7 @@ export type MenuBrowseSection = {
   name: string;
   items: MenuItemDisplay[];
   isFeatured?: boolean;
+  imageUrl?: string | null;
 };
 
 type PublicMenuBrowserProps = {
@@ -33,8 +32,8 @@ type PublicMenuBrowserProps = {
 const MENU_ITEM_GRID =
   "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:gap-5";
 
-const CATEGORY_GRID =
-  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3";
+const CATEGORY_LIST =
+  "mx-auto flex w-full max-w-2xl flex-col gap-3 sm:gap-4";
 
 export function PublicMenuBrowser({
   sections,
@@ -128,7 +127,7 @@ export function PublicMenuBrowser({
         )}
 
         <p
-          className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/50"
+          className="text-[11px] font-semibold uppercase tracking-[0.2em]"
           style={{ color: `${STOREFRONT_GOLD_LIGHT}99` }}
         >
           {storeName}
@@ -147,10 +146,10 @@ export function PublicMenuBrowser({
         />
       </header>
 
-      <ul className={CATEGORY_GRID}>
+      <ul className={CATEGORY_LIST}>
         {sections.map((section) => (
           <li key={section.id} className="min-w-0">
-            <CategoryTile
+            <CategoryRow
               section={section}
               isFeatured={section.isFeatured}
               onSelect={() => setSelectedId(section.id)}
@@ -162,7 +161,7 @@ export function PublicMenuBrowser({
   );
 }
 
-function CategoryTile({
+function CategoryRow({
   section,
   isFeatured,
   onSelect,
@@ -171,43 +170,64 @@ function CategoryTile({
   isFeatured?: boolean;
   onSelect: () => void;
 }) {
-  const { dict } = useLocale();
-  const count = section.items.length;
-  const itemCountLabel = formatMessage(dict.menu.itemsInCategory, {
-    count: String(count),
-  });
+  const imageUrl =
+    section.imageUrl ??
+    section.items.find((item) => item.image_url)?.image_url ??
+    null;
 
   return (
     <button
       type="button"
       onClick={onSelect}
-      className="group flex aspect-square w-full flex-col items-center justify-center rounded-2xl px-3 py-5 text-center transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.98] sm:rounded-[1.25rem] sm:px-4"
-      style={
-        isFeatured
-          ? {
-              ...premiumGlassTileStyle,
-              border: `1px solid ${STOREFRONT_GOLD}`,
-              boxShadow:
-                "0 12px 40px rgba(201,169,98,0.25), inset 0 1px 0 rgba(255,255,255,0.08)",
-            }
-          : premiumGlassTileStyle
-      }
+      dir="ltr"
+      className="group flex w-full items-center justify-center gap-5 rounded-xl border px-4 py-3.5 transition duration-200 hover:-translate-y-0.5 hover:brightness-110 active:scale-[0.99] sm:gap-6 sm:rounded-2xl sm:px-6 sm:py-4"
+      style={{
+        backgroundColor: "rgba(24, 24, 27, 0.92)",
+        borderColor: isFeatured ? STOREFRONT_GOLD : `${STOREFRONT_GOLD}cc`,
+        boxShadow: isFeatured
+          ? "0 6px 24px rgba(201,169,98,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
+          : "0 3px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
+      }}
     >
-      <span
-        className="mb-3 h-1 w-8 rounded-full opacity-90 transition group-hover:w-10"
-        style={{ backgroundColor: STOREFRONT_GOLD }}
-        aria-hidden
-      />
-      <span
-        className="line-clamp-3 text-[15px] font-semibold leading-snug tracking-tight sm:text-base"
-        style={{ color: STOREFRONT_GOLD_LIGHT }}
-      >
+      <span className="min-w-0 flex-1 text-center text-lg font-semibold leading-snug text-white [unicode-bidi:plaintext] sm:text-xl">
         {section.name}
       </span>
-      <span className="mt-2 text-[11px] font-medium text-white/55 sm:text-xs">
-        {itemCountLabel}
-      </span>
+      <CategoryRowThumb imageUrl={imageUrl} label={section.name} />
     </button>
+  );
+}
+
+function CategoryRowThumb({
+  imageUrl,
+  label,
+}: {
+  imageUrl: string | null;
+  label: string;
+}) {
+  if (imageUrl) {
+    return (
+      <img
+        src={imageUrl}
+        alt=""
+        className="h-14 w-14 shrink-0 rounded-lg object-cover ring-1 ring-[#d4b87a]/35 sm:h-16 sm:w-16 sm:rounded-xl"
+      />
+    );
+  }
+
+  const initial = label.charAt(0).toUpperCase() || "•";
+
+  return (
+    <div
+      className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg text-lg font-semibold sm:h-16 sm:w-16 sm:rounded-xl"
+      style={{
+        background: `linear-gradient(145deg, ${STOREFRONT_GOLD}44, rgba(0,0,0,0.5))`,
+        color: STOREFRONT_GOLD_LIGHT,
+        border: `1px solid ${STOREFRONT_GOLD}55`,
+      }}
+      aria-hidden
+    >
+      {initial}
+    </div>
   );
 }
 

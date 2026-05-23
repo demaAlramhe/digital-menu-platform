@@ -1,35 +1,256 @@
 "use client";
 
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { premiumGoldCtaStyle } from "@/lib/storefront/premium-theme";
 import { normalizePhoneForTel } from "@/lib/utils/whatsapp";
 
 type StoreFloatingPhoneButtonProps = {
   phone?: string | null;
+  /** Persists drag position per store (e.g. store slug). */
+  persistKey?: string;
 };
 
-/** Fixed call button on the physical right edge of the menu page. */
-export function StoreFloatingPhoneButton({ phone }: StoreFloatingPhoneButtonProps) {
+type Position = { x: number; y: number };
+
+const DRAG_THRESHOLD_PX = 8;
+const VIEWPORT_PAD_PX = 10;
+const ESTIMATED_WIDTH = 48;
+const ESTIMATED_HEIGHT = 62;
+
+function storageId(persistKey: string | undefined, phone: string) {
+  const base = persistKey?.trim() || normalizePhoneForTel(phone);
+  return `menu-contact-fab:${base}`;
+}
+
+function readStoredPosition(key: string): Position | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = window.localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Position;
+    if (
+      typeof parsed?.x === "number" &&
+      typeof parsed?.y === "number" &&
+      Number.isFinite(parsed.x) &&
+      Number.isFinite(parsed.y)
+    ) {
+      return parsed;
+    }
+  } catch {
+    /* ignore */
+  }
+  return null;
+}
+
+function defaultPosition(): Position {
+  if (typeof window === "undefined") {
+    return { x: 16, y: 16 };
+  }
+
+  const safeBottom =
+    typeof window !== "undefined"
+      ? Number.parseFloat(
+          getComputedStyle(document.documentElement).getPropertyValue(
+            "env(safe-area-inset-bottom)"
+          )
+        ) || 0
+      : 0;
+
+  return {
+    x: window.innerWidth - ESTIMATED_WIDTH - VIEWPORT_PAD_PX,
+    y:
+      window.innerHeight -
+      ESTIMATED_HEIGHT -
+      VIEWPORT_PAD_PX -
+      Math.max(safeBottom, 12),
+  };
+}
+
+function clampPosition(
+  x: number,
+  y: number,
+  width: number,
+  height: number
+): Position {
+  const maxX = window.innerWidth - width - VIEWPORT_PAD_PX;
+  const maxY = window.innerHeight - height - VIEWPORT_PAD_PX;
+
+  return {
+    x: Math.min(maxX, Math.max(VIEWPORT_PAD_PX, x)),
+    y: Math.min(maxY, Math.max(VIEWPORT_PAD_PX, y)),
+  };
+}
+
+/** Draggable call button — customers can move it so it does not cover the menu. */
+export function StoreFloatingPhoneButton({
+  phone,
+  persistKey,
+}: StoreFloatingPhoneButtonProps) {
   const { dict } = useLocale();
   const trimmed = phone?.trim();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const dragState = useRef({
+    pointerId: -1,
+    startX: 0,
+    startY: 0,
+    originX: 0,
+    originY: 0,
+    moved: false,
+  });
+
+  const [position, setPosition] = useState<Position | null>(null);
+  const positionRef = useRef<Position | null>(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    positionRef.current = position;
+  }, [position]);
+
+  const clampToViewport = useCallback((pos: Position): Position => {
+    const el = rootRef.current;
+    const width = el?.offsetWidth ?? ESTIMATED_WIDTH;
+    const height = el?.offsetHeight ?? ESTIMATED_HEIGHT;
+    return clampPosition(pos.x, pos.y, width, height);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!trimmed) return;
+
+    const key = storageId(persistKey, trimmed);
+    const stored = readStoredPosition(key);
+    const initial = stored ?? defaultPosition();
+    setPosition(clampToViewport(initial));
+    setReady(true);
+  }, [trimmed, persistKey, clampToViewport]);
+
+  useEffect(() => {
+    if (!trimmed || !ready) return;
+
+    function onResize() {
+      setPosition((prev) => (prev ? clampToViewport(prev) : prev));
+    }
+
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [trimmed, ready, clampToViewport]);
+
+  const persistPosition = useCallback(
+    (pos: Position) => {
+      if (!trimmed) return;
+      try {
+        window.localStorage.setItem(
+          storageId(persistKey, trimmed),
+          JSON.stringify(pos)
+        );
+      } catch {
+        /* ignore quota / private mode */
+      }
+    },
+    [trimmed, persistKey]
+  );
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!position || e.button !== 0) return;
+
+    dragState.current = {
+      pointerId: e.pointerId,
+      startX: e.clientX,
+      startY: e.clientY,
+      originX: position.x,
+      originY: position.y,
+      moved: false,
+    };
+
+    setIsDragging(true);
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
+    if (drag.pointerId !== e.pointerId) return;
+
+    const dx = e.clientX - drag.startX;
+    const dy = e.clientY - drag.startY;
+
+    if (!drag.moved && Math.hypot(dx, dy) < DRAG_THRESHOLD_PX) {
+      return;
+    }
+
+    drag.moved = true;
+
+    const next = clampToViewport({
+      x: drag.originX + dx,
+      y: drag.originY + dy,
+    });
+    setPosition(next);
+  };
+
+  const finishPointer = (e: React.PointerEvent<HTMLDivElement>) => {
+    const drag = dragState.current;
+    if (drag.pointerId !== e.pointerId) return;
+
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+
+    setIsDragging(false);
+
+    if (drag.moved && positionRef.current) {
+      persistPosition(positionRef.current);
+    }
+
+    dragState.current.pointerId = -1;
+  };
+
+  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (dragState.current.moved) {
+      e.preventDefault();
+    }
+  };
+
   if (!trimmed) return null;
 
+  const telHref = `tel:${normalizePhoneForTel(trimmed)}`;
+
   return (
-    <a
-      href={`tel:${normalizePhoneForTel(trimmed)}`}
-      className="fixed right-3 top-1/2 z-30 flex -translate-y-1/2 flex-col items-center gap-1.5 rounded-2xl border border-[#d4b87a]/55 bg-[rgba(12,10,8,0.72)] px-2.5 py-3 shadow-[0_12px_40px_rgba(0,0,0,0.5)] backdrop-blur-md transition hover:border-[#d4b87a] hover:brightness-110 active:scale-[0.97] sm:right-4 sm:px-3"
-      aria-label={`${dict.store.contactTitle}: ${trimmed}`}
+    <div
+      ref={rootRef}
+      className={`fixed z-30 touch-none select-none ${ready ? "" : "pointer-events-none opacity-0"}`}
+      style={
+        position
+          ? { left: position.x, top: position.y, right: "auto", bottom: "auto" }
+          : undefined
+      }
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={finishPointer}
+      onPointerCancel={finishPointer}
     >
-      <span
-        className="flex h-11 w-11 items-center justify-center rounded-full sm:h-12 sm:w-12"
-        style={premiumGoldCtaStyle}
+      <a
+        href={telHref}
+        onClick={handleClick}
+        draggable={false}
+        className={`flex flex-col items-center gap-1 rounded-xl border border-[#d4b87a]/50 bg-[rgba(12,10,8,0.78)] px-1.5 py-2 shadow-[0_8px_24px_rgba(0,0,0,0.45)] backdrop-blur-md transition-[border-color,filter,transform] hover:border-[#d4b87a] hover:brightness-110 ${
+          isDragging
+            ? "scale-[1.02] cursor-grabbing border-[#d4b87a] shadow-[0_16px_48px_rgba(0,0,0,0.55)]"
+            : "cursor-grab active:scale-[0.97]"
+        }`}
+        aria-label={`${dict.store.contactTitle}: ${trimmed}`}
+        title={dict.menu.dragContactHint}
       >
-        <PhoneIcon className="h-5 w-5 shrink-0" />
-      </span>
-      <span className="text-center text-[10px] font-semibold leading-tight text-[#f5e6c8] sm:text-[11px]">
-        {dict.store.contactTitle}
-      </span>
-    </a>
+        <span
+          className="flex h-8 w-8 items-center justify-center rounded-full"
+          style={premiumGoldCtaStyle}
+        >
+          <PhoneIcon className="h-3.5 w-3.5 shrink-0" />
+        </span>
+        <span className="pointer-events-none text-center text-[9px] font-medium leading-none text-[#f5e6c8]/95">
+          {dict.store.contactTitle}
+        </span>
+      </a>
+    </div>
   );
 }
 

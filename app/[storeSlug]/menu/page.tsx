@@ -93,6 +93,10 @@ function toMenuItemDisplay(item: ResolvedMenuItem): MenuItemDisplay {
 
 
 
+function pickSectionImageUrl(items: ResolvedMenuItem[]): string | null {
+  return items.find((item) => item.image_url)?.image_url ?? null;
+}
+
 function buildMenuSections(
 
   cats: { id: string; name: string; slug: string; sort_order: number }[],
@@ -123,6 +127,8 @@ function buildMenuSections(
 
       isFeatured: true,
 
+      imageUrl: pickSectionImageUrl(featuredItems),
+
     });
 
   }
@@ -145,6 +151,8 @@ function buildMenuSections(
 
       items: categoryItems.map(toMenuItemDisplay),
 
+      imageUrl: pickSectionImageUrl(categoryItems),
+
     });
 
   }
@@ -160,6 +168,8 @@ function buildMenuSections(
       name: dict.common.uncategorized,
 
       items: uncategorized.map(toMenuItemDisplay),
+
+      imageUrl: pickSectionImageUrl(uncategorized),
 
     });
 
@@ -307,13 +317,9 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
       <StorePremiumBackdrop imageUrl={backgroundImageUrl} />
 
-      <StoreFloatingPhoneButton phone={store.phone} />
+      <StoreFloatingPhoneButton phone={store.phone} persistKey={storeSlug} />
 
-      <div
-        className={`relative z-10 flex min-h-screen flex-col px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 ${
-          store.phone?.trim() ? "pe-[4.5rem] sm:pe-20" : ""
-        }`}
-      >
+      <div className="relative z-10 flex min-h-screen flex-col px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:py-8">
 
         <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
 
