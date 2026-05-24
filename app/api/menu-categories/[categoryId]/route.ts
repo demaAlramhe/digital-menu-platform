@@ -3,6 +3,7 @@ import { requireApiStoreOwner } from "@/lib/auth/api-auth";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizeSlug } from "@/lib/utils/slug";
 import { translateContentFields } from "@/lib/ai/translate-content";
+import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuCategoryPatchSchema } from "@/lib/api/schemas";
@@ -51,9 +52,7 @@ export async function PATCH(
       .from("menu_categories")
       .update({
         name: nameTrimmed,
-        name_ar: nameT?.ar || null,
-        name_he: nameT?.he || null,
-        name_en: nameT?.en || null,
+        ...trilingualColumns("name", nameT),
         slug: normalizeSlug(slug),
         sort_order: sortOrder ?? 0,
         is_active: isActive ?? true,

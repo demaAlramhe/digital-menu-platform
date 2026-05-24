@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { translateContentFields } from "@/lib/ai/translate-content";
+import { trilingualColumns } from "@/lib/ai/trilingual-db";
+import { DEFAULT_WELCOME_CTA } from "@/lib/content/default-welcome-cta";
 import { parseJsonBody } from "@/lib/api/validation";
 import { storeSettingsPatchSchema } from "@/lib/api/schemas";
 import {
@@ -77,7 +79,9 @@ export async function PATCH(req: Request) {
 
     const titleT = translations.welcome_title;
     const subtitleT = translations.welcome_subtitle;
-    const buttonT = translations.welcome_button;
+    const buttonT = buttonTrimmed
+      ? translations.welcome_button
+      : DEFAULT_WELCOME_CTA;
 
     const supabase = createAdminClient();
 
@@ -89,17 +93,11 @@ export async function PATCH(req: Request) {
       menu_background_url: menuBackgroundUrl || null,
       default_content_language: sourceLocale,
       welcome_title: titleTrimmed || null,
-      welcome_title_ar: titleT?.ar || null,
-      welcome_title_he: titleT?.he || null,
-      welcome_title_en: titleT?.en || null,
+      ...trilingualColumns("welcome_title", titleT),
       welcome_subtitle: subtitleTrimmed || null,
-      welcome_subtitle_ar: subtitleT?.ar || null,
-      welcome_subtitle_he: subtitleT?.he || null,
-      welcome_subtitle_en: subtitleT?.en || null,
-      welcome_button_text: buttonTrimmed || null,
-      welcome_button_text_ar: buttonT?.ar || null,
-      welcome_button_text_he: buttonT?.he || null,
-      welcome_button_text_en: buttonT?.en || null,
+      ...trilingualColumns("welcome_subtitle", subtitleT),
+      welcome_button_text: buttonTrimmed || DEFAULT_WELCOME_CTA[sourceLocale],
+      ...trilingualColumns("welcome_button_text", buttonT),
       show_welcome_screen: showWelcomeScreen !== false,
       primary_color: primaryColor || "#111827",
       secondary_color: secondaryColor || "#f59e0b",

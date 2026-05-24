@@ -59,6 +59,7 @@ export default async function DashboardSettingsPage() {
           menuBackgroundUrl: store.menu_background_url ?? "",
           welcomeTitle: store.welcome_title ?? "",
           welcomeSubtitle: store.welcome_subtitle ?? "",
+          welcomeButtonText: store.welcome_button_text ?? "",
           defaultContentLanguage: store.default_content_language ?? "ar",
           primaryColor: store.primary_color ?? "#111827",
           secondaryColor: store.secondary_color ?? "#f59e0b",

@@ -7,6 +7,7 @@ import {
   translateContentFields,
   type TranslateFieldInput,
 } from "@/lib/ai/translate-content";
+import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuItemPostSchema } from "@/lib/api/schemas";
@@ -87,14 +88,10 @@ export async function POST(req: Request) {
         store_id: storeId,
         category_id: resolvedCategoryId,
         name: nameTrimmed,
-        name_ar: nameT?.ar || null,
-        name_he: nameT?.he || null,
-        name_en: nameT?.en || null,
+        ...trilingualColumns("name", nameT),
         slug: normalizeSlug(slug),
         description: descriptionTrimmed || null,
-        description_ar: descT?.ar || null,
-        description_he: descT?.he || null,
-        description_en: descT?.en || null,
+        ...trilingualColumns("description", descT),
         image_url: imageUrl || null,
         price,
         is_active: isActive ?? true,

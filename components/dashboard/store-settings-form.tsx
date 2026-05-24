@@ -31,6 +31,7 @@ import {
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { appendTranslationNote } from "@/lib/dashboard/translation-feedback";
 import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
+import { RetranslateContentButton } from "@/components/dashboard/retranslate-content-button";
 
 
 
@@ -53,6 +54,8 @@ type StoreSettingsFormProps = {
     welcomeTitle: string;
 
     welcomeSubtitle: string;
+
+    welcomeButtonText: string;
 
     defaultContentLanguage: string;
 
@@ -93,6 +96,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   const [welcomeTitle, setWelcomeTitle] = useState(store.welcomeTitle);
 
   const [welcomeSubtitle, setWelcomeSubtitle] = useState(store.welcomeSubtitle);
+
+  const [welcomeButtonText, setWelcomeButtonText] = useState(store.welcomeButtonText);
 
   const [defaultContentLanguage, setDefaultContentLanguage] = useState(
 
@@ -159,6 +164,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
           welcomeTitle,
 
           welcomeSubtitle,
+
+          welcomeButtonText,
 
           showWelcomeScreen: true,
 
@@ -297,6 +304,10 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
         </p>
 
+        <div className="mb-4">
+          <RetranslateContentButton />
+        </div>
+
         <div className="grid gap-4 md:grid-cols-2">
 
           <div className="rounded-xl border border-stone-200/80 bg-stone-50/50 p-4">
@@ -369,6 +380,14 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
           />
 
+        </FormField>
+
+        <FormField label={dict.settings.welcomeButtonText}>
+          <FormInput
+            value={welcomeButtonText}
+            onChange={(e) => setWelcomeButtonText(e.target.value)}
+            placeholder={dict.settings.welcomeButtonPlaceholder}
+          />
         </FormField>
 
         <p className="text-xs text-stone-500">{dict.settings.welcomeCtaNote}</p>

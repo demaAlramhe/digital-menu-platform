@@ -19,6 +19,7 @@ import {
 import type { MenuItemDisplay } from "@/components/storefront/menu-item-card";
 
 import { StoreFloatingPhoneButton } from "@/components/storefront/store-floating-phone-button";
+import { StoreMenuLocaleBar } from "@/components/storefront/store-menu-locale-bar";
 import { StorePremiumBackdrop } from "@/components/storefront/store-premium-backdrop";
 
 import { StorePremiumGlass } from "@/components/storefront/store-premium-glass";
@@ -317,9 +318,11 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
       <StorePremiumBackdrop imageUrl={backgroundImageUrl} />
 
+      <StoreMenuLocaleBar />
+
       <StoreFloatingPhoneButton phone={store.phone} persistKey={storeSlug} />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 sm:py-8">
+      <div className="relative z-10 flex min-h-screen flex-col px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(3.25rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 sm:pt-14">
 
         <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
 

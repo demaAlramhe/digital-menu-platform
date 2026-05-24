@@ -64,7 +64,18 @@ export function resolveWelcomeContent(
     store.welcome_subtitle?.trim() || dict.store.welcomeDefaultSubtitle
   );
 
-  const buttonText = dict.store.welcomeCta;
+  const storedButton = pickLocalizedText(
+    viewerLocale,
+    {
+      ar: store.welcome_button_text_ar,
+      he: store.welcome_button_text_he,
+      en: store.welcome_button_text_en,
+    },
+    sourceLocale,
+    store.welcome_button_text
+  );
+
+  const buttonText = storedButton || dict.store.welcomeCta;
 
   const backgroundImageUrl =
     store.banner_url?.trim() ||

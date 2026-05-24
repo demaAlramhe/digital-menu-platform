@@ -30,6 +30,12 @@ Scripts are idempotent where possible (`ADD COLUMN IF NOT EXISTS`).
 6. Copy `.env.example` → `.env.local` and set Supabase + optional Cloudinary/OpenAI keys.
 7. `npm install` && `npm run dev`.
 
+## Auto-translation (OpenAI)
+
+When `OPENAI_API_KEY` is set on the server, saving **categories**, **menu items**, or **welcome settings** in the owner dashboard calls `lib/ai/translate-content.ts` once and stores `*_ar`, `*_he`, `*_en` columns. Public pages read those fields — they do **not** call OpenAI at request time.
+
+Requires step 3 (`multilingual-content-columns.sql`). Optional: `OPENAI_MODEL` (default `gpt-4o-mini`).
+
 ## App writes vs RLS
 
 Dashboard and API mutation routes use the **service role** (`createAdminClient()`), which bypasses RLS. Authorization is enforced in **Next.js API routes** (see `lib/auth/api-auth.ts`), not only by Postgres policies.

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { normalizeSlug } from "@/lib/utils/slug";
 import { translateContentFields } from "@/lib/ai/translate-content";
+import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuCategoryPostSchema } from "@/lib/api/schemas";
@@ -37,9 +38,7 @@ export async function POST(req: Request) {
       .insert({
         store_id: storeId,
         name: nameTrimmed,
-        name_ar: nameT?.ar || null,
-        name_he: nameT?.he || null,
-        name_en: nameT?.en || null,
+        ...trilingualColumns("name", nameT),
         slug: normalizeSlug(slug),
         sort_order: sortOrder ?? 0,
         is_active: isActive ?? true,

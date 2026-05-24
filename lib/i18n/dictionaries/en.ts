@@ -249,8 +249,10 @@ export const en = {
       "Used only if no welcome background is set above. Prefer the main background image.",
     welcomeTitle: "Welcome headline",
     welcomeSubtitle: "Welcome message",
+    welcomeButtonText: "Start button text (optional)",
+    welcomeButtonPlaceholder: "Leave empty for Start Now in all languages",
     welcomeCtaNote:
-      "The Start Now button is shown automatically in Arabic, Hebrew, and English.",
+      "If the button field is empty, guests see Start Now in Arabic, Hebrew, and English. Custom text is auto-translated on save.",
     menuSection: "Menu page",
     menuSectionDesc:
       "Background shown on the categories page after customers tap Start Now (/{slug}/menu).",
@@ -264,6 +266,16 @@ export const en = {
       "Enter categories, dishes, and welcome text in this language — we auto-translate to the others.",
     autoTranslateHint:
       "Saving generates Arabic, Hebrew, and English translations (requires OPENAI_API_KEY on the server).",
+    retranslateTitle: "Translate existing menu content",
+    retranslateDesc:
+      "If guests still see Arabic when they pick English, your items may have been saved before translations were generated. Run this once to fill English and Hebrew fields from your source language.",
+    retranslateAction: "Generate all translations",
+    retranslateRunning: "Translating…",
+    retranslateConfirm:
+      "Regenerate Arabic, Hebrew, and English for all categories, dishes, and welcome text?",
+    retranslateSuccess:
+      "Updated {categories} categories and {items} menu items.",
+    retranslateFailed: "Could not regenerate translations.",
   },
   qr: {
     title: "Store QR code",

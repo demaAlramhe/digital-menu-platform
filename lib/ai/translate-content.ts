@@ -136,9 +136,10 @@ async function requestOpenAITranslations(
         : "English";
 
   const systemPrompt = `You translate restaurant digital-menu content. The owner wrote in ${sourceLabel}.
-Return natural, professional wording suitable for guests (not literal or awkward).
-Keep proper nouns and brand names sensible. Menu descriptions stay short.
-Respond with JSON only: an object whose keys match the input "key" fields. Each value is { "ar": "...", "he": "...", "en": "..." }.`;
+Return natural, short, guest-friendly wording (not literal or robotic).
+Keep brand names as appropriate. Menu descriptions: 1–2 sentences max.
+For each field, return ALL three locales "ar", "he", "en". The ${sourceLabel} value must match the source text (lightly edited only if needed).
+Respond with JSON only: keys match input "key" fields; each value is { "ar": "...", "he": "...", "en": "..." }.`;
 
   const userPrompt = JSON.stringify({ sourceLocale, fields: payload });
 
@@ -192,15 +193,4 @@ Respond with JSON only: an object whose keys match the input "key" fields. Each 
   }
 
   return result;
-}
-
-export function trilingualToColumnPrefix(
-  result: TrilingualResult,
-  prefix: string
-): Record<string, string | null> {
-  return {
-    [`${prefix}_ar`]: result.ar || null,
-    [`${prefix}_he`]: result.he || null,
-    [`${prefix}_en`]: result.en || null,
-  };
 }
