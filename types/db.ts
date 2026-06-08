@@ -29,6 +29,7 @@ export type Database = {
           show_welcome_screen: boolean;
           email: string | null;
           phone: string | null;
+          whatsapp_number: string | null;
           address: string | null;
           created_at: string;
         };
@@ -59,6 +60,7 @@ export type Database = {
           show_welcome_screen?: boolean;
           email?: string | null;
           phone?: string | null;
+          whatsapp_number?: string | null;
           address?: string | null;
           created_at?: string;
         };

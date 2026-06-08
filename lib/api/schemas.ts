@@ -21,6 +21,7 @@ export const storeSettingsPatchSchema = z.object({
   primaryColor: optionalString,
   secondaryColor: optionalString,
   phone: optionalString,
+  whatsapp_number: z.string().optional().nullable(),
   email: z.string().email().or(z.literal("")).optional(),
   address: optionalString,
 });

@@ -1,11 +1,17 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { OnboardingBanner } from "@/components/dashboard/onboarding-banner";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { dash } from "@/components/dashboard/ui/styles";
 import { PublicLinkActions } from "@/components/dashboard/public-link-actions";
 import { getCurrentProfile } from "@/lib/auth/get-current-profile";
+import { getOnboardingProgress } from "@/lib/dashboard/onboarding-steps";
 import { getOwnerPublicUrls } from "@/lib/data/owner-public-urls";
-import { loadOwnerStoreBasic, requireOwnerStoreId } from "@/lib/data/owner-store";
+import {
+  getOwnerStoreAdminClient,
+  loadOwnerStoreBasic,
+  requireOwnerStoreId,
+} from "@/lib/data/owner-store";
 import { getTranslations } from "@/lib/i18n/server";
 
 const QUICK_LINKS = [
@@ -55,7 +61,33 @@ export default async function DashboardHomePage() {
   }
 
   const storeId = await requireOwnerStoreId();
-  const { store } = await loadOwnerStoreBasic(storeId);
+  const supabase = getOwnerStoreAdminClient();
+
+  const [{ store }, storeOnboardingResult, categoryResult, itemImageResult] =
+    await Promise.all([
+      loadOwnerStoreBasic(storeId),
+      supabase
+        .from("stores")
+        .select("name, logo_url, phone, primary_color, whatsapp_number")
+        .eq("id", storeId)
+        .single(),
+      supabase
+        .from("menu_categories")
+        .select("*", { count: "exact", head: true })
+        .eq("store_id", storeId)
+        .eq("is_active", true),
+      supabase
+        .from("menu_items")
+        .select("*", { count: "exact", head: true })
+        .eq("store_id", storeId)
+        .not("image_url", "is", null)
+        .eq("is_active", true),
+    ]);
+
+  const onboardingProgress = getOnboardingProgress(storeOnboardingResult.data ?? {}, {
+    categoryCount: categoryResult.count ?? 0,
+    itemWithImageCount: itemImageResult.count ?? 0,
+  });
 
   const publicUrls = store?.slug
     ? await getOwnerPublicUrls(store.slug)
@@ -65,6 +97,13 @@ export default async function DashboardHomePage() {
 
   return (
     <DashboardPage>
+      {store?.slug && (
+        <OnboardingBanner
+          progress={onboardingProgress}
+          storeSlug={store.slug}
+        />
+      )}
+
       <section className={`${dash.hero}`}>
         <div
           className="pointer-events-none absolute -end-12 -top-12 h-48 w-48 rounded-full bg-amber-100/30 blur-2xl"

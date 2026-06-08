@@ -1,6 +1,6 @@
 "use client";
 
-import { QRCodeCanvas } from "qrcode.react";
+import { QRCodeCanvas, QRCodeSVG } from "qrcode.react";
 import { useRef, useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
@@ -10,17 +10,69 @@ import {
 } from "@/components/dashboard/ui/buttons";
 import { dash } from "@/components/dashboard/ui/styles";
 
+const QR_SIZE = 280;
+
 type StoreQrCardProps = {
   storeName: string;
   storeSlug: string;
   menuUrl: string;
 };
 
+function triggerDownload(href: string, filename: string) {
+  const link = document.createElement("a");
+  link.download = filename;
+  link.href = href;
+  link.click();
+}
+
+function svgElementToCanvas(svg: SVGElement, size: number): Promise<HTMLCanvasElement> {
+  const svgString = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([svgString], { type: "image/svg+xml;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) {
+        URL.revokeObjectURL(url);
+        reject(new Error("Canvas context unavailable"));
+        return;
+      }
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, size, size);
+      ctx.drawImage(img, 0, 0, size, size);
+      URL.revokeObjectURL(url);
+      resolve(canvas);
+    };
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error("SVG image load failed"));
+    };
+    img.src = url;
+  });
+}
+
 export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps) {
   const { dict } = useLocale();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const qrContainerRef = useRef<HTMLDivElement>(null);
   const [copyMessage, setCopyMessage] = useState("");
   const [downloadMessage, setDownloadMessage] = useState("");
+
+  const pngFilename = `menu-qr-${storeSlug}.png`;
+  const svgFilename = `menu-qr-${storeSlug}.svg`;
+
+  const qrProps = {
+    value: menuUrl,
+    size: QR_SIZE,
+    level: "M" as const,
+    includeMargin: true,
+    bgColor: "#ffffff",
+    fgColor: "#111827",
+  };
 
   async function handleCopyLink() {
     setCopyMessage("");
@@ -32,19 +84,53 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
     }
   }
 
-  function handleDownload() {
+  async function handleDownloadPng() {
     setDownloadMessage("");
-    const canvas = canvasRef.current;
-    if (!canvas) {
+    const container = qrContainerRef.current;
+    if (!container) {
       setDownloadMessage(dict.qr.qrNotReady);
       return;
     }
+
+    const canvas = container.querySelector("canvas");
+    const svg = container.querySelector("svg");
+
     try {
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = `${storeSlug}-menu-qr.png`;
-      link.click();
+      if (canvas instanceof HTMLCanvasElement) {
+        triggerDownload(canvas.toDataURL("image/png"), pngFilename);
+        setDownloadMessage(dict.qr.downloadReady);
+        return;
+      }
+
+      if (svg instanceof SVGElement) {
+        const exportCanvas = await svgElementToCanvas(svg, QR_SIZE);
+        triggerDownload(exportCanvas.toDataURL("image/png"), pngFilename);
+        setDownloadMessage(dict.qr.downloadReady);
+        return;
+      }
+
+      setDownloadMessage(dict.qr.qrNotReady);
+    } catch {
+      setDownloadMessage(dict.qr.downloadFailed);
+    }
+  }
+
+  function handleDownloadSvg() {
+    setDownloadMessage("");
+    const container = qrContainerRef.current;
+    const svg = container?.querySelector("svg");
+
+    if (!(svg instanceof SVGElement)) {
+      setDownloadMessage(dict.qr.qrNotReady);
+      return;
+    }
+
+    try {
+      const svgString = new XMLSerializer().serializeToString(svg);
+      const blob = new Blob([svgString], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+      triggerDownload(url, svgFilename);
+      window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       setDownloadMessage(dict.qr.downloadReady);
     } catch {
       setDownloadMessage(dict.qr.downloadFailed);
@@ -88,9 +174,6 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
               <SecondaryButton type="button" onClick={handleCopyLink}>
                 {dict.qr.copyLink}
               </SecondaryButton>
-              <PrimaryButton type="button" onClick={handleDownload}>
-                {dict.qr.downloadPng}
-              </PrimaryButton>
               <SecondaryLink href="/dashboard/qr/poster">{dict.qr.printPoster}</SecondaryLink>
             </div>
 
@@ -100,17 +183,32 @@ export function StoreQrCard({ storeName, storeSlug, menuUrl }: StoreQrCardProps)
             )}
           </div>
 
-          <div className="flex justify-center lg:justify-center">
-            <div className="rounded-2xl border border-stone-200/80 bg-white p-6 shadow-[inset_0_2px_12px_rgba(15,23,42,0.04)] ring-1 ring-stone-900/[0.03] sm:p-10">
-              <QRCodeCanvas
-                ref={canvasRef}
-                value={menuUrl}
-                size={280}
-                level="M"
-                includeMargin
-                bgColor="#ffffff"
-                fgColor="#111827"
-              />
+          <div className="flex flex-col items-center gap-4">
+            <div
+              ref={qrContainerRef}
+              className="rounded-2xl border border-stone-200/80 bg-white p-6 shadow-[inset_0_2px_12px_rgba(15,23,42,0.04)] ring-1 ring-stone-900/[0.03] sm:p-10"
+            >
+              <QRCodeCanvas {...qrProps} />
+              <div className="sr-only" aria-hidden>
+                <QRCodeSVG {...qrProps} />
+              </div>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              <PrimaryButton
+                type="button"
+                onClick={handleDownloadPng}
+                className="shrink-0 whitespace-nowrap"
+              >
+                {dict.qr.downloadPng ?? "PNG"}
+              </PrimaryButton>
+              <SecondaryButton
+                type="button"
+                onClick={handleDownloadSvg}
+                className="shrink-0 whitespace-nowrap"
+              >
+                {dict.qr.downloadSvg ?? "SVG"}
+              </SecondaryButton>
             </div>
           </div>
         </div>

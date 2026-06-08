@@ -64,6 +64,7 @@ export default async function DashboardSettingsPage() {
           primaryColor: store.primary_color ?? "#111827",
           secondaryColor: store.secondary_color ?? "#f59e0b",
           phone: store.phone ?? "",
+          whatsappNumber: store.whatsapp_number ?? "",
           email: store.email ?? "",
           address: store.address ?? "",
         }}

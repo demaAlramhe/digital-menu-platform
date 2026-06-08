@@ -4,6 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import type { Locale } from "@/lib/i18n/types";
 import { useLocale } from "@/components/i18n/locale-provider";
+import {
+  STOREFRONT_GOLD,
+  STOREFRONT_GOLD_DARK,
+} from "@/lib/storefront/premium-theme";
 
 const LOCALE_ORDER: Locale[] = ["ar", "en", "he"];
 
@@ -36,7 +40,7 @@ export function StoreIntroLocaleBar() {
 
   return (
     <div
-      className="mt-8 grid w-full grid-cols-3 gap-2 sm:mt-9"
+      className="grid w-full grid-cols-3 gap-2"
       role="group"
       aria-label={dict.lang.label}
     >
@@ -49,11 +53,18 @@ export function StoreIntroLocaleBar() {
             onClick={() => switchLocale(code)}
             disabled={loading}
             suppressHydrationWarning
-            className={`w-full rounded-full border px-2 py-2 text-center text-[11px] font-medium leading-tight transition disabled:opacity-50 sm:px-3 sm:py-2.5 sm:text-xs ${
+            className={`w-full rounded-full border px-2 py-2.5 text-center text-[11px] font-semibold leading-tight transition-all duration-200 disabled:opacity-50 sm:px-3 sm:text-xs ${
               isActive
-                ? "border-[#d4b87a] bg-[#d4b87a]/20 text-[#f5e6c8] shadow-[0_0_20px_rgba(212,184,122,0.25)]"
-                : "border-white/25 bg-transparent text-white/75 hover:border-[#d4b87a]/50 hover:bg-white/5 hover:text-white"
+                ? "border-[#d4b87a] text-[#1a1408] shadow-[0_4px_16px_rgba(201,169,98,0.35)]"
+                : "border-[#d4b87a]/55 bg-transparent text-[#f5e6c8]/85 hover:border-[#d4b87a] hover:bg-[#d4b87a]/10 hover:text-[#f5e6c8]"
             }`}
+            style={
+              isActive
+                ? {
+                    background: `linear-gradient(180deg, ${STOREFRONT_GOLD} 0%, ${STOREFRONT_GOLD_DARK} 100%)`,
+                  }
+                : undefined
+            }
             aria-pressed={isActive}
           >
             {labels[code]}

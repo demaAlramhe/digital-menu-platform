@@ -65,6 +65,8 @@ type StoreSettingsFormProps = {
 
     phone: string;
 
+    whatsappNumber: string;
+
     email: string;
 
     address: string;
@@ -110,6 +112,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
   const [secondaryColor, setSecondaryColor] = useState(store.secondaryColor);
 
   const [phone, setPhone] = useState(store.phone);
+
+  const [whatsappNumber, setWhatsappNumber] = useState(store.whatsappNumber);
 
   const [email, setEmail] = useState(store.email);
 
@@ -176,6 +180,8 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
           secondaryColor,
 
           phone,
+
+          whatsapp_number: whatsappNumber,
 
           email,
 
@@ -487,6 +493,16 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
           <FormField label={dict.common.phone}>
 
             <FormInput value={phone} onChange={(e) => setPhone(e.target.value)} />
+
+          </FormField>
+
+          <FormField label={dict.settings.whatsappNumber}>
+
+            <FormInput
+              value={whatsappNumber}
+              onChange={(e) => setWhatsappNumber(e.target.value)}
+              placeholder={dict.settings.whatsappPlaceholder}
+            />
 
           </FormField>
 

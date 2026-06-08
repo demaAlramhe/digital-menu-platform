@@ -180,6 +180,50 @@ export const en = {
     cardQr: "QR code",
     cardQrDesc: "QR code and direct link to your public menu.",
   },
+  onboarding: {
+    bannerTitle: "Finish setting up your restaurant",
+    bannerSubtitle: "{done} of {total} steps complete",
+    completeSetup: "Complete setup",
+    dismiss: "Dismiss",
+    pageTitle: "Restaurant setup",
+    pageSubtitle: "Follow these steps to get started",
+    goToStep: "Go",
+    done: "Done",
+    steps: {
+      logo: {
+        title: "Upload your logo",
+        description: "Add your restaurant logo — it appears on the welcome screen for guests.",
+      },
+      contact: {
+        title: "Contact details",
+        description: "Fill in your business name and phone number so guests can reach you.",
+      },
+      colors: {
+        title: "Brand colors",
+        description: "Pick a primary color that fits your restaurant — it shapes how the menu looks.",
+      },
+      category: {
+        title: "First category",
+        description: "Create at least one category — e.g. starters, mains, or drinks.",
+      },
+      item: {
+        title: "Item with a photo",
+        description: "Add at least one dish with an image — photos help guests choose.",
+      },
+      whatsapp: {
+        title: "WhatsApp number",
+        description: "Add a WhatsApp number so guests can message you directly from the menu.",
+      },
+      preview: {
+        title: "Preview your menu",
+        description: "See how the menu looks to guests before you print your QR code.",
+      },
+      qr: {
+        title: "Print QR poster",
+        description: "Download and print a QR poster for tables or your entrance.",
+      },
+    },
+  },
   menuItems: {
     title: "Menu items",
     publicMenu: "View public menu",
@@ -208,6 +252,30 @@ export const en = {
       name: "Item name",
       slug: "item-slug",
       description: "Item description",
+    },
+  },
+  csvImport: {
+    title: "Import items from CSV",
+    listButton: "Import from CSV",
+    downloadTemplate: "Download CSV template",
+    uploadFile: "Choose CSV file",
+    preview: "Preview",
+    validRows: "Valid rows",
+    errorRows: "Rows with errors",
+    rowError: "Row {row}: {reason}",
+    importButton: "Import {count} items",
+    importing: "Please wait — auto-translation may take a moment.",
+    importingProgress: "Importing... {current}/{total}",
+    success: "{count} items imported successfully",
+    failed: "{count} items failed",
+    goToItems: "Go to menu items",
+    importAnother: "Import another file",
+    errors: {
+      missingName: "Missing name",
+      invalidPrice: "Invalid price",
+      emptyFile: "File is empty",
+      invalidRow: "Incomplete row",
+      invalidFeatured: "Invalid is_featured value",
     },
   },
   categories: {
@@ -276,6 +344,8 @@ export const en = {
     retranslateSuccess:
       "Updated {categories} categories and {items} menu items.",
     retranslateFailed: "Could not regenerate translations.",
+    whatsappNumber: "WhatsApp Number",
+    whatsappPlaceholder: "+972501234567",
   },
   qr: {
     title: "Store QR code",
@@ -287,7 +357,8 @@ export const en = {
     publicUrl: "Store landing link",
     scanHint: "One scan — welcome page, then the menu.",
     copyLink: "Copy link",
-    downloadPng: "Download QR image",
+    downloadPng: "Download PNG",
+    downloadSvg: "Download SVG",
     copied: "Link copied to clipboard.",
     copyFailed: "Could not copy. Please copy manually.",
     downloadReady: "QR code downloaded successfully.",

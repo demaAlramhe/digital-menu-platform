@@ -12,7 +12,7 @@ export type Dictionary = DeepStringRecord<typeof he>;
 
 export const LOCALES: Locale[] = ["he", "ar", "en"];
 
-export const DEFAULT_LOCALE: Locale = "he";
+export const DEFAULT_LOCALE: Locale = "ar";
 
 export const LOCALE_COOKIE = "menu-locale";
 

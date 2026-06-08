@@ -41,10 +41,10 @@ export function MenuItemCard({
 
   return (
     <article
-      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition-shadow duration-300 ${
+      className={`group flex h-full flex-col overflow-hidden rounded-2xl transition-all duration-200 ${
         isPremium
-          ? "border border-[#d4b87a]/35"
-          : `bg-white ${
+          ? "border border-[#d4b87a]/35 hover:scale-[1.02]"
+          : `bg-white hover:scale-[1.02] ${
               variant === "featured"
                 ? ""
                 : "shadow-[0_4px_20px_rgba(15,23,42,0.06)] ring-1 ring-stone-200/60 hover:shadow-[0_8px_28px_rgba(15,23,42,0.09)]"
@@ -70,7 +70,7 @@ export function MenuItemCard({
       }
     >
       <div
-        className={`relative aspect-[4/3] w-full shrink-0 overflow-hidden ${
+        className={`relative aspect-square w-full shrink-0 overflow-hidden rounded-t-2xl ${
           isPremium ? "bg-black/40" : "bg-stone-100"
         }`}
       >
@@ -78,11 +78,11 @@ export function MenuItemCard({
           <img
             src={item.image_url}
             alt={item.name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+            className="h-full w-full rounded-lg object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           <div
-            className={`flex h-full w-full items-center justify-center ${
+            className={`flex h-full w-full items-center justify-center rounded-lg ${
               isPremium
                 ? "bg-gradient-to-br from-black/50 to-black/30"
                 : "bg-gradient-to-br from-stone-100 to-stone-200/80"
@@ -127,7 +127,7 @@ export function MenuItemCard({
               <span className="line-clamp-2">{item.name}</span>
             </h3>
             <p
-              className="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-bold tabular-nums sm:text-sm"
+              className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-sm font-bold tabular-nums sm:text-base"
               style={
                 isPremium
                   ? {
@@ -140,7 +140,7 @@ export function MenuItemCard({
                     }
               }
             >
-              <span className="text-[10px] font-semibold opacity-80">
+              <span className="text-[10px] font-semibold opacity-80 sm:text-xs">
                 {dict.common.currency}
               </span>
               {formatPrice(item.price)}
@@ -148,8 +148,8 @@ export function MenuItemCard({
           </div>
           {item.description && (
             <p
-              className={`line-clamp-3 text-[13px] leading-relaxed sm:text-sm ${
-                isPremium ? "text-white/70" : "text-stone-600"
+              className={`line-clamp-2 text-sm leading-relaxed ${
+                isPremium ? "text-white/55" : "text-stone-500"
               }`}
             >
               {item.description}

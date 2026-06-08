@@ -35,6 +35,7 @@ export async function PATCH(req: Request) {
       primaryColor,
       secondaryColor,
       phone,
+      whatsapp_number,
       email,
       address,
     } = parsed.data;
@@ -102,6 +103,7 @@ export async function PATCH(req: Request) {
       primary_color: primaryColor || "#111827",
       secondary_color: secondaryColor || "#f59e0b",
       phone: phone || null,
+      whatsapp_number: whatsapp_number || null,
       email: email || null,
       address: address || null,
     };

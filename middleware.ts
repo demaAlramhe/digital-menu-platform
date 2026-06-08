@@ -4,7 +4,12 @@ import {
   applyPublicLocaleFromQuery,
   setLocaleCookieOnResponse,
 } from "@/lib/middleware/public-locale";
-import { isLocale } from "@/lib/i18n/types";
+import {
+  DEFAULT_LOCALE,
+  isLocale,
+  LOCALE_COOKIE,
+  type Locale,
+} from "@/lib/i18n/types";
 import { getSupabaseUrl } from "@/lib/supabase/url";
 
 type CookieToSet = {
@@ -35,6 +40,14 @@ export async function middleware(request: NextRequest) {
   const langParam = request.nextUrl.searchParams.get("lang");
   if (isLocale(langParam)) {
     setLocaleCookieOnResponse(langParam, response);
+  } else {
+    const existingLocale = request.cookies.get(LOCALE_COOKIE)?.value;
+    if (!isLocale(existingLocale)) {
+      const detected = detectLocaleFromAcceptLanguage(
+        request.headers.get("accept-language")
+      );
+      setLocaleCookieOnResponse(detected, response);
+    }
   }
 
   const pathname = request.nextUrl.pathname;
@@ -83,6 +96,26 @@ export async function middleware(request: NextRequest) {
   }
 
   return response;
+}
+
+function detectLocaleFromAcceptLanguage(header: string | null): Locale {
+  if (!header) {
+    return DEFAULT_LOCALE;
+  }
+
+  const first = header.split(",")[0]?.trim().toLowerCase() ?? "";
+
+  if (first.startsWith("ar")) {
+    return "ar";
+  }
+  if (first.startsWith("he")) {
+    return "he";
+  }
+  if (first.startsWith("en")) {
+    return "en";
+  }
+
+  return DEFAULT_LOCALE;
 }
 
 export const config = {

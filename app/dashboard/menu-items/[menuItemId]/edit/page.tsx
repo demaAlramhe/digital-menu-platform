@@ -1,5 +1,7 @@
 import { notFound } from "next/navigation";
 import { EditMenuItemForm } from "@/components/dashboard/edit-menu-item-form";
+import { TranslationStatusBadge } from "@/components/dashboard/translation-status-badge";
+import { getTranslationStatus } from "@/lib/dashboard/translation-status";
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { PageHeader } from "@/components/dashboard/ui/page-header";
 import { SecondaryLink } from "@/components/dashboard/ui/buttons";
@@ -39,6 +41,8 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
     notFound();
   }
 
+  const translationStatus = getTranslationStatus(menuItem);
+
   return (
     <DashboardPage>
       <PageHeader
@@ -49,6 +53,9 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
           </SecondaryLink>
         }
       />
+      <div className="mb-6">
+        <TranslationStatusBadge status={translationStatus} showDetails />
+      </div>
       <EditMenuItemForm
         menuItem={{
           id: menuItem.id,

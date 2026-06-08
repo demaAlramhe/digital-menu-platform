@@ -7,9 +7,11 @@ import { CategoryFilterBanner } from "@/components/dashboard/ui/category-filter-
 import { DashboardPage } from "@/components/dashboard/ui/dashboard-page";
 import { EmptyState } from "@/components/dashboard/ui/empty-state";
 import { PageHeader } from "@/components/dashboard/ui/page-header";
-import { PrimaryLink } from "@/components/dashboard/ui/buttons";
+import { PrimaryLink, SecondaryLink } from "@/components/dashboard/ui/buttons";
+import { TranslationStatusBadge } from "@/components/dashboard/translation-status-badge";
 import { StatusBadge } from "@/components/dashboard/ui/status-badge";
 import { dash } from "@/components/dashboard/ui/styles";
+import { getTranslationStatus } from "@/lib/dashboard/translation-status";
 import {
   getOwnerStoreAdminClient,
   loadOwnerStoreBasic,
@@ -128,7 +130,14 @@ export default async function DashboardMenuItemsPage({
         eyebrow={store.name ?? undefined}
         title={dict.menuItems.title}
         description={dict.menuItems.publicMenu}
-        action={<PrimaryLink href={newItemHref}>{dict.menuItems.add}</PrimaryLink>}
+        action={
+          <div className="flex flex-wrap gap-2">
+            <SecondaryLink href="/dashboard/menu-items/import">
+              {dict.csvImport.listButton}
+            </SecondaryLink>
+            <PrimaryLink href={newItemHref}>{dict.menuItems.add}</PrimaryLink>
+          </div>
+        }
       />
 
       {publicUrls && (
@@ -170,7 +179,13 @@ export default async function DashboardMenuItemsPage({
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-start justify-between gap-3">
                     <div>
-                      <h2 className="text-lg font-semibold text-stone-900">{item.name}</h2>
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h2 className="text-lg font-semibold text-stone-900">{item.name}</h2>
+                        <TranslationStatusBadge
+                          status={getTranslationStatus(item)}
+                          showDetails={false}
+                        />
+                      </div>
                       <p className="mt-0.5 font-mono text-xs text-stone-500">{item.slug}</p>
                     </div>
                     <p className={dash.priceBadge}>

@@ -30,17 +30,17 @@ export function StoreWelcomeScreen({
       <StorePremiumBackdrop imageUrl={content.backgroundImageUrl} />
 
       <div className="relative z-10 flex h-full min-h-[100dvh] items-center justify-center px-4 py-8 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(1.5rem,env(safe-area-inset-top))]">
-        <StorePremiumGlass>
-          <div className="flex flex-col items-center text-center">
+        <StorePremiumGlass className="max-w-sm py-6 sm:max-w-md sm:py-7">
+          <div className="flex flex-col items-center gap-5 text-center sm:gap-6">
             {logoUrl ? (
               <img
                 src={logoUrl}
                 alt=""
-                className="mb-6 h-20 w-20 rounded-full object-cover ring-2 ring-[#d4b87a]/40 sm:h-[5.5rem] sm:w-[5.5rem]"
+                className="h-24 w-24 rounded-full object-cover drop-shadow-lg ring-2 ring-amber-400/60 sm:h-28 sm:w-28"
               />
             ) : (
               <div
-                className="mb-6 flex h-20 w-20 items-center justify-center rounded-full text-3xl font-semibold sm:h-[5.5rem] sm:w-[5.5rem]"
+                className="flex h-24 w-24 items-center justify-center rounded-full font-serif text-4xl font-semibold drop-shadow-lg ring-2 ring-amber-400/60 sm:h-28 sm:w-28 sm:text-5xl"
                 style={{
                   background: `linear-gradient(145deg, ${STOREFRONT_GOLD}33, rgba(0,0,0,0.4))`,
                   color: STOREFRONT_GOLD_LIGHT,
@@ -52,19 +52,19 @@ export function StoreWelcomeScreen({
             )}
 
             <h1
-              className="text-[1.75rem] font-semibold leading-tight tracking-tight sm:text-[2rem]"
+              className="text-2xl font-bold tracking-wide sm:text-3xl"
               style={{ color: STOREFRONT_GOLD_LIGHT }}
             >
               {content.headline}
             </h1>
 
-            <p className="mt-4 max-w-[18rem] text-[14px] leading-relaxed text-white/88 sm:text-[15px] sm:leading-relaxed">
+            <p className="max-w-[18rem] text-[14px] leading-relaxed text-white/88 sm:text-[15px]">
               {content.welcomeMessage}
             </p>
 
             <Link
               href={menuHref}
-              className="mt-8 flex min-h-[3.125rem] w-full max-w-[15rem] items-center justify-center rounded-full px-8 text-[15px] font-semibold tracking-wide transition active:scale-[0.98] hover:brightness-110 sm:mt-9 sm:min-h-[3.25rem] sm:text-base"
+              className="flex w-full items-center justify-center rounded-full px-8 py-3.5 text-base font-semibold transition-all duration-200 hover:brightness-110 active:scale-[0.98]"
               style={premiumGoldCtaStyle}
             >
               {content.buttonText}
