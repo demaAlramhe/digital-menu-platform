@@ -6,6 +6,7 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
 import { AdminUserStoreSelect } from "@/components/admin/admin-user-store-select";
 import { AdminUserProfileEdit } from "@/components/admin/admin-user-profile-edit";
+import { AdminUserDeleteButton } from "@/components/admin/admin-user-delete-button";
 import { StatCard } from "@/components/dashboard/ui/stat-card";
 import { RoleBadge } from "@/components/dashboard/ui/role-badge";
 import { dash } from "@/components/dashboard/ui/styles";
@@ -36,8 +37,9 @@ type AdminUsersPageProps = {
 export default async function AdminUsersPage({
   searchParams,
 }: AdminUsersPageProps) {
-  await requireSuperAdmin();
+  const current = await requireSuperAdmin();
   const { dict } = await getTranslations();
+  const currentUserId = current.user.id;
 
   const ROLE_FILTERS = [
     { label: dict.roles.all, value: "all" },
@@ -135,6 +137,8 @@ export default async function AdminUsersPage({
     store_owner: users.filter((user) => user.role === "store_owner").length,
   };
 
+  const isLastSuperAdmin = counters.super_admin <= 1;
+
   return (
     <AppShell title={dict.admin.manageUsers} subtitle={dict.admin.usersTitle}>
       <div className="space-y-6">
@@ -220,12 +224,24 @@ export default async function AdminUsersPage({
               <p className="text-sm text-slate-600">{dict.admin.noData}</p>
             ) : (
               <div className="space-y-4">
-                {finalUsers.map((user) => (
+                {finalUsers.map((user) => {
+                  const displayName = user.full_name ?? user.email ?? "—";
+                  const isSelf = user.id === currentUserId;
+                  const cannotDeleteLastAdmin =
+                    user.role === "super_admin" && isLastSuperAdmin;
+                  const deleteDisabled = isSelf || cannotDeleteLastAdmin;
+                  const deleteDisabledReason = isSelf
+                    ? dict.admin.cannotDeleteSelf
+                    : cannotDeleteLastAdmin
+                      ? dict.admin.cannotDeleteLastSuperAdmin
+                      : undefined;
+
+                  return (
                   <div key={user.id} className={`${dash.card} p-5 sm:p-6`}>
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <h3 className="text-lg font-semibold text-stone-900">
-                          {user.full_name ?? user.email ?? "—"}
+                          {displayName}
                         </h3>
                         <p className="mt-0.5 text-sm text-stone-600">{user.email ?? "—"}</p>
                       </div>
@@ -234,6 +250,12 @@ export default async function AdminUsersPage({
                           userId={user.id}
                           initialFullName={user.full_name}
                           initialEmail={user.email}
+                        />
+                        <AdminUserDeleteButton
+                          userId={user.id}
+                          userLabel={displayName}
+                          disabled={deleteDisabled}
+                          disabledReason={deleteDisabledReason}
                         />
                         <RoleBadge role={user.role} dict={dict} />
                       </div>
@@ -286,7 +308,8 @@ export default async function AdminUsersPage({
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

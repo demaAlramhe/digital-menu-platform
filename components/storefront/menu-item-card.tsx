@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "@/components/i18n/locale-provider";
+import { calculateDiscount } from "@/lib/storefront/discount";
 import {
   premiumGlassTileStyle,
   STOREFRONT_GOLD,
@@ -12,6 +13,7 @@ export type MenuItemDisplay = {
   name: string;
   description: string | null;
   price: number;
+  original_price?: number | null;
   image_url: string | null;
   is_featured?: boolean;
 };
@@ -21,6 +23,7 @@ type MenuItemCardProps = {
   primaryColor: string;
   secondaryColor: string;
   showFeaturedBadge?: boolean;
+  showDiscount?: boolean;
   variant?: "default" | "featured";
   theme?: "default" | "premium";
 };
@@ -31,6 +34,7 @@ export function MenuItemCard({
   primaryColor,
   secondaryColor,
   showFeaturedBadge = false,
+  showDiscount = false,
   variant = "default",
   theme = "default",
 }: MenuItemCardProps) {
@@ -38,6 +42,11 @@ export function MenuItemCard({
   const isFeatured =
     variant === "featured" || showFeaturedBadge || item.is_featured;
   const isPremium = theme === "premium";
+  const { hasDiscount, percentage } = calculateDiscount(
+    item.price,
+    item.original_price ?? null
+  );
+  const showDiscountUi = showDiscount || hasDiscount;
 
   return (
     <article
@@ -93,9 +102,16 @@ export function MenuItemCard({
             />
           </div>
         )}
+        {showDiscountUi && hasDiscount && (
+          <span className="absolute start-2 top-2 rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">
+            -{percentage}%
+          </span>
+        )}
         {isFeatured && (
           <span
-            className="absolute start-2.5 top-2.5 inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg"
+            className={`absolute inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold tracking-wide text-white shadow-lg ${
+              showDiscountUi && hasDiscount ? "end-2.5 top-2.5" : "start-2.5 top-2.5"
+            }`}
             style={{
               backgroundColor: isPremium ? STOREFRONT_GOLD : secondaryColor,
               color: isPremium ? "#1a1408" : undefined,
@@ -113,21 +129,41 @@ export function MenuItemCard({
         }`}
       >
         <div className="min-w-0 space-y-2">
-          <div className="flex items-start justify-between gap-2">
-            <h3
-              className={`min-w-0 flex-1 font-semibold leading-snug ${
-                isPremium ? "" : "text-stone-900"
-              } ${
-                variant === "featured"
-                  ? "text-base sm:text-lg"
-                  : "text-sm sm:text-base"
-              }`}
-              style={isPremium ? { color: STOREFRONT_GOLD_LIGHT } : undefined}
-            >
-              <span className="line-clamp-2">{item.name}</span>
-            </h3>
+          <h3
+            className={`font-semibold leading-snug ${
+              isPremium ? "" : "text-stone-900"
+            } ${
+              variant === "featured"
+                ? "text-base sm:text-lg"
+                : "text-sm sm:text-base"
+            }`}
+            style={isPremium ? { color: STOREFRONT_GOLD_LIGHT } : undefined}
+          >
+            <span className="line-clamp-2">{item.name}</span>
+          </h3>
+
+          {showDiscountUi && hasDiscount && item.original_price != null ? (
+            <div className="flex items-center gap-2">
+              <span
+                className={`text-sm line-through ${
+                  isPremium ? "text-white/40" : "text-stone-400"
+                }`}
+              >
+                {dict.common.currency}
+                {formatPrice(item.original_price)}
+              </span>
+              <span
+                className={`text-lg font-bold ${
+                  isPremium ? "text-amber-400" : "text-amber-600"
+                }`}
+              >
+                {dict.common.currency}
+                {formatPrice(item.price)}
+              </span>
+            </div>
+          ) : (
             <p
-              className="inline-flex shrink-0 items-center rounded-full px-2.5 py-1 text-sm font-bold tabular-nums sm:text-base"
+              className="inline-flex items-center rounded-full px-2.5 py-1 text-sm font-bold tabular-nums sm:text-base"
               style={
                 isPremium
                   ? {
@@ -145,7 +181,8 @@ export function MenuItemCard({
               </span>
               {formatPrice(item.price)}
             </p>
-          </div>
+          )}
+
           {item.description && (
             <p
               className={`line-clamp-2 text-sm leading-relaxed ${

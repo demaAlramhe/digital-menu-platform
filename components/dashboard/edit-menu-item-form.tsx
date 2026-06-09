@@ -30,6 +30,7 @@ type EditMenuItemFormProps = {
     slug: string;
     description: string;
     price: number;
+    originalPrice: number | null;
     sortOrder: number;
     categoryId: string;
     isActive: boolean;
@@ -47,6 +48,9 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
   const [slug, setSlug] = useState(menuItem.slug);
   const [description, setDescription] = useState(menuItem.description);
   const [price, setPrice] = useState(String(menuItem.price));
+  const [originalPrice, setOriginalPrice] = useState(
+    menuItem.originalPrice != null ? String(menuItem.originalPrice) : ""
+  );
   const [sortOrder, setSortOrder] = useState(String(menuItem.sortOrder));
   const [categoryId, setCategoryId] = useState(menuItem.categoryId);
   const [isActive, setIsActive] = useState(menuItem.isActive);
@@ -74,6 +78,8 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           slug: normalizeSlug(slug),
           description,
           price: Number(price),
+          original_price:
+            originalPrice.trim() === "" ? null : Number(originalPrice),
           sortOrder: Number(sortOrder || 0),
           categoryId: categoryId || null,
           isActive,
@@ -132,12 +138,25 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       <FormSection>
         <div className="grid gap-4 sm:grid-cols-2">
           <FormField label={dict.common.price}>
-            <FormInput type="number" step="0.01" value={price} onChange={(e) => setPrice(e.target.value)} />
+            <FormInput type="number" step="0.01" min="0" value={price} onChange={(e) => setPrice(e.target.value)} />
           </FormField>
           <FormField label={dict.common.sortOrder}>
             <FormInput type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} />
           </FormField>
         </div>
+        <FormField
+          label={dict.menuItems.originalPrice}
+          hint={dict.menuItems.originalPriceHelp}
+        >
+          <FormInput
+            type="number"
+            step="0.01"
+            min="0"
+            value={originalPrice}
+            onChange={(e) => setOriginalPrice(e.target.value)}
+            placeholder={dict.menuItems.originalPricePlaceholder}
+          />
+        </FormField>
         <CheckboxField id="editIsActive" label={dict.menuItems.activeItem} checked={isActive} onChange={setIsActive} />
         <CheckboxField id="editIsFeatured" label={dict.menuItems.featuredItem} checked={isFeatured} onChange={setIsFeatured} />
       </FormSection>

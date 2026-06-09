@@ -108,6 +108,7 @@ export type Database = {
           description_he: string | null;
           description_en: string | null;
           price: number;
+          original_price: number | null;
           image_url: string | null;
           is_active: boolean;
           is_featured: boolean;
@@ -128,6 +129,7 @@ export type Database = {
           description_he?: string | null;
           description_en?: string | null;
           price: number;
+          original_price?: number | null;
           image_url?: string | null;
           is_active?: boolean;
           is_featured?: boolean;

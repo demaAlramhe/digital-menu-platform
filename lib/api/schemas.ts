@@ -40,6 +40,7 @@ export const menuItemPostSchema = z.object({
   slug: z.string().trim().min(1, "Slug is required."),
   description: optionalString,
   price: z.number({ message: "Price is required." }).nonnegative(),
+  original_price: z.number().positive().optional().nullable(),
   isActive: z.boolean().optional(),
   isFeatured: z.boolean().optional(),
   sortOrder: z.number().int().optional(),

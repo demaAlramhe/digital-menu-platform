@@ -21,6 +21,7 @@ export type ResolvedMenuItem = {
   name: string;
   description: string | null;
   price: number;
+  original_price: number | null;
   image_url: string | null;
   is_featured: boolean;
   sort_order: number;
@@ -56,7 +57,9 @@ export function resolvePublicMenuItems(
 ): ResolvedMenuItem[] {
   return items.map((item) => ({
     id: item.id,
-    price: item.price,
+    price: Number(item.price),
+    original_price:
+      item.original_price != null ? Number(item.original_price) : null,
     image_url: item.image_url,
     is_featured: item.is_featured,
     sort_order: item.sort_order,

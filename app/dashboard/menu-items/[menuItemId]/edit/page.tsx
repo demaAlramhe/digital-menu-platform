@@ -63,6 +63,10 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
           slug: menuItem.slug,
           description: menuItem.description ?? "",
           price: Number(menuItem.price),
+          originalPrice:
+            menuItem.original_price != null
+              ? Number(menuItem.original_price)
+              : null,
           sortOrder: menuItem.sort_order ?? 0,
           categoryId: menuItem.category_id ?? "",
           isActive: menuItem.is_active,

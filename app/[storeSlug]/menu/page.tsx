@@ -22,6 +22,7 @@ import { StoreFloatingPhoneButton } from "@/components/storefront/store-floating
 import { StoreWhatsAppButton } from "@/components/storefront/store-whatsapp-button";
 import { StoreMenuLocaleBar } from "@/components/storefront/store-menu-locale-bar";
 import { StorePremiumBackdrop } from "@/components/storefront/store-premium-backdrop";
+import { PwaInstallBanner } from "@/components/storefront/pwa-install-banner";
 
 import { StorePremiumGlass } from "@/components/storefront/store-premium-glass";
 
@@ -84,6 +85,8 @@ function toMenuItemDisplay(item: ResolvedMenuItem): MenuItemDisplay {
     description: item.description,
 
     price: item.price,
+
+    original_price: item.original_price,
 
     image_url: item.image_url,
 
@@ -291,6 +294,18 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
   );
 
+  const offerItems = items
+
+    .filter(
+
+      (item) =>
+
+        item.original_price != null && item.original_price > item.price
+
+    )
+
+    .map(toMenuItemDisplay);
+
 
 
   const primaryColor = store.primary_color || "#111827";
@@ -349,6 +364,10 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
               logoUrl={store.logo_url}
 
+              whatsappNumber={store.whatsapp_number}
+
+              offerItems={offerItems}
+
             />
 
           )}
@@ -356,6 +375,8 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
         </div>
 
       </div>
+
+      <PwaInstallBanner />
 
     </main>
 

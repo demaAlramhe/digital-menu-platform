@@ -13,6 +13,7 @@ import {
   type MenuItemDisplay,
 } from "@/components/storefront/menu-item-card";
 import { MenuSectionHeading } from "@/components/storefront/menu-section-heading";
+import { WhatsAppOrderButton } from "@/components/storefront/whatsapp-order-button";
 
 export type MenuBrowseSection = {
   id: string;
@@ -28,6 +29,8 @@ type PublicMenuBrowserProps = {
   secondaryColor: string;
   storeName: string;
   logoUrl?: string | null;
+  whatsappNumber?: string | null;
+  offerItems?: MenuItemDisplay[];
 };
 
 const MENU_ITEM_GRID =
@@ -42,6 +45,8 @@ export function PublicMenuBrowser({
   secondaryColor,
   storeName,
   logoUrl,
+  whatsappNumber,
+  offerItems = [],
 }: PublicMenuBrowserProps) {
   const { dict } = useLocale();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -155,6 +160,38 @@ export function PublicMenuBrowser({
         </div>
       </header>
 
+      {offerItems.length > 0 && (
+        <section className="mx-auto mb-6 w-full max-w-2xl">
+          <div className="mb-4 flex items-center gap-2">
+            <span aria-hidden>🔥</span>
+            <h2 className="text-xl font-bold text-amber-400">
+              {dict.menu.offersTitle}
+            </h2>
+            <span aria-hidden>🔥</span>
+          </div>
+          <div
+            className="mb-4 h-px w-full"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${STOREFRONT_GOLD}99, transparent)`,
+            }}
+            aria-hidden
+          />
+          <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {offerItems.map((item) => (
+              <div key={item.id} className="max-w-[160px] min-w-[160px]">
+                <MenuItemCard
+                  item={item}
+                  primaryColor={primaryColor}
+                  secondaryColor={secondaryColor}
+                  showDiscount
+                  theme="premium"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
       <ul className={CATEGORY_LIST}>
         {sections.map((section) => (
           <li key={section.id} className="min-w-0">
@@ -166,6 +203,13 @@ export function PublicMenuBrowser({
           </li>
         ))}
       </ul>
+
+      <div className="mx-auto mt-6 w-full max-w-2xl">
+        <WhatsAppOrderButton
+          whatsappNumber={whatsappNumber ?? null}
+          storeName={storeName}
+        />
+      </div>
     </StorePremiumGlass>
   );
 }

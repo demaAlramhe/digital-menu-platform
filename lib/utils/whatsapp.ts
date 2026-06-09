@@ -32,6 +32,30 @@ export function buildWhatsAppUrl(phone: string, message?: string): string | null
   return url.toString();
 }
 
+const ORDER_MESSAGES: Record<
+  "ar" | "he" | "en",
+  (storeName: string) => string
+> = {
+  ar: (storeName) => `مرحبا، بدي أطلب طلبية من ${storeName} 🍽️`,
+  he: (storeName) => `שלום, אני רוצה להזמין מ${storeName} 🍽️`,
+  en: (storeName) => `Hi, I'd like to place an order from ${storeName} 🍽️`,
+};
+
+export function buildWhatsAppOrderUrl(
+  phone: string,
+  storeName: string,
+  locale: "ar" | "he" | "en"
+): string | null {
+  const trimmed = phone?.trim();
+  if (!trimmed) return null;
+
+  const digits = normalizeWhatsAppDigits(trimmed);
+  if (!digits) return null;
+
+  const message = ORDER_MESSAGES[locale](storeName);
+  return `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+}
+
 export function normalizePhoneForTel(phone: string): string {
   const digits = phone.replace(/\D/g, "");
   if (!digits) return phone;
