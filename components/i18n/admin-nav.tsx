@@ -12,9 +12,14 @@ const NAV_ITEMS = [
   { href: "/admin", labelKey: "admin" as const, exact: true },
   { href: "/admin/stores", labelKey: "stores" as const },
   { href: "/admin/users", labelKey: "users" as const },
-];
+  { href: "/admin/signups", labelKey: "signups" as const, badge: true },
+] as const;
 
-export function AdminNav() {
+type AdminNavProps = {
+  pendingSignupsCount?: number;
+};
+
+export function AdminNav({ pendingSignupsCount = 0 }: AdminNavProps) {
   const { dict } = useLocale();
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -41,17 +46,24 @@ export function AdminNav() {
             aria-label={dict.nav.admin}
           >
             {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href, item.exact);
+              const active = isActive(item.href, "exact" in item ? item.exact : false);
               const label = dict.nav[item.labelKey];
+              const showBadge =
+                "badge" in item && item.badge && pendingSignupsCount > 0;
 
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={active ? dash.navLinkActive : dash.navLink}
+                  className={`${active ? dash.navLinkActive : dash.navLink} inline-flex items-center gap-1.5`}
                   aria-current={active ? "page" : undefined}
                 >
                   {label}
+                  {showBadge && (
+                    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {pendingSignupsCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -84,21 +96,28 @@ export function AdminNav() {
         {mobileOpen && (
           <nav
             id="admin-mobile-nav"
-            className="mt-3 grid grid-cols-3 gap-2 border-t border-stone-100 pt-3 md:hidden"
+            className="mt-3 grid grid-cols-2 gap-2 border-t border-stone-100 pt-3 sm:grid-cols-4 md:hidden"
             aria-label={dict.nav.admin}
           >
             {NAV_ITEMS.map((item) => {
-              const active = isActive(item.href, item.exact);
+              const active = isActive(item.href, "exact" in item ? item.exact : false);
               const label = dict.nav[item.labelKey];
+              const showBadge =
+                "badge" in item && item.badge && pendingSignupsCount > 0;
 
               return (
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={active ? dash.navMobileLinkActive : dash.navMobileLink}
+                  className={`${active ? dash.navMobileLinkActive : dash.navMobileLink} inline-flex items-center justify-center gap-1.5`}
                   aria-current={active ? "page" : undefined}
                 >
                   {label}
+                  {showBadge && (
+                    <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                      {pendingSignupsCount}
+                    </span>
+                  )}
                 </Link>
               );
             })}

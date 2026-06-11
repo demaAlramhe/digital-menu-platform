@@ -3,9 +3,11 @@ import type { he } from "./dictionaries/he";
 export type Locale = "he" | "ar" | "en";
 
 type DeepStringRecord<T> = {
-  [K in keyof T]: T[K] extends Record<string, unknown>
-    ? DeepStringRecord<T[K]>
-    : string;
+  [K in keyof T]: T[K] extends readonly string[]
+    ? readonly string[]
+    : T[K] extends Record<string, unknown>
+      ? DeepStringRecord<T[K]>
+      : string;
 };
 
 export type Dictionary = DeepStringRecord<typeof he>;

@@ -107,3 +107,14 @@ export const adminUserProfilePatchSchema = z.object({
     .max(120, "Full name is too long."),
   email: z.string().trim().email("A valid email is required."),
 });
+
+export const signupPlanSchema = z.enum(["basic", "pro", "premium"]);
+
+export const signupPostSchema = z.object({
+  full_name: z.string().trim().min(1, "Full name is required."),
+  restaurant_name: z.string().trim().min(1, "Restaurant name is required."),
+  email: z.string().trim().email("A valid email is required."),
+  whatsapp: z.string().trim().min(5, "WhatsApp number is required."),
+  plan: signupPlanSchema,
+  notes: z.string().trim().optional().nullable(),
+});

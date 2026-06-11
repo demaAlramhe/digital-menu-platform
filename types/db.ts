@@ -153,6 +153,35 @@ export type Database = {
         };
         Update: Partial<Database["public"]["Tables"]["profiles"]["Insert"]>;
       };
+      pending_signups: {
+        Row: {
+          id: string;
+          full_name: string;
+          restaurant_name: string;
+          email: string;
+          whatsapp: string;
+          plan: "basic" | "pro" | "premium";
+          notes: string | null;
+          status: "pending" | "approved" | "rejected";
+          approved_store_id: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          full_name: string;
+          restaurant_name: string;
+          email: string;
+          whatsapp: string;
+          plan: "basic" | "pro" | "premium";
+          notes?: string | null;
+          status?: "pending" | "approved" | "rejected";
+          approved_store_id?: string | null;
+          created_at?: string;
+        };
+        Update: Partial<Database["public"]["Tables"]["pending_signups"]["Insert"]>;
+      };
     };
   };
 };
+
+export type PendingSignupRow = Database["public"]["Tables"]["pending_signups"]["Row"];

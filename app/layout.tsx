@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AccessibilityWidget } from "@/components/accessibility/accessibility-widget";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
+import { getAccessibilityBootScript } from "@/lib/accessibility/boot-script";
 import { getDirection } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
@@ -30,10 +32,14 @@ export default async function RootLayout({
           content="black-translucent"
         />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <script
+          dangerouslySetInnerHTML={{ __html: getAccessibilityBootScript() }}
+        />
       </head>
       <body>
         <LocaleProvider locale={locale} dict={dict}>
           {children}
+          <AccessibilityWidget />
         </LocaleProvider>
       </body>
     </html>
