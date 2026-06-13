@@ -2,6 +2,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { AdminCreateStoreForm } from "@/components/admin/admin-create-store-form";
+import { AdminStoreDeleteButton } from "@/components/admin/admin-store-delete-button";
 import { AdminStoreStatusButton } from "@/components/admin/admin-store-status-button";
 import { PrimaryLink } from "@/components/dashboard/ui/buttons";
 import { StatCard } from "@/components/dashboard/ui/stat-card";
@@ -294,13 +295,17 @@ export default async function AdminStoresPage({
                       </dl>
                     </div>
 
-                    <div className="mt-5 flex flex-wrap gap-2 border-t border-stone-100 pt-4">
+                    <div className="mt-5 flex flex-wrap items-center gap-2 border-t border-stone-100 pt-4">
                       <PrimaryLink href={`/admin/stores/${store.id}`}>
                         {dict.common.edit}
                       </PrimaryLink>
                       <AdminStoreStatusButton
                         storeId={store.id}
                         currentStatus={store.status}
+                      />
+                      <AdminStoreDeleteButton
+                        storeId={store.id}
+                        storeName={store.name}
                       />
                     </div>
                   </div>

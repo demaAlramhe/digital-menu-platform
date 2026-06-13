@@ -18,8 +18,7 @@ import {
 
 import type { MenuItemDisplay } from "@/components/storefront/menu-item-card";
 
-import { StoreFloatingPhoneButton } from "@/components/storefront/store-floating-phone-button";
-import { StoreWhatsAppButton } from "@/components/storefront/store-whatsapp-button";
+import { StoreMenuBottomBar } from "@/components/storefront/store-menu-bottom-bar";
 import { StoreMenuLocaleBar } from "@/components/storefront/store-menu-locale-bar";
 import { StorePremiumBackdrop } from "@/components/storefront/store-premium-backdrop";
 import { PwaInstallBanner } from "@/components/storefront/pwa-install-banner";
@@ -336,13 +335,9 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
       <StoreMenuLocaleBar />
 
-      <StoreFloatingPhoneButton phone={store.phone} persistKey={storeSlug} />
+      <StoreMenuBottomBar phone={store.phone} />
 
-      <StoreWhatsAppButton
-        whatsappNumber={store.whatsapp_number ?? store.phone}
-      />
-
-      <div className="relative z-10 px-4 py-6 pb-[max(5rem,env(safe-area-inset-bottom))] pt-[max(3.25rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 sm:pt-14 sm:pb-24">
+      <div className="relative z-10 px-4 py-6 pb-[max(5.5rem,env(safe-area-inset-bottom))] pt-[max(3.25rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 sm:pt-14 sm:pb-28">
 
         <div className="mx-auto w-full max-w-4xl">
 

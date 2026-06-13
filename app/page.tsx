@@ -52,12 +52,6 @@ export default async function HomePage() {
     dict.home.included10,
   ];
 
-  const mockupItems = [
-    { emoji: "🥙", name: dict.home.mockupItem1, price: "₪42" },
-    { emoji: "🍔", name: dict.home.mockupItem2, price: "₪58" },
-    { emoji: "🥗", name: dict.home.mockupItem3, price: "₪36" },
-  ];
-
   return (
     <div className="min-h-screen bg-slate-50 text-slate-900">
       <SiteHeader />
@@ -114,8 +108,7 @@ export default async function HomePage() {
 
             <div className="w-full shrink-0 lg:w-auto">
               <HeroMenuMockup
-                storeName={dict.home.mockupStoreName}
-                items={mockupItems}
+                imageSrc="/images/hero-menu.jpeg"
                 ariaLabel={dict.home.mockupAriaLabel}
               />
             </div>

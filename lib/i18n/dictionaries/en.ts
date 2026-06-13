@@ -578,6 +578,10 @@ export const en = {
     archiveConfirm: "Archive this store?",
     archiveFailed: "Failed to archive store.",
     archiveError: "Something went wrong while archiving the store.",
+    deleteStoreConfirm:
+      "Delete store {name}? Menu and items will be permanently removed. This cannot be undone.",
+    deleteStoreFailed: "Failed to delete store.",
+    deleteStoreError: "Something went wrong while deleting the store.",
     statusUpdateFailed: "Failed to update status.",
     statusUpdateError: "Something went wrong while updating status.",
     roleUpdateFailed: "Failed to update role.",

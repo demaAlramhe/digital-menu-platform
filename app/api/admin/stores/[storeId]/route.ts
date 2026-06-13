@@ -78,3 +78,54 @@ export async function PATCH(
     );
   }
 }
+
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ storeId: string }> }
+) {
+  try {
+    const auth = await requireApiSuperAdmin();
+    if (auth.errorResponse) {
+      return auth.errorResponse;
+    }
+
+    const { storeId } = await params;
+    const supabase = createAdminClient();
+
+    const { data: store, error: loadError } = await supabase
+      .from("stores")
+      .select("id, name")
+      .eq("id", storeId)
+      .maybeSingle();
+
+    if (loadError) {
+      return NextResponse.json(
+        { error: "Failed to load store.", details: loadError },
+        { status: 500 }
+      );
+    }
+
+    if (!store) {
+      return NextResponse.json({ error: "Store not found." }, { status: 404 });
+    }
+
+    const { error: deleteError } = await supabase
+      .from("stores")
+      .delete()
+      .eq("id", storeId);
+
+    if (deleteError) {
+      return NextResponse.json(
+        { error: "Failed to delete store.", details: deleteError },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({ success: true, storeName: store.name });
+  } catch (error) {
+    return NextResponse.json(
+      { error: "Unexpected server error.", details: String(error) },
+      { status: 500 }
+    );
+  }
+}

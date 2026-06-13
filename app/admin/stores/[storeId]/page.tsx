@@ -4,6 +4,7 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { Card } from "@/components/ui/card";
 import { createAdminClient } from "../../../../lib/supabase/admin";
 import { AdminEditStoreForm } from "@/components/admin/admin-edit-store-form";
+import { AdminStoreDeleteButton } from "@/components/admin/admin-store-delete-button";
 import {
   buildPublicMenuUrl,
   buildPublicStoreUrl,
@@ -96,6 +97,21 @@ export default async function AdminStorePage({ params }: AdminStorePageProps) {
             status: store.status ?? "active",
           }}
         />
+      </Card>
+
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <p className="font-medium text-stone-900">{dict.common.delete}</p>
+            <p className="mt-1 text-sm text-stone-500">
+              {dict.admin.deleteStoreConfirm.replace("{name}", store.name ?? "")}
+            </p>
+          </div>
+          <AdminStoreDeleteButton
+            storeId={store.id}
+            storeName={store.name ?? ""}
+          />
+        </div>
       </Card>
     </AppShell>
   );

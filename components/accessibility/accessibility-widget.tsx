@@ -16,9 +16,7 @@ import {
   type AccessibilitySettings,
 } from "@/lib/accessibility/types";
 
-export function AccessibilityWidget() {
-  const { dict, dir } = useLocale();
-  const pathname = usePathname();
+function useAccessibilityControl() {
   const panelId = useId();
   const panelRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
@@ -27,8 +25,6 @@ export function AccessibilityWidget() {
     DEFAULT_ACCESSIBILITY_SETTINGS
   );
   const [ready, setReady] = useState(false);
-
-  const isMenuPage = Boolean(pathname?.includes("/menu"));
 
   useEffect(() => {
     const loaded = loadAccessibilitySettings();
@@ -98,13 +94,78 @@ export function AccessibilityWidget() {
     persist(DEFAULT_ACCESSIBILITY_SETTINGS);
   }
 
-  // Menu: WhatsApp FAB is always physical left — keep widget on physical right, elevated.
-  const positionClass = isMenuPage
-    ? "right-4 bottom-[calc(max(1rem,env(safe-area-inset-bottom))+5.75rem)] sm:right-5"
-    : "end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] sm:end-5";
+  return {
+    panelId,
+    panelRef,
+    buttonRef,
+    open,
+    setOpen,
+    settings,
+    ready,
+    increaseText,
+    decreaseText,
+    resetText,
+    toggle,
+    resetAll,
+  };
+}
 
-  if (!ready) return null;
+export function AccessibilityMenuControl() {
+  const { dict, dir } = useLocale();
+  const control = useAccessibilityControl();
 
+  if (!control.ready) return null;
+
+  return (
+    <AccessibilityControlUI
+      dict={dict}
+      dir={dir}
+      layout="menu-bar"
+      {...control}
+    />
+  );
+}
+
+export function AccessibilityWidget() {
+  const { dict, dir } = useLocale();
+  const pathname = usePathname();
+  const control = useAccessibilityControl();
+
+  if (pathname?.includes("/menu")) return null;
+  if (!control.ready) return null;
+
+  return (
+    <AccessibilityControlUI
+      dict={dict}
+      dir={dir}
+      layout="fixed"
+      {...control}
+    />
+  );
+}
+
+type AccessibilityControlUIProps = ReturnType<typeof useAccessibilityControl> & {
+  dict: ReturnType<typeof useLocale>["dict"];
+  dir: ReturnType<typeof useLocale>["dir"];
+  layout: "fixed" | "menu-bar";
+};
+
+function AccessibilityControlUI({
+  dict,
+  dir,
+  layout,
+  panelId,
+  panelRef,
+  buttonRef,
+  open,
+  setOpen,
+  settings,
+  increaseText,
+  decreaseText,
+  resetText,
+  toggle,
+  resetAll,
+}: AccessibilityControlUIProps) {
   const toggleOptions: Array<{
     key: keyof Omit<AccessibilitySettings, "fontScale">;
     label: string;
@@ -120,84 +181,100 @@ export function AccessibilityWidget() {
     { key: "underlineLinks", label: dict.accessibility.underlineLinks, active: settings.underlineLinks },
   ];
 
-  return (
+  const panel = open ? (
     <div
-      className={`a11y-widget-root fixed z-[90] ${positionClass} flex flex-col items-end gap-2`}
-      dir={dir}
+      ref={panelRef}
+      id={panelId}
+      role="dialog"
+      aria-modal="true"
+      aria-label={dict.accessibility.title}
+      className={`a11y-panel-enter w-[min(100vw-2rem,20rem)] rounded-2xl border border-stone-200/90 bg-white/95 p-4 shadow-[0_16px_48px_rgba(15,23,42,0.18)] backdrop-blur-md ${
+        layout === "menu-bar" ? "absolute bottom-full z-[90] mb-2" : ""
+      }`}
     >
-      {open && (
-        <div
-          ref={panelRef}
-          id={panelId}
-          role="dialog"
-          aria-modal="true"
-          aria-label={dict.accessibility.title}
-          className="a11y-panel-enter w-[min(100vw-2rem,20rem)] rounded-2xl border border-stone-200/90 bg-white/95 p-4 shadow-[0_16px_48px_rgba(15,23,42,0.18)] backdrop-blur-md"
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <h2 className="text-sm font-bold text-stone-900">
+          {dict.accessibility.title}
+        </h2>
+        <button
+          type="button"
+          onClick={() => setOpen(false)}
+          className="rounded-lg px-2 py-1 text-stone-500 transition hover:bg-stone-100 hover:text-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+          aria-label={dict.accessibility.close}
         >
-          <div className="mb-3 flex items-center justify-between gap-2">
-            <h2 className="text-sm font-bold text-stone-900">
-              {dict.accessibility.title}
-            </h2>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="rounded-lg px-2 py-1 text-stone-500 transition hover:bg-stone-100 hover:text-stone-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
-              aria-label={dict.accessibility.close}
-            >
-              ×
-            </button>
-          </div>
+          ×
+        </button>
+      </div>
 
-          <div className="space-y-3">
-            <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
-                {dict.accessibility.textSize}
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                <PanelButton onClick={decreaseText} label={dict.accessibility.decreaseText} />
-                <PanelButton
-                  onClick={resetText}
-                  label={dict.accessibility.resetTextSize}
-                  variant="muted"
-                />
-                <PanelButton onClick={increaseText} label={dict.accessibility.increaseText} />
-              </div>
-            </div>
-
-            <ul className="space-y-1.5" role="list">
-              {toggleOptions.map((option) => (
-                <li key={option.key}>
-                  <ToggleRow
-                    label={option.label}
-                    pressed={option.active}
-                    onClick={() => toggle(option.key)}
-                  />
-                </li>
-              ))}
-            </ul>
-
-            <button
-              type="button"
-              onClick={resetAll}
-              className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
-            >
-              {dict.accessibility.resetAll}
-            </button>
+      <div className="space-y-3">
+        <div>
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-stone-500">
+            {dict.accessibility.textSize}
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            <PanelButton onClick={decreaseText} label={dict.accessibility.decreaseText} />
+            <PanelButton
+              onClick={resetText}
+              label={dict.accessibility.resetTextSize}
+              variant="muted"
+            />
+            <PanelButton onClick={increaseText} label={dict.accessibility.increaseText} />
           </div>
         </div>
-      )}
 
-      <button
-        ref={buttonRef}
-        type="button"
-        onClick={() => setOpen((v) => !v)}
-        aria-expanded={open}
-        aria-controls={panelId}
-        aria-label={dict.accessibility.openMenu}
-        className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/90 bg-white/95 text-slate-800 shadow-[0_8px_28px_rgba(15,23,42,0.15)] backdrop-blur-md transition hover:border-slate-300 hover:bg-white hover:shadow-[0_12px_32px_rgba(15,23,42,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 active:scale-[0.97]"
-      >
-        <AccessibilityIcon />
-      </button>
+        <ul className="space-y-1.5" role="list">
+          {toggleOptions.map((option) => (
+            <li key={option.key}>
+              <ToggleRow
+                label={option.label}
+                pressed={option.active}
+                onClick={() => toggle(option.key)}
+              />
+            </li>
+          ))}
+        </ul>
+
+        <button
+          type="button"
+          onClick={resetAll}
+          className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2.5 text-sm font-semibold text-stone-800 transition hover:bg-stone-100 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900"
+        >
+          {dict.accessibility.resetAll}
+        </button>
+      </div>
+    </div>
+  ) : null;
+
+  const trigger = (
+    <button
+      ref={buttonRef}
+      type="button"
+      onClick={() => setOpen((v) => !v)}
+      aria-expanded={open}
+      aria-controls={panelId}
+      aria-label={dict.accessibility.openMenu}
+      className="flex h-12 w-12 items-center justify-center rounded-full border border-stone-200/90 bg-white/95 text-slate-800 shadow-[0_8px_28px_rgba(15,23,42,0.15)] backdrop-blur-md transition hover:border-slate-300 hover:bg-white hover:shadow-[0_12px_32px_rgba(15,23,42,0.18)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 active:scale-[0.97]"
+    >
+      <AccessibilityIcon />
+    </button>
+  );
+
+  if (layout === "menu-bar") {
+    return (
+      <div className="a11y-widget-root relative flex flex-col items-center" dir={dir}>
+        {panel}
+        {trigger}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      className="a11y-widget-root fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[90] flex flex-col items-end gap-2 sm:end-5"
+      dir={dir}
+    >
+      {panel}
+      {trigger}
     </div>
   );
 }

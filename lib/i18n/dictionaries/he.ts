@@ -576,6 +576,10 @@ export const he = {
     archiveConfirm: "האם לארכב את העסק?",
     archiveFailed: "ארכוב העסק נכשל.",
     archiveError: "משהו השתבש בארכוב העסק.",
+    deleteStoreConfirm:
+      "למחוק את העסק {name}? התפריט והפריטים יימחקו לצמיתות ולא ניתן לבטל.",
+    deleteStoreFailed: "מחיקת העסק נכשלה.",
+    deleteStoreError: "משהו השתבש במחיקת העסק.",
     statusUpdateFailed: "עדכון הסטטוס נכשל.",
     statusUpdateError: "משהו השתבש בעדכון הסטטוס.",
     roleUpdateFailed: "עדכון התפקיד נכשל.",

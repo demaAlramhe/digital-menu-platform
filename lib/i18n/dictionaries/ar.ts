@@ -577,6 +577,10 @@ export const ar: Dictionary = {
     archiveConfirm: "هل تريد أرشفة هذا المتجر؟",
     archiveFailed: "فشل أرشفة المتجر.",
     archiveError: "حدث خطأ أثناء أرشفة المتجر.",
+    deleteStoreConfirm:
+      "حذف المتجر {name}؟ سيتم حذف القائمة والأصناف نهائياً ولا يمكن التراجع.",
+    deleteStoreFailed: "فشل حذف المتجر.",
+    deleteStoreError: "حدث خطأ أثناء حذف المتجر.",
     statusUpdateFailed: "فشل تحديث الحالة.",
     statusUpdateError: "حدث خطأ أثناء تحديث الحالة.",
     roleUpdateFailed: "فشل تحديث الدور.",
