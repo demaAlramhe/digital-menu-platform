@@ -41,7 +41,7 @@ export function TrustSection({ dict }: TrustSectionProps) {
   return (
     <section
       id="trust"
-      className="scroll-mt-20 border-y border-slate-200/80 bg-gradient-to-b from-white via-slate-50/80 to-white py-16 sm:py-20 lg:py-24"
+      className="scroll-mt-20 border-y border-slate-200/80 bg-white py-16 sm:py-20 lg:py-24"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
