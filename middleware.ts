@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import {
   applyPublicLocaleFromQuery,
+  isPublicStorePath,
   setLocaleCookieOnResponse,
 } from "@/lib/middleware/public-locale";
 import {
@@ -43,10 +44,15 @@ export async function middleware(request: NextRequest) {
   } else {
     const existingLocale = request.cookies.get(LOCALE_COOKIE)?.value;
     if (!isLocale(existingLocale)) {
-      const detected = detectLocaleFromAcceptLanguage(
-        request.headers.get("accept-language")
-      );
-      setLocaleCookieOnResponse(detected, response);
+      const pathname = request.nextUrl.pathname;
+      const useArabicDefault =
+        pathname === "/" || isPublicStorePath(pathname);
+      const initialLocale = useArabicDefault
+        ? DEFAULT_LOCALE
+        : detectLocaleFromAcceptLanguage(
+            request.headers.get("accept-language")
+          );
+      setLocaleCookieOnResponse(initialLocale, response);
     }
   }
 
