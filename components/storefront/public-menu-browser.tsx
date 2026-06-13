@@ -1,19 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import { StorePremiumGlass } from "@/components/storefront/store-premium-glass";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { formatMessage } from "@/lib/i18n";
 import {
   STOREFRONT_GOLD,
   STOREFRONT_GOLD_LIGHT,
 } from "@/lib/storefront/premium-theme";
+import { calculateDiscount } from "@/lib/storefront/discount";
 import {
   MenuItemCard,
   type MenuItemDisplay,
 } from "@/components/storefront/menu-item-card";
-import { MenuSectionHeading } from "@/components/storefront/menu-section-heading";
-import { WhatsAppOrderButton } from "@/components/storefront/whatsapp-order-button";
 
 export type MenuBrowseSection = {
   id: string;
@@ -29,15 +27,20 @@ type PublicMenuBrowserProps = {
   secondaryColor: string;
   storeName: string;
   logoUrl?: string | null;
-  whatsappNumber?: string | null;
   offerItems?: MenuItemDisplay[];
 };
 
-const MENU_ITEM_GRID =
-  "grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:gap-5";
+const STICKY_TABS_CLASS =
+  "sticky top-[max(3.25rem,env(safe-area-inset-top))] z-20";
+const SECTION_SCROLL_MARGIN =
+  "scroll-mt-[calc(max(3.25rem,env(safe-area-inset-top))+3.75rem)]";
 
-const CATEGORY_LIST =
-  "mx-auto flex w-full max-w-2xl flex-col gap-2.5 sm:gap-3";
+const HORIZONTAL_SCROLL =
+  "flex gap-3 overflow-x-auto overscroll-x-contain pb-2 snap-x snap-proximity [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden";
+
+function sectionAnchorId(sectionId: string) {
+  return `category-${sectionId}`;
+}
 
 export function PublicMenuBrowser({
   sections,
@@ -45,20 +48,123 @@ export function PublicMenuBrowser({
   secondaryColor,
   storeName,
   logoUrl,
-  whatsappNumber,
-  offerItems = [],
 }: PublicMenuBrowserProps) {
   const { dict } = useLocale();
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [activeSectionId, setActiveSectionId] = useState(sections[0]?.id ?? "");
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+  const scrollSpyEnabled = useRef(true);
 
-  const selectedSection = useMemo(
-    () => sections.find((section) => section.id === selectedId) ?? null,
-    [sections, selectedId]
+  const setSectionRef = useCallback(
+    (id: string) => (node: HTMLElement | null) => {
+      sectionRefs.current[id] = node;
+    },
+    []
   );
 
+  const scrollTabIntoView = useCallback((sectionId: string) => {
+    tabRefs.current[sectionId]?.scrollIntoView({
+      behavior: "smooth",
+      inline: "center",
+      block: "nearest",
+    });
+  }, []);
+
+  const scrollToSection = useCallback(
+    (sectionId: string) => {
+      const node = sectionRefs.current[sectionId];
+      if (!node) return;
+
+      scrollSpyEnabled.current = false;
+      setActiveSectionId(sectionId);
+      scrollTabIntoView(sectionId);
+
+      node.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      window.setTimeout(() => {
+        scrollSpyEnabled.current = true;
+      }, 700);
+    },
+    [scrollTabIntoView]
+  );
+
+  useLayoutEffect(() => {
+    if (sections.length === 0) return;
+
+    let observer: IntersectionObserver | null = null;
+    let rafId = 0;
+    const visibleSections = new Map<string, number>();
+
+    const attachObserver = () => {
+      const nodes = sections
+        .map((section) => sectionRefs.current[section.id])
+        .filter((node): node is HTMLElement => node != null);
+
+      if (nodes.length === 0) {
+        rafId = requestAnimationFrame(attachObserver);
+        return;
+      }
+
+      observer = new IntersectionObserver(
+        (entries) => {
+          if (!scrollSpyEnabled.current) return;
+
+          for (const entry of entries) {
+            const id = entry.target.getAttribute("data-section-id");
+            if (!id) continue;
+
+            if (entry.isIntersecting) {
+              visibleSections.set(id, entry.intersectionRatio);
+            } else {
+              visibleSections.delete(id);
+            }
+          }
+
+          if (visibleSections.size === 0) return;
+
+          let bestId = "";
+          let bestRatio = -1;
+
+          for (const [id, ratio] of visibleSections) {
+            if (ratio > bestRatio) {
+              bestRatio = ratio;
+              bestId = id;
+            }
+          }
+
+          if (bestId) {
+            setActiveSectionId((current) => {
+              if (current === bestId) return current;
+              scrollTabIntoView(bestId);
+              return bestId;
+            });
+          }
+        },
+        {
+          root: null,
+          rootMargin: "-20% 0px -55% 0px",
+          threshold: [0, 0.15, 0.35, 0.55, 0.75, 1],
+        }
+      );
+
+      for (const node of nodes) {
+        observer.observe(node);
+      }
+    };
+
+    attachObserver();
+
+    return () => {
+      cancelAnimationFrame(rafId);
+      observer?.disconnect();
+    };
+  }, [sections, scrollTabIntoView]);
+
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }, [selectedId]);
+    if (!sections.some((section) => section.id === activeSectionId)) {
+      setActiveSectionId(sections[0]?.id ?? "");
+    }
+  }, [sections, activeSectionId]);
 
   if (sections.length === 0) {
     return null;
@@ -66,173 +172,181 @@ export function PublicMenuBrowser({
 
   const initial = storeName?.charAt(0)?.toUpperCase() || "M";
 
-  if (selectedSection) {
-    return (
-      <StorePremiumGlass size="wide" className="mx-auto">
-        <div className="flex flex-col gap-5 sm:gap-6">
-          <button
-            type="button"
-            onClick={() => setSelectedId(null)}
-            className="group inline-flex min-h-11 w-fit items-center gap-2.5 rounded-full border border-[#d4b87a]/70 bg-[#d4b87a]/10 px-5 py-2.5 text-sm font-semibold text-[#f5e6c8] shadow-[0_4px_16px_rgba(0,0,0,0.25)] backdrop-blur-sm transition-all duration-200 hover:border-[#d4b87a] hover:bg-[#d4b87a]/20 active:scale-[0.98]"
-          >
-            <BackChevron className="h-4 w-4 text-[#d4b87a] transition group-hover:text-[#f5e6c8]" />
-            {dict.menu.backToCategories}
-          </button>
-
-          {selectedSection.isFeatured ? (
-            <FeaturedSectionHeading
-              title={selectedSection.name}
-              subtitle={dict.menu.featuredSubtitle}
+  return (
+    <div className="mx-auto w-full">
+      <header className="-mx-4 px-4 py-8 text-center sm:-mx-6 sm:px-6 sm:py-12">
+        <div className="flex flex-col items-center gap-3 sm:gap-4">
+          {logoUrl ? (
+            <img
+              src={logoUrl}
+              alt=""
+              className="h-16 w-16 rounded-full object-cover ring-2 ring-[#d4b87a]/40 drop-shadow-lg sm:h-[4.5rem] sm:w-[4.5rem]"
             />
           ) : (
-            <MenuSectionHeading
-              title={selectedSection.name}
-              primaryColor={primaryColor}
-              accent="default"
-              theme="premium"
-            />
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-semibold drop-shadow-lg sm:h-[4.5rem] sm:w-[4.5rem]"
+              style={{
+                background: `linear-gradient(145deg, ${STOREFRONT_GOLD}33, rgba(0,0,0,0.4))`,
+                color: STOREFRONT_GOLD_LIGHT,
+                border: `1px solid ${STOREFRONT_GOLD}66`,
+              }}
+            >
+              {initial}
+            </div>
           )}
 
-          <ul className={MENU_ITEM_GRID}>
-            {selectedSection.items.map((item) => (
-              <li key={item.id} className="min-w-0">
-                <MenuItemCard
-                  item={item}
-                  primaryColor={primaryColor}
-                  secondaryColor={secondaryColor}
-                  variant={selectedSection.isFeatured ? "featured" : "default"}
-                  showFeaturedBadge={
-                    selectedSection.isFeatured || item.is_featured
-                  }
-                  theme="premium"
-                />
-              </li>
-            ))}
-          </ul>
-        </div>
-      </StorePremiumGlass>
-    );
-  }
-
-  return (
-    <StorePremiumGlass size="wide" className="mx-auto">
-      <header className="flex flex-col items-center gap-3 pb-5 pt-1 text-center sm:gap-4 sm:pb-6">
-        {logoUrl ? (
-          <img
-            src={logoUrl}
-            alt=""
-            className="h-16 w-16 rounded-full object-cover ring-2 ring-[#d4b87a]/40 sm:h-[4.5rem] sm:w-[4.5rem]"
-          />
-        ) : (
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-full text-2xl font-semibold sm:h-[4.5rem] sm:w-[4.5rem]"
-            style={{
-              background: `linear-gradient(145deg, ${STOREFRONT_GOLD}33, rgba(0,0,0,0.4))`,
-              color: STOREFRONT_GOLD_LIGHT,
-              border: `1px solid ${STOREFRONT_GOLD}66`,
-            }}
+          <p
+            className="text-sm font-medium uppercase tracking-widest drop-shadow-md"
+            style={{ color: `${STOREFRONT_GOLD_LIGHT}88` }}
           >
-            {initial}
-          </div>
-        )}
-
-        <p
-          className="text-sm font-medium uppercase tracking-widest text-white/50"
-          style={{ color: `${STOREFRONT_GOLD_LIGHT}88` }}
-        >
-          {storeName}
-        </p>
-
-        <div className="flex flex-col items-center gap-2">
-          <h1
-            className="text-3xl font-bold tracking-tight"
-            style={{ color: STOREFRONT_GOLD_LIGHT }}
-          >
-            {dict.menu.categoriesTitle}
-          </h1>
-          <div
-            className="h-0.5 w-16 rounded-full"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${STOREFRONT_GOLD}, transparent)`,
-            }}
-            aria-hidden
-          />
+            {storeName}
+          </p>
         </div>
       </header>
 
-      {offerItems.length > 0 && (
-        <section className="mx-auto mb-6 w-full max-w-2xl">
-          <div className="mb-4 flex items-center gap-2">
-            <span aria-hidden>🔥</span>
-            <h2 className="text-xl font-bold text-amber-400">
-              {dict.menu.offersTitle}
-            </h2>
-            <span aria-hidden>🔥</span>
-          </div>
-          <div
-            className="mb-4 h-px w-full"
-            style={{
-              background: `linear-gradient(90deg, transparent, ${STOREFRONT_GOLD}99, transparent)`,
-            }}
-            aria-hidden
+      <nav
+        aria-label={dict.menu.categoriesTitle}
+        className={`${STICKY_TABS_CLASS} -mx-4 mb-5 border-b border-[#d4b87a]/20 bg-[#0c0b0a]/90 px-4 py-2.5 backdrop-blur-md sm:-mx-6 sm:mb-6 sm:px-6`}
+      >
+        <div className={`${HORIZONTAL_SCROLL} gap-2`}>
+          {sections.map((section) => {
+            const isActive = activeSectionId === section.id;
+
+            return (
+              <button
+                key={section.id}
+                ref={(node) => {
+                  tabRefs.current[section.id] = node;
+                }}
+                type="button"
+                onClick={() => scrollToSection(section.id)}
+                className={`shrink-0 snap-start whitespace-nowrap rounded-full px-4 py-2 text-sm font-semibold transition active:scale-[0.98] ${
+                  isActive
+                    ? "text-[#1a1408] shadow-[0_4px_16px_rgba(201,169,98,0.35)]"
+                    : "border border-[#d4b87a]/35 bg-black/30 text-[#f5e6c8]/85 hover:border-[#d4b87a]/60 hover:bg-black/45"
+                }`}
+                style={
+                  isActive
+                    ? {
+                        background: `linear-gradient(180deg, ${STOREFRONT_GOLD} 0%, #9A7B3C 100%)`,
+                      }
+                    : undefined
+                }
+                aria-current={isActive ? "true" : undefined}
+              >
+                {section.isFeatured && (
+                  <span className="me-1" aria-hidden>
+                    🔥
+                  </span>
+                )}
+                {section.name}
+              </button>
+            );
+          })}
+        </div>
+      </nav>
+
+      <div className="flex flex-col gap-8 sm:gap-10">
+        {sections.map((section) => (
+          <MenuCategorySection
+            key={section.id}
+            section={section}
+            primaryColor={primaryColor}
+            secondaryColor={secondaryColor}
+            sectionRef={setSectionRef(section.id)}
+            featuredSubtitle={dict.menu.featuredSubtitle}
           />
-          <div className="flex gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {offerItems.map((item) => (
-              <div key={item.id} className="max-w-[160px] min-w-[160px]">
-                <MenuItemCard
-                  item={item}
-                  primaryColor={primaryColor}
-                  secondaryColor={secondaryColor}
-                  showDiscount
-                  theme="premium"
-                />
-              </div>
-            ))}
-          </div>
-        </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MenuCategorySection({
+  section,
+  primaryColor,
+  secondaryColor,
+  sectionRef,
+  featuredSubtitle,
+}: {
+  section: MenuBrowseSection;
+  primaryColor: string;
+  secondaryColor: string;
+  sectionRef: (node: HTMLElement | null) => void;
+  featuredSubtitle: string;
+}) {
+  const { dict } = useLocale();
+  const itemCountLabel = formatMessage(dict.menu.itemsInCategory, {
+    count: section.items.length,
+  });
+
+  return (
+    <section
+      ref={sectionRef}
+      id={sectionAnchorId(section.id)}
+      data-section-id={section.id}
+      className={SECTION_SCROLL_MARGIN}
+    >
+      {section.isFeatured ? (
+        <FeaturedSectionHeading
+          title={section.name}
+          subtitle={featuredSubtitle}
+          itemCountLabel={itemCountLabel}
+        />
+      ) : (
+        <CategorySectionHeading title={section.name} itemCountLabel={itemCountLabel} />
       )}
 
-      <ul className={CATEGORY_LIST}>
-        {sections.map((section) => (
-          <li key={section.id} className="min-w-0">
-            <CategoryRow
-              section={section}
-              isFeatured={section.isFeatured}
-              onSelect={() => setSelectedId(section.id)}
-            />
-          </li>
-        ))}
-      </ul>
+      <div className={HORIZONTAL_SCROLL}>
+        {section.items.map((item) => {
+          const { hasDiscount } = calculateDiscount(
+            item.price,
+            item.original_price ?? null
+          );
 
-      <div className="mx-auto mt-6 w-full max-w-2xl">
-        <WhatsAppOrderButton
-          whatsappNumber={whatsappNumber ?? null}
-          storeName={storeName}
-        />
+          return (
+            <div key={item.id} className="w-36 shrink-0 sm:w-40">
+              <MenuItemCard
+                item={item}
+                primaryColor={primaryColor}
+                secondaryColor={secondaryColor}
+                variant={section.isFeatured ? "featured" : "default"}
+                showFeaturedBadge={section.isFeatured || item.is_featured}
+                showDiscount={hasDiscount}
+                theme="premium"
+                layout="scroll"
+              />
+            </div>
+          );
+        })}
       </div>
-    </StorePremiumGlass>
+    </section>
   );
 }
 
 function FeaturedSectionHeading({
   title,
   subtitle,
+  itemCountLabel,
 }: {
   title: string;
   subtitle: string;
+  itemCountLabel: string;
 }) {
   return (
-    <div className="flex flex-col gap-2">
-      <h2
-        className="flex items-center gap-2.5 text-xl font-bold sm:text-2xl"
-        style={{ color: STOREFRONT_GOLD_LIGHT }}
-      >
-        <span className="text-lg sm:text-xl" aria-hidden>
-          ⭐
-        </span>
-        {title}
-      </h2>
+    <div className="mb-4 flex flex-col gap-2 sm:mb-5">
+      <div className="flex flex-wrap items-center gap-2">
+        <span aria-hidden>🔥</span>
+        <h2
+          className="text-xl font-bold sm:text-2xl"
+          style={{ color: STOREFRONT_GOLD_LIGHT }}
+        >
+          {title}
+        </h2>
+        <span aria-hidden>🔥</span>
+      </div>
       <p className="text-sm leading-relaxed text-white/65">{subtitle}</p>
+      <p className="text-xs text-white/50">{itemCountLabel}</p>
       <div
         className="mt-1 h-px w-full"
         style={{
@@ -244,118 +358,31 @@ function FeaturedSectionHeading({
   );
 }
 
-function CategoryRow({
-  section,
-  isFeatured,
-  onSelect,
+function CategorySectionHeading({
+  title,
+  itemCountLabel,
 }: {
-  section: MenuBrowseSection;
-  isFeatured?: boolean;
-  onSelect: () => void;
+  title: string;
+  itemCountLabel: string;
 }) {
-  const { dict } = useLocale();
-  const imageUrl =
-    section.imageUrl ??
-    section.items.find((item) => item.image_url)?.image_url ??
-    null;
-
-  const itemCountLabel = formatMessage(dict.menu.itemsInCategory, {
-    count: section.items.length,
-  });
-
   return (
-    <button
-      type="button"
-      onClick={onSelect}
-      className="group flex h-20 w-full items-center gap-3 rounded-xl border px-3 transition-all duration-200 hover:brightness-110 active:scale-[0.99] sm:h-24 sm:gap-4 sm:rounded-2xl sm:px-4"
-      style={{
-        backgroundColor: "rgba(24, 24, 27, 0.92)",
-        borderColor: isFeatured ? STOREFRONT_GOLD : `${STOREFRONT_GOLD}cc`,
-        boxShadow: isFeatured
-          ? "0 6px 24px rgba(201,169,98,0.2), inset 0 1px 0 rgba(255,255,255,0.06)"
-          : "0 3px 16px rgba(0,0,0,0.35), inset 0 1px 0 rgba(255,255,255,0.04)",
-      }}
-    >
-      <ForwardChevron className="h-5 w-5 shrink-0 text-[#d4b87a]/80 transition group-hover:text-[#f5e6c8]" />
-
-      <div className="flex min-w-0 flex-1 flex-col items-start gap-0.5 text-start">
-        <span className="line-clamp-2 text-lg font-semibold leading-snug text-white">
-          {section.name}
-        </span>
+    <div className="mb-4 flex flex-col gap-1 sm:mb-5">
+      <div className="flex flex-wrap items-baseline gap-2">
+        <h2
+          className="text-lg font-bold sm:text-xl"
+          style={{ color: STOREFRONT_GOLD_LIGHT }}
+        >
+          {title}
+        </h2>
         <span className="text-xs text-white/50">{itemCountLabel}</span>
       </div>
-
-      <CategoryRowThumb imageUrl={imageUrl} label={section.name} />
-    </button>
-  );
-}
-
-function CategoryRowThumb({
-  imageUrl,
-  label,
-}: {
-  imageUrl: string | null;
-  label: string;
-}) {
-  if (imageUrl) {
-    return (
-      <img
-        src={imageUrl}
-        alt=""
-        className="h-20 w-20 shrink-0 rounded-lg object-cover ring-1 ring-[#d4b87a]/35"
+      <div
+        className="mt-1 h-px w-full"
+        style={{
+          background: `linear-gradient(90deg, transparent, ${STOREFRONT_GOLD}55, transparent)`,
+        }}
+        aria-hidden
       />
-    );
-  }
-
-  const initial = label.charAt(0).toUpperCase() || "•";
-
-  return (
-    <div
-      className="flex h-20 w-20 shrink-0 items-center justify-center rounded-lg text-lg font-semibold"
-      style={{
-        background: `linear-gradient(145deg, ${STOREFRONT_GOLD}44, rgba(0,0,0,0.5))`,
-        color: STOREFRONT_GOLD_LIGHT,
-        border: `1px solid ${STOREFRONT_GOLD}55`,
-      }}
-      aria-hidden
-    >
-      {initial}
     </div>
-  );
-}
-
-function BackChevron({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className={`shrink-0 rtl:rotate-180 ${className ?? ""}`}
-      aria-hidden
-    >
-      <path
-        fillRule="evenodd"
-        d="M11.78 5.22a.75.75 0 0 1 0 1.06L8.06 10l3.72 3.72a.75.75 0 1 1-1.06 1.06l-4.25-4.25a.75.75 0 0 1 0-1.06l4.25-4.25a.75.75 0 0 1 1.06 0Z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
-}
-
-function ForwardChevron({ className }: { className?: string }) {
-  return (
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 20 20"
-      fill="currentColor"
-      className={`shrink-0 rtl:rotate-180 ${className ?? ""}`}
-      aria-hidden
-    >
-      <path
-        fillRule="evenodd"
-        d="M8.22 5.22a.75.75 0 0 1 1.06 0l4.25 4.25a.75.75 0 0 1 0 1.06l-4.25 4.25a.75.75 0 0 1-1.06-1.06L11.94 10 8.22 6.28a.75.75 0 0 1 0-1.06Z"
-        clipRule="evenodd"
-      />
-    </svg>
   );
 }

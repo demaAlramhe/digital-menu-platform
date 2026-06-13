@@ -330,7 +330,7 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
   return (
 
-    <main className="menu-page relative min-h-screen overflow-x-hidden bg-[#0c0b0a] text-white">
+    <main className="menu-page relative min-h-dvh bg-[#0c0b0a] text-white">
 
       <StorePremiumBackdrop imageUrl={backgroundImageUrl} />
 
@@ -342,9 +342,9 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
         whatsappNumber={store.whatsapp_number ?? store.phone}
       />
 
-      <div className="relative z-10 flex min-h-screen flex-col px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-[max(3.25rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 sm:pt-14">
+      <div className="relative z-10 px-4 py-6 pb-[max(5rem,env(safe-area-inset-bottom))] pt-[max(3.25rem,env(safe-area-inset-top))] sm:px-6 sm:py-8 sm:pt-14 sm:pb-24">
 
-        <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center">
+        <div className="mx-auto w-full max-w-4xl">
 
           {isEmpty ? (
 
@@ -363,8 +363,6 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
               storeName={storeName}
 
               logoUrl={store.logo_url}
-
-              whatsappNumber={store.whatsapp_number}
 
               offerItems={offerItems}
 

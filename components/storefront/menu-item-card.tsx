@@ -26,9 +26,10 @@ type MenuItemCardProps = {
   showDiscount?: boolean;
   variant?: "default" | "featured";
   theme?: "default" | "premium";
+  layout?: "grid" | "scroll";
 };
 
-/** Vertical card for grid layouts (image on top, details below). */
+/** Vertical card for grid or horizontal scroll layouts. */
 export function MenuItemCard({
   item,
   primaryColor,
@@ -37,6 +38,7 @@ export function MenuItemCard({
   showDiscount = false,
   variant = "default",
   theme = "default",
+  layout = "grid",
 }: MenuItemCardProps) {
   const { dict } = useLocale();
   const isFeatured =
@@ -47,6 +49,69 @@ export function MenuItemCard({
     item.original_price ?? null
   );
   const showDiscountUi = showDiscount || hasDiscount;
+
+  if (layout === "scroll") {
+    return (
+      <article className="flex w-full shrink-0 snap-start flex-col gap-2">
+        <div className="relative aspect-square w-full overflow-hidden rounded-lg bg-black/40">
+          {item.image_url ? (
+            <img
+              src={item.image_url}
+              alt={item.name}
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-black/50 to-black/30">
+              <PlateIcon className="h-8 w-8 text-[#d4b87a]/60" />
+            </div>
+          )}
+          {showDiscountUi && hasDiscount && (
+            <span className="absolute start-1.5 top-1.5 rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-bold text-white">
+              -{percentage}%
+            </span>
+          )}
+          {isFeatured && (
+            <span
+              className={`absolute inline-flex items-center gap-0.5 rounded-full px-1.5 py-0.5 text-[9px] font-semibold text-[#1a1408] ${
+                showDiscountUi && hasDiscount ? "end-1.5 top-1.5" : "start-1.5 top-1.5"
+              }`}
+              style={{ backgroundColor: STOREFRONT_GOLD }}
+            >
+              <StarIcon className="h-2.5 w-2.5" />
+              {dict.menu.featured}
+            </span>
+          )}
+        </div>
+
+        <h3
+          className="line-clamp-2 text-sm font-semibold leading-snug"
+          style={isPremium ? { color: STOREFRONT_GOLD_LIGHT } : undefined}
+        >
+          {item.name}
+        </h3>
+
+        {showDiscountUi && hasDiscount && item.original_price != null ? (
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className="text-xs line-through text-white/40">
+              {dict.common.currency}
+              {formatPrice(item.original_price)}
+            </span>
+            <span className="text-sm font-bold text-amber-400">
+              {dict.common.currency}
+              {formatPrice(item.price)}
+            </span>
+          </div>
+        ) : (
+          <p className="text-sm font-bold text-amber-400">
+            <span className="text-[10px] font-semibold opacity-80">
+              {dict.common.currency}
+            </span>
+            {formatPrice(item.price)}
+          </p>
+        )}
+      </article>
+    );
+  }
 
   return (
     <article

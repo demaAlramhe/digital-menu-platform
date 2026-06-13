@@ -20,7 +20,7 @@ export function StorePremiumGlass({
 
   return (
     <div
-      className={`rounded-[1.625rem] px-6 py-8 sm:px-8 sm:py-10 ${sizeClass} ${className}`}
+      className={`overflow-visible rounded-[1.625rem] px-6 py-8 sm:px-8 sm:py-10 ${sizeClass} ${className}`}
       style={premiumGlassPanelStyle}
     >
       {children}
