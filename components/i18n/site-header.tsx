@@ -9,7 +9,7 @@ const NAV_LINKS = [
   { href: "/", labelKey: "home" as const, exact: true },
   { href: "/#features", labelKey: "features" as const },
   { href: "/#how-it-works", labelKey: "howItWorks" as const },
-  { href: "/pricing", labelKey: "plans" as const },
+  { href: "/pricing", labelKey: "pricing" as const },
 ] as const;
 
 export function SiteHeader() {

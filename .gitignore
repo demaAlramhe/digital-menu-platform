@@ -11,7 +11,13 @@ out/
 .env.local
 .env.*
 !.env.example
+!.env.e2e.example
 
 # misc
 *.log
 .DS_Store
+
+# playwright
+/playwright-report/
+/blob-report/
+/test-results/

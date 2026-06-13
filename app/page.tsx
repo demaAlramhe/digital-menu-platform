@@ -77,13 +77,13 @@ export default async function HomePage() {
                 href="/pricing"
                 className="flex min-h-12 w-full items-center justify-center rounded-xl bg-slate-900 px-8 text-base font-semibold text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition hover:bg-slate-800 active:scale-[0.98] sm:w-auto"
               >
-                {dict.home.ctaPricing}
+                {dict.hero.getStarted}
               </Link>
               <Link
-                href="#how-it-works"
+                href="/pricing"
                 className="flex min-h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-8 text-base font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-[0.98] sm:w-auto"
               >
-                {dict.home.ctaHow}
+                {dict.hero.viewPricing}
               </Link>
             </div>
 

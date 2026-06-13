@@ -61,16 +61,20 @@ export const he = {
     settings: "הגדרות",
     qr: "קוד QR",
     admin: "ניהול",
+    adminHome: "סקירה",
     stores: "עסקים",
     users: "משתמשים",
     signups: "בקשות הצטרפות",
     manageMenu: "לניהול התפריט",
     plans: "חבילות",
+    pricing: "מסלולים",
     home: "ראשי",
     features: "יתרונות",
     howItWorks: "איך זה עובד?",
     requestService: "הזמנת שירות",
     site: "ניווט באתר",
+    sidebarCollapse: "כיווץ תפריט",
+    sidebarExpand: "הרחבת תפריט",
   },
   pricing: {
     title: "חבילות תפריט דיגיטלי",
@@ -85,6 +89,8 @@ export const he = {
     mostPopular: "הכי מבוקש",
     contactPrompt: "לשאלות:",
     contactLink: "צרו קשר בוואטסאפ",
+    maintenanceNote: "תחזוקה חודשית אופציונלית החל מ-",
+    maintenanceNoteRate: "99₪ לחודש",
     plans: {
       basic: {
         name: "בסיסית",
@@ -156,6 +162,10 @@ export const he = {
       "לבעל העסק עדיין לא שויך עסק. יש לשייך עסק לפני השימוש במערכת.",
     createdAt: "נוצר בתאריך",
     ownerSection: "פרטי בעלים",
+  },
+  hero: {
+    viewPricing: "צפה במסלולים",
+    getStarted: "התחל עכשיו",
   },
   home: {
     badge: "למסעדות, בתי קפה וברים",

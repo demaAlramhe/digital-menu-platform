@@ -61,16 +61,20 @@ export const en = {
     settings: "Settings",
     qr: "QR code",
     admin: "Admin",
+    adminHome: "Overview",
     stores: "Stores",
     users: "Users",
     signups: "Signups",
     manageMenu: "Manage menu",
     plans: "Plans",
+    pricing: "Plans",
     home: "Home",
     features: "Features",
     howItWorks: "How it works",
     requestService: "Request service",
     site: "Site navigation",
+    sidebarCollapse: "Collapse sidebar",
+    sidebarExpand: "Expand sidebar",
   },
   pricing: {
     title: "Digital Menu Plans",
@@ -85,10 +89,12 @@ export const en = {
     mostPopular: "Most popular",
     contactPrompt: "Questions?",
     contactLink: "Contact us on WhatsApp",
+    maintenanceNote: "Optional monthly maintenance from",
+    maintenanceNoteRate: "₪99/month",
     plans: {
       basic: {
         name: "Basic",
-        price: "₪699",
+        price: "699₪",
         cta: "Start now",
         features: [
           "Full digital menu in three languages",
@@ -100,7 +106,7 @@ export const en = {
       },
       pro: {
         name: "Pro",
-        price: "₪1,199",
+        price: "1,199₪",
         cta: "Most popular",
         features: [
           "Everything in Basic",
@@ -113,7 +119,7 @@ export const en = {
       },
       premium: {
         name: "Premium",
-        price: "₪1,799",
+        price: "1,799₪",
         cta: "Get the best",
         features: [
           "Everything in Pro",
@@ -156,6 +162,10 @@ export const en = {
       "This store owner has no store assigned yet. Assign a store before using the dashboard.",
     createdAt: "Created",
     ownerSection: "Owner details",
+  },
+  hero: {
+    viewPricing: "View Plans",
+    getStarted: "Get Started",
   },
   home: {
     badge: "For restaurants, cafés & bars",

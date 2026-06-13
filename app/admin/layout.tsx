@@ -1,13 +1,14 @@
-import { AdminNav } from "@/components/i18n/admin-nav";
-import { InternalAtmosphere } from "@/components/dashboard/ui/internal-atmosphere";
-import { dash } from "@/components/dashboard/ui/styles";
+import { InternalShell } from "@/components/dashboard/ui/internal-shell";
+import { adminSidebarNav } from "@/lib/dashboard/sidebar-nav";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
+import { getTranslations } from "@/lib/i18n/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export default async function AdminLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   await requireSuperAdmin();
+  const { dict } = await getTranslations();
 
   const supabase = createAdminClient();
   const { count: pendingSignupsCount } = await supabase
@@ -16,10 +17,12 @@ export default async function AdminLayout({
     .eq("status", "pending");
 
   return (
-    <div className={dash.shell}>
-      <InternalAtmosphere />
-      <AdminNav pendingSignupsCount={pendingSignupsCount ?? 0} />
+    <InternalShell
+      navGroups={adminSidebarNav}
+      brandLabel={dict.nav.admin}
+      badges={{ signups: pendingSignupsCount ?? 0 }}
+    >
       {children}
-    </div>
+    </InternalShell>
   );
 }

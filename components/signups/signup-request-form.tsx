@@ -88,7 +88,10 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
 
   if (success) {
     return (
-      <div className="rounded-2xl border border-[#C9A962]/50 bg-stone-900/70 p-6 text-center sm:p-8">
+      <div
+        data-testid="signup-success"
+        className="rounded-2xl border border-[#C9A962]/50 bg-stone-900/70 p-6 text-center sm:p-8"
+      >
         <p className="text-3xl" aria-hidden>
           ✅
         </p>

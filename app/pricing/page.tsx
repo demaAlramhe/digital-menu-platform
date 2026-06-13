@@ -78,7 +78,9 @@ export default async function PricingPage() {
                   {plan.name}
                 </h2>
                 <p className="mt-4 text-4xl font-bold tracking-tight">
-                  {plan.price}
+                  <span dir="ltr" className="inline-block">
+                    {plan.price}
+                  </span>
                 </p>
                 <p className="mt-1 text-sm text-white/50">
                   {pricing.oneTimeSetup}
@@ -120,7 +122,13 @@ export default async function PricingPage() {
           })}
         </div>
 
-        <footer className="mt-10 text-center text-sm text-white/65">
+        <footer className="mt-10 space-y-3 text-center text-sm text-white/65">
+          <p>
+            {pricing.maintenanceNote}{" "}
+            <span dir="ltr" className="inline-block">
+              {pricing.maintenanceNoteRate}
+            </span>
+          </p>
           <p>
             {pricing.contactPrompt}{" "}
             <Link

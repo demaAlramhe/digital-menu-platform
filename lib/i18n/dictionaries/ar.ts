@@ -63,16 +63,20 @@ export const ar: Dictionary = {
     settings: "الإعدادات",
     qr: "رمز QR",
     admin: "الإدارة",
+    adminHome: "نظرة عامة",
     stores: "المتاجر",
     users: "المستخدمون",
     signups: "طلبات التسجيل",
     manageMenu: "إدارة القائمة",
     plans: "الباقات",
+    pricing: "الباقات",
     home: "الرئيسية",
     features: "المميزات",
     howItWorks: "كيف يعمل؟",
     requestService: "اطلب الخدمة",
     site: "تنقل الموقع",
+    sidebarCollapse: "طي القائمة",
+    sidebarExpand: "توسيع القائمة",
   },
   pricing: {
     title: "باقات المنيو الرقمي",
@@ -87,6 +91,8 @@ export const ar: Dictionary = {
     mostPopular: "الأكثر طلباً",
     contactPrompt: "للاستفسار:",
     contactLink: "تواصل معنا على واتساب",
+    maintenanceNote: "صيانة شهرية اختيارية تبدأ من",
+    maintenanceNoteRate: "99₪/شهر",
     plans: {
       basic: {
         name: "أساسية",
@@ -158,6 +164,10 @@ export const ar: Dictionary = {
       "صاحب المتجر غير مربوط بمتجر بعد. يجب ربط متجر قبل استخدام النظام.",
     createdAt: "تاريخ الإنشاء",
     ownerSection: "بيانات المالك",
+  },
+  hero: {
+    viewPricing: "شوف الباقات",
+    getStarted: "ابدأ الآن",
   },
   home: {
     badge: "للمطاعم، المقاهي والبارات",

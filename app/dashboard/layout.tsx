@@ -1,18 +1,17 @@
-import { DashboardNav } from "@/components/i18n/dashboard-nav";
-import { InternalAtmosphere } from "@/components/dashboard/ui/internal-atmosphere";
-import { dash } from "@/components/dashboard/ui/styles";
+import { InternalShell } from "@/components/dashboard/ui/internal-shell";
+import { ownerSidebarNav } from "@/lib/dashboard/sidebar-nav";
 import { requireStoreOwner } from "@/lib/auth/require-store-owner";
+import { getTranslations } from "@/lib/i18n/server";
 
 export default async function DashboardLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   await requireStoreOwner();
+  const { dict } = await getTranslations();
 
   return (
-    <div className={dash.shell}>
-      <InternalAtmosphere />
-      <DashboardNav />
+    <InternalShell navGroups={ownerSidebarNav} brandLabel={dict.common.brand}>
       {children}
-    </div>
+    </InternalShell>
   );
 }
