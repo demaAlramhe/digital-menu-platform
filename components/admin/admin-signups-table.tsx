@@ -158,6 +158,7 @@ export function AdminSignupsTable({
                 <th className="px-4 py-3 text-start font-semibold text-stone-700">الإيميل</th>
                 <th className="px-4 py-3 text-start font-semibold text-stone-700">واتساب</th>
                 <th className="px-4 py-3 text-start font-semibold text-stone-700">الباقة</th>
+                <th className="px-4 py-3 text-start font-semibold text-stone-700">حجم المنيو</th>
                 <th className="px-4 py-3 text-start font-semibold text-stone-700">الحالة</th>
                 <th className="px-4 py-3 text-start font-semibold text-stone-700">إجراء</th>
               </tr>
@@ -196,6 +197,9 @@ export function AdminSignupsTable({
                     </td>
                     <td className="px-4 py-3">
                       <PlanBadge plan={signup.plan} />
+                    </td>
+                    <td className="px-4 py-3 text-stone-700">
+                      <EstimatedItemsBadge value={signup.estimated_items} />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge status={signup.status} />
@@ -330,12 +334,18 @@ function PlanBadge({ plan }: { plan: PendingSignupRow["plan"] }) {
     basic: "bg-stone-100 text-stone-700",
     pro: "bg-amber-100 text-amber-900",
     premium: "bg-purple-100 text-purple-900",
+    small: "bg-stone-100 text-stone-700",
+    medium: "bg-amber-100 text-amber-900",
+    large: "bg-purple-100 text-purple-900",
   } as const;
 
   const labels = {
     basic: "أساسية",
     pro: "متقدمة",
     premium: "بريميوم",
+    small: "صغير",
+    medium: "متوسط",
+    large: "كبير",
   } as const;
 
   return (
@@ -343,6 +353,21 @@ function PlanBadge({ plan }: { plan: PendingSignupRow["plan"] }) {
       {labels[plan]}
     </span>
   );
+}
+
+function EstimatedItemsBadge({ value }: { value: string | null }) {
+  if (!value) {
+    return <span className="text-stone-400">—</span>;
+  }
+
+  const labels: Record<string, string> = {
+    up_to_25: "حتى 25",
+    "26_50": "26-50",
+    "51_80": "51-80",
+    over_80: "أكثر من 80",
+  };
+
+  return <span>{labels[value] ?? value}</span>;
 }
 
 function StatusBadge({ status }: { status: PendingSignupRow["status"] }) {

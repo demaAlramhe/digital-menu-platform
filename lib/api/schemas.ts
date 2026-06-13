@@ -108,13 +108,14 @@ export const adminUserProfilePatchSchema = z.object({
   email: z.string().trim().email("A valid email is required."),
 });
 
-export const signupPlanSchema = z.enum(["basic", "pro", "premium"]);
+export const signupPlanSchema = z.enum(["small", "medium", "large"]);
 
 export const signupPostSchema = z.object({
   full_name: z.string().trim().min(1, "Full name is required."),
   restaurant_name: z.string().trim().min(1, "Restaurant name is required."),
   email: z.string().trim().email("A valid email is required."),
   whatsapp: z.string().trim().min(5, "WhatsApp number is required."),
-  plan: signupPlanSchema,
+  plan: z.enum(["small", "medium", "large"]),
   notes: z.string().trim().optional().nullable(),
+  estimated_items: z.string().optional().nullable(),
 });

@@ -4,8 +4,9 @@ CREATE TABLE IF NOT EXISTS public.pending_signups (
   restaurant_name text NOT NULL,
   email text NOT NULL,
   whatsapp text NOT NULL,
-  plan text NOT NULL CHECK (plan IN ('basic', 'pro', 'premium')),
+  plan text NOT NULL CHECK (plan IN ('basic', 'pro', 'premium', 'small', 'medium', 'large')),
   notes text,
+  estimated_items text,
   status text NOT NULL DEFAULT 'pending'
     CHECK (status IN ('pending', 'approved', 'rejected')),
   approved_store_id uuid REFERENCES public.stores(id) ON DELETE SET NULL,

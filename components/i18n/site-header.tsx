@@ -53,7 +53,7 @@ export function SiteHeader() {
               <LanguageSwitcher compact />
             </div>
             <Link
-              href="/request?plan=pro"
+              href="/request?plan=medium"
               className="hidden rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 sm:inline-flex"
               aria-label={dict.nav.requestService}
             >
@@ -110,7 +110,7 @@ export function SiteHeader() {
               </li>
               <li className="pt-2">
                 <Link
-                  href="/request?plan=pro"
+                  href="/request?plan=medium"
                   className="flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white"
                   onClick={() => setMobileOpen(false)}
                 >

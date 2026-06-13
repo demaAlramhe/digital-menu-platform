@@ -30,7 +30,7 @@ test.describe("Admin signups flow", () => {
       optionalEnv("E2E_APPROVE_SIGNUP_EMAIL") ?? uniqueTestEmail("approve");
 
     if (!optionalEnv("E2E_APPROVE_SIGNUP_EMAIL")) {
-      await page.goto("/request?plan=basic");
+      await page.goto("/request?plan=medium");
       await page.getByLabel("الاسم الكامل").fill("E2E Approve User");
       await page.getByLabel("اسم المطعم").fill("E2E Approve Restaurant");
       await page.getByLabel("البريد الإلكتروني").fill(targetEmail);

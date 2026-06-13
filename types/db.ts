@@ -160,8 +160,9 @@ export type Database = {
           restaurant_name: string;
           email: string;
           whatsapp: string;
-          plan: "basic" | "pro" | "premium";
+          plan: "basic" | "pro" | "premium" | "small" | "medium" | "large";
           notes: string | null;
+          estimated_items: string | null;
           status: "pending" | "approved" | "rejected";
           approved_store_id: string | null;
           created_at: string;
@@ -172,8 +173,9 @@ export type Database = {
           restaurant_name: string;
           email: string;
           whatsapp: string;
-          plan: "basic" | "pro" | "premium";
+          plan: "basic" | "pro" | "premium" | "small" | "medium" | "large";
           notes?: string | null;
+          estimated_items?: string | null;
           status?: "pending" | "approved" | "rejected";
           approved_store_id?: string | null;
           created_at?: string;

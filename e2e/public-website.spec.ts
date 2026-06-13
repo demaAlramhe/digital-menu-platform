@@ -12,8 +12,8 @@ test.describe("Public website flow", () => {
     await expect(page).toHaveURL("/pricing");
     await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
 
-    await page.locator('a[href="/request?plan=pro"]').click();
-    await expect(page).toHaveURL(/\/request\?plan=pro/);
+    await page.locator('a[href="/request?plan=medium"]').click();
+    await expect(page).toHaveURL(/\/request\?plan=medium/);
 
     await page.getByLabel("الاسم الكامل").fill("E2E Test User");
     await page.getByLabel("اسم المطعم").fill("E2E Test Restaurant");

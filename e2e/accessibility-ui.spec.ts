@@ -6,7 +6,7 @@ const storeSlug = optionalEnv("E2E_TEST_STORE_SLUG");
 const publicPages = [
   { name: "homepage", path: "/" },
   { name: "pricing", path: "/pricing" },
-  { name: "request", path: "/request?plan=pro" },
+  { name: "request", path: "/request?plan=medium" },
 ] as const;
 
 for (const { name, path } of publicPages) {

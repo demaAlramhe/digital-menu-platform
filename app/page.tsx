@@ -3,6 +3,7 @@ import { TrustSection } from "@/components/home/trust-section";
 import { SiteHeader } from "@/components/i18n/site-header";
 import { HeroMenuMockup } from "@/components/marketing/hero-menu-mockup";
 import { getTranslations } from "@/lib/i18n/server";
+import { buildWhatsAppUrl, getBusinessWhatsAppNumber } from "@/lib/utils/whatsapp";
 
 const FEATURE_ICONS = [
   GlobeIcon,
@@ -15,6 +16,7 @@ const FEATURE_ICONS = [
 
 export default async function HomePage() {
   const { dict } = await getTranslations();
+  const footerWhatsAppUrl = buildWhatsAppUrl(getBusinessWhatsAppNumber());
 
   const benefits = [
     { title: dict.home.benefit1Title, description: dict.home.benefit1Desc },
@@ -67,8 +69,8 @@ export default async function HomePage() {
           aria-hidden
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
-          <div className="flex flex-col items-center gap-12 lg:flex-row lg:items-center lg:justify-between lg:gap-16">
-            <div className="w-full max-w-2xl text-center lg:flex-1 lg:text-start">
+          <div className="flex flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-16">
+            <div className="w-full max-w-2xl lg:flex-1">
               <p className="mb-5 inline-flex items-center rounded-full bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-900 ring-1 ring-amber-200/80">
                 {dict.home.badge}
               </p>
@@ -76,11 +78,11 @@ export default async function HomePage() {
                 <span className="block">{dict.home.headlineLine1}</span>
                 <span className="block">{dict.home.headlineLine2}</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl lg:mx-0">
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl">
                 {dict.home.subheadline}
               </p>
 
-              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start">
+              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/request"
                   className="flex min-h-12 w-full items-center justify-center rounded-xl bg-slate-900 px-8 text-base font-semibold text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition hover:bg-slate-800 active:scale-[0.98] sm:w-auto"
@@ -95,7 +97,7 @@ export default async function HomePage() {
                 </Link>
               </div>
 
-              <ul className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 lg:justify-start">
+              <ul className="mt-8 flex flex-wrap items-center justify-center gap-2.5 sm:gap-3">
                 {highlights.map((item) => (
                   <li
                     key={item}
@@ -288,12 +290,18 @@ export default async function HomePage() {
                   {dict.common.login}
                 </Link>
               </nav>
-              <a
-                href="mailto:support@menuqr.com"
-                className="text-sm text-slate-600 hover:text-slate-900"
-              >
-                {dict.home.footerContact}
-              </a>
+              {footerWhatsAppUrl ? (
+                <a
+                  href={footerWhatsAppUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm font-medium text-emerald-700 hover:text-emerald-900"
+                >
+                  {dict.home.footerContact}
+                </a>
+              ) : (
+                <span className="text-sm text-slate-600">{dict.home.footerContact}</span>
+              )}
             </div>
 
             <p className="text-xs text-slate-400">{dict.home.footerCopyright}</p>

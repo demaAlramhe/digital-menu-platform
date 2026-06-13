@@ -77,58 +77,65 @@ export const en = {
     sidebarExpand: "Expand sidebar",
   },
   pricing: {
-    title: "Digital Menu Plans",
-    subtitle: "Choose the right plan for your restaurant and get started within 24 hours",
+    heroTitle: "One complete system — for every restaurant and café",
+    heroSubtitle:
+      "Every restaurant gets the same full system: a trilingual digital menu, QR code, AI translation, direct WhatsApp contact, and an easy dashboard. Pricing depends only on your menu size.",
+    tiersHeading: "Choose the tier closest to your menu size",
+    mostCommon: "Most common",
+    perMonth: "per month",
     oneTimeSetup: "One-time setup fee",
-    maintenanceBasic:
-      "Includes one free month of operation and support, then ₪99/month for hosting and maintenance",
-    maintenancePro:
-      "Includes one free month of operation and support, then ₪149/month for hosting and maintenance",
-    maintenancePremium:
-      "Includes one free month of operation and support, then ₪199/month for hosting and maintenance",
-    mostPopular: "Most popular",
-    contactPrompt: "Questions?",
-    contactLink: "Contact us on WhatsApp",
-    maintenanceNote: "Optional monthly maintenance from",
-    maintenanceNoteRate: "₪99/month",
-    plans: {
-      basic: {
-        name: "Basic",
-        price: "699₪",
-        cta: "Start now",
-        features: [
-          "Full digital menu in three languages",
-          "Print-ready QR code",
-          "WhatsApp button + direct call",
-          "Restaurant logo and brand colors",
-          "Owner dashboard",
-        ],
+    monthlyPlus: "+ {fee}/month",
+    requestCta: "Request service",
+    largeMenuNote:
+      "Menu larger than 80 items? Contact us for a custom quote",
+    includedHeading: "Every tier includes the same full system",
+    monthlyFeeExplanation:
+      "₪99/month for all restaurants — includes hosting, AI translation, and basic support",
+    ctaUnsureTitle: "Not sure which tier fits your menu?",
+    ctaUnsureSubtitle:
+      "Send us your item count and we'll get back to you with an exact price within hours",
+    ctaUnsureButton: "Request service",
+    monthlyFee: "99₪",
+    tiers: {
+      small: {
+        name: "Small",
+        itemRange: "Up to 25 items",
+        setupPrice: "499₪",
       },
-      pro: {
-        name: "Pro",
-        price: "1,199₪",
-        cta: "Most popular",
-        features: [
-          "Everything in Basic",
-          "AI-powered automatic translation",
-          "Custom design with your colors and logo",
-          "Up to 50 items with photos",
-          "Offers and discounts section",
-          "One full month of support",
-        ],
+      medium: {
+        name: "Medium",
+        itemRange: "26–50 items",
+        setupPrice: "799₪",
       },
-      premium: {
-        name: "Premium",
-        price: "1,799₪",
-        cta: "Get the best",
-        features: [
-          "Everything in Pro",
-          "We enter your full menu for you",
-          "Professional QR poster",
-          "3 months of full support",
-          "Priority updates",
-        ],
+      large: {
+        name: "Large",
+        itemRange: "51–80 items",
+        setupPrice: "1,199₪",
       },
+    },
+    includedFeatures: [
+      "Full design with your restaurant colors",
+      "We enter all items and photos for you",
+      "Print-ready QR code",
+      "Automatic translation in three languages",
+      "Full training for the restaurant owner",
+      "Direct WhatsApp + phone call",
+      "Easy owner dashboard",
+      "Trilingual digital menu",
+      "Offers and discounts",
+      "Save menu to phone home screen",
+    ],
+    estimatedItemsLabel: "Roughly how many items are on your menu? (optional)",
+    estimatedItemsOptions: {
+      up_to_25: "Up to 25",
+      "26_50": "26–50",
+      "51_80": "51–80",
+      over_80: "More than 80",
+    },
+    planLabels: {
+      small: "Small — up to 25 items",
+      medium: "Medium — 26–50 items",
+      large: "Large — 51–80 items",
     },
   },
   accessibility: {
@@ -164,7 +171,7 @@ export const en = {
     ownerSection: "Owner details",
   },
   hero: {
-    viewPricing: "View Plans",
+    viewPricing: "Available plans",
     getStarted: "Get Started",
   },
   home: {
@@ -248,9 +255,14 @@ export const en = {
     ctaLogin: "Sign in",
     ctaLoginPrompt: "Already have an account?",
     footer: "Smart digital menus for restaurants, cafés & bars in Israel.",
-    footerContact: "Contact us: support@menuqr.com",
+    footerContact: "Contact us on WhatsApp",
     footerCopyright: "© 2026 MenuQR — All rights reserved",
     footerDashboard: "Dashboard",
+  },
+  signup: {
+    whatsappConfirm: "Confirm via WhatsApp",
+    whatsappConfirmHint:
+      "Tap to send your request details directly — this helps us respond faster",
   },
   auth: {
     title: "Sign in",

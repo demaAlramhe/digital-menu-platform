@@ -10,7 +10,7 @@ export async function POST(req: Request) {
       return parsed.error;
     }
 
-    const { full_name, restaurant_name, email, whatsapp, plan, notes } =
+    const { full_name, restaurant_name, email, whatsapp, plan, notes, estimated_items } =
       parsed.data;
 
     const supabase = createAdminClient();
@@ -48,6 +48,7 @@ export async function POST(req: Request) {
       whatsapp,
       plan,
       notes: notes?.trim() || null,
+      estimated_items: estimated_items?.trim() || null,
       status: "pending",
     });
 
