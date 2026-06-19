@@ -88,6 +88,10 @@ export default async function AdminPage() {
     [...storeSummaries].sort((a, b) => b.menu_items_count - a.menu_items_count)[0] ??
     null;
 
+  const topStoreByCategories =
+    [...storeSummaries].sort((a, b) => b.categories_count - a.categories_count)[0] ??
+    null;
+
   return (
     <AppShell title={dict.admin.overviewTitle} subtitle={dict.admin.overviewSubtitle}>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
@@ -116,26 +120,43 @@ export default async function AdminPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <StatCard label={dict.admin.menuCategories} value={totalCategories ?? 0} />
         <Card>
-          <p className={dash.statLabel}>{dict.admin.topByItems}</p>
-          {topStoreByMenuItems ? (
-            <div className="mt-3 space-y-1.5">
-              <p className="text-xl font-semibold tracking-tight text-stone-900">
-                {topStoreByMenuItems.store_name}
-              </p>
-              <p className="text-sm text-stone-600">
-                {formatMessage(dict.admin.itemsCount, {
-                  count: topStoreByMenuItems.menu_items_count,
-                })}
-              </p>
-              <p className="font-mono text-sm text-stone-500">
-                /{topStoreByMenuItems.store_slug}/menu
-              </p>
-            </div>
-          ) : (
-            <p className="mt-3 text-sm text-stone-600">{dict.admin.noData}</p>
-          )}
+          <h2 className={dash.sectionTitle}>{dict.admin.menuCategories}</h2>
+          <p className="mt-2 text-3xl font-semibold tracking-tight text-brand-dark tabular-nums">
+            {totalCategories ?? 0}
+          </p>
+
+          <div className="mt-5 border-t border-brand-secondary/30 pt-4">
+            <h3 className="text-sm font-semibold text-brand-dark">
+              {dict.admin.topByCategories}
+            </h3>
+            <TopStoreHighlight
+              store={topStoreByCategories}
+              metricLabel={
+                topStoreByCategories
+                  ? formatMessage(dict.admin.categoriesCountSingle, {
+                      count: topStoreByCategories.categories_count,
+                    })
+                  : undefined
+              }
+              noDataLabel={dict.admin.noData}
+            />
+          </div>
+        </Card>
+
+        <Card>
+          <h2 className={dash.sectionTitle}>{dict.admin.topByItems}</h2>
+          <TopStoreHighlight
+            store={topStoreByMenuItems}
+            metricLabel={
+              topStoreByMenuItems
+                ? formatMessage(dict.admin.itemsCount, {
+                    count: topStoreByMenuItems.menu_items_count,
+                  })
+                : undefined
+            }
+            noDataLabel={dict.admin.noData}
+          />
         </Card>
       </div>
 
@@ -151,7 +172,7 @@ export default async function AdminPage() {
         <Card>
           <h2 className={dash.sectionTitle}>{dict.admin.storesSnapshot}</h2>
           {!storeSummaries.length ? (
-            <p className="mt-3 text-sm text-stone-600">{dict.admin.noData}</p>
+            <AdminNoData message={dict.admin.noData} />
           ) : (
             <ul className="mt-4 space-y-3">
               {storeSummaries
@@ -181,5 +202,56 @@ export default async function AdminPage() {
         </Card>
       </div>
     </AppShell>
+  );
+}
+
+function AdminNoData({ message }: { message: string }) {
+  return (
+    <div className="mt-4 flex items-start gap-3 rounded-xl border border-dashed border-brand-secondary/50 bg-brand-secondary/10 px-4 py-3">
+      <span
+        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white text-stone-500 ring-1 ring-brand-secondary/40"
+        aria-hidden
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+          className="h-4 w-4"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M4 7h16M4 12h10M4 17h7"
+          />
+        </svg>
+      </span>
+      <p className="text-sm leading-relaxed text-stone-600">{message}</p>
+    </div>
+  );
+}
+
+function TopStoreHighlight({
+  store,
+  metricLabel,
+  noDataLabel,
+}: {
+  store: StoreMenuSummary | null;
+  metricLabel?: string;
+  noDataLabel: string;
+}) {
+  if (!store) {
+    return <AdminNoData message={noDataLabel} />;
+  }
+
+  return (
+    <div className="mt-3 space-y-1.5">
+      <p className="text-xl font-semibold tracking-tight text-stone-900">
+        {store.store_name}
+      </p>
+      {metricLabel && <p className="text-sm text-stone-600">{metricLabel}</p>}
+      <p className="font-mono text-sm text-stone-500">/{store.store_slug}/menu</p>
+    </div>
   );
 }

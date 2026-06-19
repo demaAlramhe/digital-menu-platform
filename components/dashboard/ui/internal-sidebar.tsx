@@ -1,10 +1,12 @@
 "use client";
 
 import * as LucideIcons from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 import { tokens } from "@/components/dashboard/ui/design-tokens";
+import { brandAssets } from "@/lib/design/brand-tokens";
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
   resolveNavLabel,
@@ -74,7 +76,7 @@ export function InternalSidebar({
 
   const sidebarContent = (
     <>
-      <div className="shrink-0 border-b border-stone-200">
+      <div className="shrink-0 border-b border-brand-secondary/40">
         <div
           className={`flex h-14 items-center gap-2 px-3 ${
             collapsed ? "md:justify-center md:px-2" : ""
@@ -87,11 +89,16 @@ export function InternalSidebar({
             }`}
             onClick={onMobileClose}
           >
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-white">
-              <LucideIcons.LayoutGrid className="h-4 w-4" aria-hidden />
-            </span>
+            <Image
+              src={brandAssets.icon}
+              alt=""
+              width={32}
+              height={32}
+              className="h-8 w-8 shrink-0 object-contain"
+              aria-hidden
+            />
             <span
-              className={`truncate text-sm font-semibold text-stone-900 ${
+              className={`truncate text-sm font-semibold text-brand-dark ${
                 collapsed ? "md:hidden" : ""
               }`}
             >
@@ -106,7 +113,7 @@ export function InternalSidebar({
           title={collapseLabel}
           aria-label={collapseLabel}
           aria-expanded={!collapsed}
-          className="mx-auto mb-2 mt-2 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-stone-100 md:flex"
+          className="mx-auto mb-2 mt-2 hidden h-9 w-9 shrink-0 items-center justify-center rounded-lg text-stone-600 transition-colors hover:bg-brand-secondary/20 hover:text-brand-dark md:flex"
         >
           <CollapseIcon className="h-5 w-5 shrink-0" aria-hidden />
         </button>
@@ -163,7 +170,7 @@ export function InternalSidebar({
                       </span>
                       {badgeCount > 0 && (
                         <span
-                          className={`inline-flex min-w-5 items-center justify-center rounded-full bg-amber-500 px-1.5 py-0.5 text-[10px] font-bold text-white ${
+                          className={`inline-flex min-w-5 items-center justify-center rounded-full bg-brand-dark px-1.5 py-0.5 text-[10px] font-bold text-white ${
                             collapsed ? "md:hidden" : ""
                           }`}
                         >
@@ -172,7 +179,7 @@ export function InternalSidebar({
                       )}
                       {badgeCount > 0 && (
                         <span
-                          className={`absolute end-1.5 top-1.5 h-2 w-2 rounded-full bg-amber-500 ${
+                          className={`absolute end-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-dark ${
                             collapsed ? "hidden md:block" : "hidden"
                           }`}
                           aria-hidden

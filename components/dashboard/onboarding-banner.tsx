@@ -2,24 +2,27 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { useLocale } from "@/components/i18n/locale-provider";
 import { dash } from "@/components/dashboard/ui/styles";
-import { formatMessage } from "@/lib/i18n";
 import type { OnboardingProgress } from "@/lib/dashboard/onboarding-steps";
 
 type OnboardingBannerProps = {
   progress: OnboardingProgress;
-  storeSlug: string;
+  bannerTitle: string;
+  bannerSubtitle: string;
+  completeSetupLabel: string;
+  dismissLabel: string;
 };
 
 export function OnboardingBanner({
   progress,
-  storeSlug: _storeSlug,
+  bannerTitle,
+  bannerSubtitle,
+  completeSetupLabel,
+  dismissLabel,
 }: OnboardingBannerProps) {
-  const { dict } = useLocale();
   const [dismissed, setDismissed] = useState(false);
 
-  if (dismissed || progress.allComplete) {
+  if (dismissed) {
     return null;
   }
 
@@ -29,50 +32,47 @@ export function OnboardingBanner({
 
   return (
     <div
-      className={`${dash.card} mb-6 flex items-center gap-3 px-4 py-3 sm:px-5`}
+      className="mb-6 rounded-2xl border border-brand-secondary/40 bg-white px-4 py-4 shadow-sm sm:px-5"
       role="status"
     >
-      <div className="min-w-0 flex-1">
-        <p className="text-sm font-semibold text-stone-900">
-          {dict.onboarding.bannerTitle}
-        </p>
-        <div className="mt-1.5 flex items-center gap-2">
-          <div
-            className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-stone-100"
-            aria-hidden
-          >
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-brand-dark">{bannerTitle}</p>
+          <div className="mt-1.5 flex items-center gap-2">
             <div
-              className="h-full rounded-full bg-emerald-500 transition-[width]"
-              style={{ width: `${percent}%` }}
-            />
+              className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-brand-secondary/30"
+              aria-hidden
+            >
+              <div
+                className="h-full rounded-full bg-brand-dark transition-[width]"
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+            <span className="shrink-0 text-xs font-medium tabular-nums text-stone-600">
+              {progress.completedCount}/{progress.totalCount}
+            </span>
           </div>
-          <span className="shrink-0 text-xs font-medium tabular-nums text-stone-500">
-            {progress.completedCount}/{progress.totalCount}
-          </span>
+          <p className="mt-1 text-xs text-stone-600">{bannerSubtitle}</p>
         </div>
-        <p className="mt-1 text-xs text-stone-500">
-          {formatMessage(dict.onboarding.bannerSubtitle, {
-            done: progress.completedCount,
-            total: progress.totalCount,
-          })}
-        </p>
+
+        <div className="flex shrink-0 items-center gap-2 self-end sm:self-center">
+          <Link
+            href="/dashboard/onboarding"
+            className={`${dash.primaryBtn} !min-h-9 !px-3.5 !py-2 text-xs`}
+          >
+            {completeSetupLabel}
+          </Link>
+
+          <button
+            type="button"
+            onClick={() => setDismissed(true)}
+            className={`${dash.ghostBtn} !min-h-8 !px-2 text-lg leading-none`}
+            aria-label={dismissLabel}
+          >
+            ×
+          </button>
+        </div>
       </div>
-
-      <Link
-        href="/dashboard/onboarding"
-        className={`${dash.primaryBtn} shrink-0 !min-h-9 !px-3.5 !py-2 text-xs`}
-      >
-        {dict.onboarding.completeSetup}
-      </Link>
-
-      <button
-        type="button"
-        onClick={() => setDismissed(true)}
-        className={`${dash.ghostBtn} shrink-0 !min-h-8 !px-2 text-lg leading-none`}
-        aria-label={dict.onboarding.dismiss}
-      >
-        ×
-      </button>
     </div>
   );
 }

@@ -1,5 +1,13 @@
 @import "tailwindcss";
 
+@theme {
+  --color-brand-dark: #3b4350;
+  --color-brand-dark-hover: #2d333d;
+  --color-brand-bg: #d7d7d4;
+  --color-brand-secondary: #cac3b9;
+  --color-brand-border-subtle: #e5e4e0;
+}
+
 :root {
   color-scheme: light;
   --a11y-font-scale: 1;

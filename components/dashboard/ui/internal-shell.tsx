@@ -55,7 +55,7 @@ export function InternalShell({
   const closeMobile = useCallback(() => setMobileOpen(false), []);
 
   const languageSwitcher = (
-    <div className="rounded-xl border border-stone-200 bg-white p-0.5 shadow-sm">
+    <div className="rounded-xl border border-brand-secondary/40 bg-white p-0.5 shadow-sm">
       <LanguageSwitcher compact />
     </div>
   );
@@ -92,11 +92,11 @@ export function InternalShell({
           collapsed ? "md:ps-[68px]" : "md:ps-64"
         }`}
       >
-        <header className="sticky top-0 z-30 border-b border-stone-200 bg-white/80 backdrop-blur-sm print:hidden">
+        <header className="sticky top-0 z-30 border-b border-brand-secondary/40 bg-white/80 backdrop-blur-sm print:hidden">
           <div className="relative flex min-h-11 items-center justify-center px-4 py-2.5 sm:min-h-12 sm:px-6 sm:py-3">
             <button
               type="button"
-              className="absolute start-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-stone-200 bg-white px-3 py-2 text-stone-700 shadow-sm transition hover:bg-stone-50 sm:start-6 md:hidden"
+              className="absolute start-4 top-1/2 inline-flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-xl border border-brand-secondary/40 bg-white px-3 py-2 text-brand-dark shadow-sm transition hover:bg-brand-secondary/10 sm:start-6 md:hidden"
               aria-expanded={mobileOpen}
               aria-label={dict.nav.site}
               onClick={() => setMobileOpen((open) => !open)}

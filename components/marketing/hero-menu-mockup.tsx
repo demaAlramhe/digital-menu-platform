@@ -9,7 +9,7 @@ export function HeroMenuMockup({ imageSrc, ariaLabel }: HeroMenuMockupProps) {
   return (
     <div className="relative mx-auto w-full max-w-[240px] sm:max-w-[260px] lg:mx-0 lg:max-w-none">
       <div
-        className="pointer-events-none absolute inset-6 rounded-[2.5rem] bg-amber-400/25 blur-3xl"
+        className="pointer-events-none absolute inset-6 rounded-[2.5rem] bg-brand-dark/15 blur-3xl"
         aria-hidden
       />
 

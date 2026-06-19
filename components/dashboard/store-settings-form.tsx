@@ -242,7 +242,7 @@ export function StoreSettingsForm({ store }: StoreSettingsFormProps) {
 
             onChange={(e) => setDefaultContentLanguage(e.target.value)}
 
-            className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-800 shadow-sm focus:border-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-200/80"
+            className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2.5 text-sm text-stone-800 shadow-sm focus:border-brand-dark focus:outline-none focus:ring-2 focus:ring-brand-dark/20"
 
           >
 

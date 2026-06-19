@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
 import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { useLocale } from "@/components/i18n/locale-provider";
 
@@ -12,37 +13,41 @@ const NAV_LINKS = [
   { href: "/pricing", labelKey: "pricing" as const },
 ] as const;
 
+const linkFocus =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2";
+
 export function SiteHeader() {
   const { dict } = useLocale();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/90 backdrop-blur-xl">
+    <header className="sticky top-0 z-40 overflow-visible border-b border-brand-secondary/50 bg-white/95 backdrop-blur-xl">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="flex h-16 items-center justify-between gap-3">
+        <div className="flex h-16 items-center justify-between gap-2 overflow-visible sm:gap-3 lg:gap-4">
           <Link
             href="/"
-            className="shrink-0 text-lg font-bold tracking-tight text-slate-900"
+            className={`flex shrink-0 items-center overflow-visible ${linkFocus} rounded-lg`}
+            aria-label="Bel Afia — QR Menu"
           >
-            {dict.common.brand}
+            <BelAfiaLogo priority />
           </Link>
 
           <nav
-            className="hidden items-center gap-1 lg:flex"
+            className="hidden items-center gap-0.5 lg:flex xl:gap-1"
             aria-label={dict.nav.site}
           >
             {NAV_LINKS.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+                className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium text-brand-dark/80 transition hover:bg-brand-bg hover:text-brand-dark xl:px-3 ${linkFocus}`}
               >
                 {dict.nav[item.labelKey]}
               </Link>
             ))}
             <Link
               href="/auth/login"
-              className="rounded-lg px-3 py-2 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900"
+              className={`whitespace-nowrap rounded-lg px-2.5 py-2 text-sm font-medium text-brand-dark/80 transition hover:bg-brand-bg hover:text-brand-dark xl:px-3 ${linkFocus}`}
             >
               {dict.common.login}
             </Link>
@@ -54,14 +59,14 @@ export function SiteHeader() {
             </div>
             <Link
               href="/request?plan=medium"
-              className="hidden rounded-xl bg-slate-900 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-800 sm:inline-flex"
+              className={`hidden rounded-xl bg-brand-dark px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-dark-hover sm:inline-flex ${linkFocus}`}
               aria-label={dict.nav.requestService}
             >
               {dict.nav.requestService}
             </Link>
             <button
               type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 text-slate-700 lg:hidden"
+              className={`inline-flex h-10 w-10 items-center justify-center rounded-xl border border-brand-secondary/60 text-brand-dark lg:hidden ${linkFocus}`}
               aria-expanded={mobileOpen}
               aria-controls="site-mobile-nav"
               aria-label={mobileOpen ? dict.common.dismiss : dict.nav.site}
@@ -81,7 +86,7 @@ export function SiteHeader() {
         {mobileOpen && (
           <nav
             id="site-mobile-nav"
-            className="border-t border-slate-100 py-3 lg:hidden"
+            className="border-t border-brand-border-subtle py-3 lg:hidden"
             aria-label={dict.nav.site}
           >
             <div className="mb-3 sm:hidden">
@@ -92,7 +97,7 @@ export function SiteHeader() {
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                    className={`block rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-bg ${linkFocus}`}
                     onClick={() => setMobileOpen(false)}
                   >
                     {dict.nav[item.labelKey]}
@@ -102,7 +107,7 @@ export function SiteHeader() {
               <li>
                 <Link
                   href="/auth/login"
-                  className="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"
+                  className={`block rounded-lg px-3 py-2.5 text-sm font-medium text-brand-dark hover:bg-brand-bg ${linkFocus}`}
                   onClick={() => setMobileOpen(false)}
                 >
                   {dict.common.login}
@@ -111,7 +116,7 @@ export function SiteHeader() {
               <li className="pt-2">
                 <Link
                   href="/request?plan=medium"
-                  className="flex min-h-11 items-center justify-center rounded-xl bg-slate-900 px-4 text-sm font-semibold text-white"
+                  className={`flex min-h-11 items-center justify-center rounded-xl bg-brand-dark px-4 text-sm font-semibold text-white hover:bg-brand-dark-hover ${linkFocus}`}
                   onClick={() => setMobileOpen(false)}
                 >
                   {dict.nav.requestService}

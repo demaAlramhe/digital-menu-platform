@@ -12,6 +12,7 @@ import {
   loadOwnerStoreBasic,
   requireOwnerStoreId,
 } from "@/lib/data/owner-store";
+import { formatMessage } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
 
 const QUICK_LINKS = [
@@ -41,7 +42,7 @@ const QUICK_LINKS = [
     titleKey: "cardSettings" as const,
     descKey: "cardSettingsDesc" as const,
     icon: SettingsIcon,
-    accent: "bg-amber-50 text-amber-800",
+    accent: "bg-brand-dark/8 text-brand-dark",
   },
   {
     href: "/dashboard/qr",
@@ -94,28 +95,41 @@ export default async function DashboardHomePage() {
     : null;
 
   const displayName = current.profile?.full_name || current.user.email;
+  const storeName = storeOnboardingResult.data?.name ?? store?.name ?? "";
+  const storeLogoUrl = storeOnboardingResult.data?.logo_url ?? null;
 
   return (
     <DashboardPage>
-      {store?.slug && (
+      {store?.slug && !onboardingProgress.allComplete && (
         <OnboardingBanner
           progress={onboardingProgress}
-          storeSlug={store.slug}
+          bannerTitle={dict.onboarding.bannerTitle}
+          bannerSubtitle={formatMessage(dict.onboarding.bannerSubtitle, {
+            done: onboardingProgress.completedCount,
+            total: onboardingProgress.totalCount,
+          })}
+          completeSetupLabel={dict.onboarding.completeSetup}
+          dismissLabel={dict.onboarding.dismiss}
         />
       )}
 
       <section className={`${dash.hero}`}>
         <div
-          className="pointer-events-none absolute -end-12 -top-12 h-48 w-48 rounded-full bg-amber-100/30 blur-2xl"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_end,rgba(202,195,185,0.18),transparent_58%)]"
           aria-hidden
         />
-        <p className={dash.eyebrow}>{dict.nav.dashboard}</p>
-        <h1 className="mt-2 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
-          {dict.dashboard.welcome}, {displayName}
-        </h1>
-        <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-stone-600">
-          {dict.dashboard.intro}
-        </p>
+        <div className="relative flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
+          <StoreHeroMark logoUrl={storeLogoUrl} storeName={storeName} />
+          <div className="min-w-0 flex-1">
+            <p className={dash.eyebrow}>{dict.nav.dashboard}</p>
+            <h1 className="mt-2 text-2xl font-semibold tracking-tight text-stone-900 sm:text-3xl">
+              {dict.dashboard.welcome}, {displayName}
+            </h1>
+            <p className="mt-3 max-w-2xl text-[15px] leading-relaxed text-stone-600">
+              {dict.dashboard.intro}
+            </p>
+          </div>
+        </div>
       </section>
 
       {publicUrls && (
@@ -158,6 +172,35 @@ export default async function DashboardHomePage() {
         })}
       </div>
     </DashboardPage>
+  );
+}
+
+function StoreHeroMark({
+  logoUrl,
+  storeName,
+}: {
+  logoUrl: string | null;
+  storeName: string;
+}) {
+  const initial = storeName.trim().charAt(0).toUpperCase() || "?";
+
+  if (logoUrl?.trim()) {
+    return (
+      <img
+        src={logoUrl.trim()}
+        alt=""
+        className="h-16 w-16 shrink-0 rounded-2xl object-cover ring-1 ring-brand-secondary/50 sm:h-20 sm:w-20"
+      />
+    );
+  }
+
+  return (
+    <div
+      className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-brand-dark text-xl font-semibold text-white shadow-sm sm:h-20 sm:w-20 sm:text-2xl"
+      aria-hidden
+    >
+      {initial}
+    </div>
   );
 }
 

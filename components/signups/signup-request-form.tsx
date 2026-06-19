@@ -4,9 +4,15 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
-  STOREFRONT_GOLD,
-  STOREFRONT_GOLD_LIGHT,
-} from "@/lib/storefront/premium-theme";
+  marketingCardClass,
+  marketingErrorClass,
+  marketingFieldErrorClass,
+  marketingInputClass,
+  marketingLabelClass,
+  marketingLinkFocus,
+  marketingPrimaryBtnClass,
+  marketingSecondaryBtnClass,
+} from "@/components/marketing/marketing-form-styles";
 import { buildSignupConfirmationWhatsAppUrl } from "@/lib/utils/whatsapp";
 
 type PlanId = "small" | "medium" | "large";
@@ -152,15 +158,13 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
     return (
       <div
         data-testid="signup-success"
-        className="rounded-2xl border border-[#C9A962]/50 bg-stone-900/70 p-6 text-center sm:p-8"
+        className={`${marketingCardClass} text-center`}
       >
-        <p className="text-3xl" aria-hidden>
+        <p className="text-3xl text-[#15803d]" aria-hidden>
           ✅
         </p>
-        <h2 className="mt-3 text-xl font-bold" style={{ color: STOREFRONT_GOLD_LIGHT }}>
-          تم استلام طلبك!
-        </h2>
-        <p className="mt-3 text-sm leading-relaxed text-white/80">
+        <h2 className="mt-3 text-xl font-bold text-brand-dark">تم استلام طلبك!</h2>
+        <p className="mt-3 text-sm leading-relaxed text-[#6b7280]">
           سنتواصل معك خلال 24 ساعة على واتساب أو الإيميل.
         </p>
 
@@ -170,12 +174,12 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
               href={whatsappConfirmUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#20BD5A] active:scale-[0.98]"
+              className={`inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-[#25D366] px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#20BD5A] active:scale-[0.98] ${marketingLinkFocus}`}
             >
               <WhatsAppIcon />
               {dict.signup.whatsappConfirm}
             </a>
-            <p className="mt-2 text-xs leading-relaxed text-white/55">
+            <p className="mt-2 text-xs leading-relaxed text-[#6b7280]">
               {dict.signup.whatsappConfirmHint}
             </p>
           </div>
@@ -183,7 +187,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
 
         <Link
           href="/pricing"
-          className="mt-6 inline-flex min-h-11 items-center justify-center rounded-xl border border-[#C9A962]/60 px-5 py-2.5 text-sm font-semibold text-[#f5e6c8] hover:border-[#C9A962]"
+          className={`mt-6 ${marketingSecondaryBtnClass}`}
         >
           العودة للباقات
         </Link>
@@ -192,10 +196,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="rounded-2xl border border-stone-700 bg-stone-900/70 p-6 sm:p-8"
-    >
+    <form onSubmit={handleSubmit} className={marketingCardClass}>
       <div className="space-y-5">
         <Field
           label="الاسم الكامل"
@@ -307,19 +308,12 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
         />
 
         {error && (
-          <p className="text-sm text-red-400" role="alert">
+          <p className={marketingErrorClass} role="alert">
             {error}
           </p>
         )}
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="inline-flex min-h-11 w-full items-center justify-center rounded-xl px-5 py-3 text-sm font-semibold text-stone-900 transition hover:brightness-110 disabled:opacity-50"
-          style={{
-            background: `linear-gradient(180deg, ${STOREFRONT_GOLD} 0%, #9A7B3C 100%)`,
-          }}
-        >
+        <button type="submit" disabled={loading} className={marketingPrimaryBtnClass}>
           {loading ? "جارٍ الإرسال..." : "إرسال الطلب"}
         </button>
       </div>
@@ -327,8 +321,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
   );
 }
 
-const inputClass =
-  "mt-1.5 w-full rounded-xl border border-stone-600 bg-stone-950/80 px-3.5 py-2.5 text-[15px] text-white outline-none transition placeholder:text-stone-500 focus:border-[#C9A962] focus:ring-2 focus:ring-[#C9A962]/20";
+const inputClass = marketingInputClass;
 
 function Field({
   label,
@@ -340,11 +333,11 @@ function Field({
   error?: string;
 }) {
   return (
-    <label className="block text-sm font-medium text-white/90">
+    <label className={marketingLabelClass}>
       {label}
       {input}
       {error && (
-        <span className="mt-1 block text-xs text-red-400" role="alert">
+        <span className={marketingFieldErrorClass} role="alert">
           {error}
         </span>
       )}

@@ -41,14 +41,14 @@ export function TrustSection({ dict }: TrustSectionProps) {
   return (
     <section
       id="trust"
-      className="scroll-mt-20 border-y border-slate-200/80 bg-white py-16 sm:py-20 lg:py-24"
+      className="scroll-mt-20 border-y border-brand-secondary/40 bg-white py-16 sm:py-20 lg:py-24"
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">
+          <h2 className="text-2xl font-bold text-brand-dark sm:text-3xl lg:text-4xl">
             {trust.title}
           </h2>
-          <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
+          <p className="mt-4 text-base leading-relaxed text-[#6b7280] sm:text-lg">
             {trust.subtitle}
           </p>
         </div>
@@ -57,12 +57,12 @@ export function TrustSection({ dict }: TrustSectionProps) {
           {statItems.map((stat) => (
             <li
               key={stat.label}
-              className="flex flex-1 items-center justify-center gap-2.5 rounded-2xl border border-slate-200/90 bg-white px-4 py-3.5 shadow-sm sm:px-5"
+              className="flex flex-1 items-center justify-center gap-2.5 rounded-2xl border border-brand-secondary/40 bg-white px-4 py-3.5 shadow-sm sm:px-5"
             >
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-900 text-white">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-brand-dark text-white">
                 <stat.Icon />
               </span>
-              <span className="text-sm font-semibold text-slate-800 sm:text-base">
+              <span className="text-sm font-semibold text-brand-dark sm:text-base">
                 {stat.label}
               </span>
             </li>
@@ -73,15 +73,15 @@ export function TrustSection({ dict }: TrustSectionProps) {
           {TRUST_CARDS.map((card) => (
             <li
               key={card.titleKey}
-              className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-amber-200/80 hover:shadow-md sm:p-7"
+              className="group rounded-2xl border border-brand-secondary/40 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-secondary/70 hover:shadow-md sm:p-7"
             >
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-800 ring-1 ring-amber-100 transition group-hover:bg-amber-100">
+              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-secondary/30 text-brand-dark ring-1 ring-brand-secondary/50 transition group-hover:bg-brand-secondary/40">
                 <card.Icon />
               </span>
-              <h3 className="mt-4 text-lg font-semibold text-slate-900">
+              <h3 className="mt-4 text-lg font-semibold text-brand-dark">
                 {trust[card.titleKey]}
               </h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
+              <p className="mt-2 text-[15px] leading-relaxed text-[#6b7280]">
                 {trust[card.textKey]}
               </p>
             </li>

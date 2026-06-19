@@ -9,8 +9,12 @@ import { getTranslations } from "@/lib/i18n/server";
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getTranslations();
   return {
-    title: "MenuQR — Digital Menu & QR Code for Restaurants",
+    title: "Bel Afia — QR Menu for Restaurants",
     description: dict.home.subheadline,
+    icons: {
+      icon: "/brand/bel-afia-icon.png",
+      apple: "/icons/icon-192.png",
+    },
   };
 }
 
@@ -24,7 +28,7 @@ export default async function RootLayout({
     <html lang={locale} dir={dir}>
       <head>
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#1c1917" />
+        <meta name="theme-color" content="#3b4350" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta

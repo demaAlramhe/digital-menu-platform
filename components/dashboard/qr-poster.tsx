@@ -214,7 +214,7 @@ function StyleToggle({
       onClick={onClick}
       className={`rounded-md px-3 py-1.5 font-medium transition ${
         active
-          ? "bg-stone-900 text-white shadow-sm"
+          ? "bg-brand-dark text-white shadow-sm"
           : "text-stone-600 hover:bg-white"
       }`}
     >

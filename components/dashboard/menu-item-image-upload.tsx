@@ -81,7 +81,7 @@ export function MenuItemImageUpload({
           type="file"
           accept="image/*"
           onChange={handleFileChange}
-          className="block w-full text-sm text-stone-600 file:me-3 file:rounded-lg file:border-0 file:bg-stone-900 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+          className="block w-full text-sm text-stone-600 file:me-3 file:rounded-lg file:border-0 file:bg-brand-dark file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-brand-dark-hover"
         />
 
         {uploading && (

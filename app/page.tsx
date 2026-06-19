@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
 import { TrustSection } from "@/components/home/trust-section";
 import { SiteHeader } from "@/components/i18n/site-header";
 import { HeroMenuMockup } from "@/components/marketing/hero-menu-mockup";
@@ -14,8 +15,11 @@ const FEATURE_ICONS = [
   PhoneIcon,
 ] as const;
 
+const linkFocus =
+  "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-dark focus-visible:ring-offset-2";
+
 export default async function HomePage() {
-  const { dict } = await getTranslations();
+  const { locale, dict } = await getTranslations();
   const footerWhatsAppUrl = buildWhatsAppUrl(getBusinessWhatsAppNumber());
 
   const benefits = [
@@ -52,40 +56,47 @@ export default async function HomePage() {
     dict.home.included10,
   ];
 
+  const footerCopyright =
+    locale === "ar"
+      ? "© 2026 Bel Afia — QR Menu. جميع الحقوق محفوظة."
+      : locale === "he"
+        ? "© 2026 Bel Afia — QR Menu. כל הזכויות שמורות."
+        : "© 2026 Bel Afia — QR Menu. All rights reserved.";
+
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-brand-bg text-brand-dark">
       <SiteHeader />
 
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-slate-200/80 bg-white">
+      <section className="relative overflow-hidden border-b border-brand-secondary/40 bg-white">
         <div
-          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(201,169,98,0.08),_transparent_55%)]"
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(59,67,80,0.06),_transparent_55%)]"
           aria-hidden
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
           <div className="flex flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-16">
             <div className="w-full max-w-2xl lg:flex-1">
-              <p className="mb-5 inline-flex items-center rounded-full bg-amber-50 px-4 py-1.5 text-sm font-semibold text-amber-900 ring-1 ring-amber-200/80">
+              <p className="mb-5 inline-flex items-center rounded-full bg-brand-secondary/30 px-4 py-1.5 text-sm font-semibold text-brand-dark ring-1 ring-brand-secondary/50">
                 {dict.home.badge}
               </p>
-              <h1 className="text-4xl font-bold leading-tight tracking-tight text-slate-900 sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
+              <h1 className="text-4xl font-bold leading-tight tracking-tight text-brand-dark sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
                 <span className="block">{dict.home.headlineLine1}</span>
                 <span className="block">{dict.home.headlineLine2}</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-slate-600 sm:text-xl">
+              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#6b7280] sm:text-xl">
                 {dict.home.subheadline}
               </p>
 
               <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/request"
-                  className="flex min-h-12 w-full items-center justify-center rounded-xl bg-slate-900 px-8 text-base font-semibold text-white shadow-[0_8px_24px_rgba(15,23,42,0.18)] transition hover:bg-slate-800 active:scale-[0.98] sm:w-auto"
+                  className={`flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-dark px-8 text-base font-semibold text-white shadow-[0_8px_24px_rgba(59,67,80,0.22)] transition hover:bg-brand-dark-hover active:scale-[0.98] sm:w-auto ${linkFocus}`}
                 >
                   {dict.hero.getStarted}
                 </Link>
                 <Link
                   href="/pricing"
-                  className="flex min-h-12 w-full items-center justify-center rounded-xl border border-slate-300 bg-white px-8 text-base font-semibold text-slate-800 shadow-sm transition hover:bg-slate-50 active:scale-[0.98] sm:w-auto"
+                  className={`flex min-h-12 w-full items-center justify-center rounded-xl border border-brand-dark bg-white px-8 text-base font-semibold text-brand-dark shadow-sm transition hover:bg-brand-dark/5 active:scale-[0.98] sm:w-auto ${linkFocus}`}
                 >
                   {dict.hero.viewPricing}
                 </Link>
@@ -95,9 +106,9 @@ export default async function HomePage() {
                 {highlights.map((item) => (
                   <li
                     key={item}
-                    className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white/90 px-3.5 py-1.5 text-xs font-medium text-slate-700 shadow-sm sm:text-sm"
+                    className="inline-flex items-center gap-1.5 rounded-full border border-brand-secondary/50 bg-white/90 px-3.5 py-1.5 text-xs font-medium text-brand-dark shadow-sm sm:text-sm"
                   >
-                    <span className="text-amber-600" aria-hidden>
+                    <span className="text-[#15803d]" aria-hidden>
                       ✓
                     </span>
                     {item}
@@ -119,14 +130,14 @@ export default async function HomePage() {
       {/* Features */}
       <section
         id="features"
-        className="scroll-mt-20 bg-stone-50 py-16 sm:py-20 lg:py-24"
+        className="scroll-mt-20 bg-brand-bg py-16 sm:py-20 lg:py-24"
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">
+            <h2 className="text-2xl font-bold text-brand-dark sm:text-3xl lg:text-4xl">
               {dict.home.benefitsTitle}
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-[#6b7280] sm:text-lg">
               {dict.home.benefitsSubtitle}
             </p>
           </div>
@@ -137,15 +148,15 @@ export default async function HomePage() {
               return (
                 <li
                   key={benefit.title}
-                  className="group rounded-2xl border border-slate-200/90 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md sm:p-7"
+                  className="group rounded-2xl border border-brand-secondary/40 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:border-brand-secondary/70 hover:shadow-md sm:p-7"
                 >
-                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-amber-50 text-amber-800 ring-1 ring-amber-100 transition group-hover:bg-amber-100">
+                  <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-brand-secondary/30 text-brand-dark ring-1 ring-brand-secondary/50 transition group-hover:bg-brand-secondary/40">
                     <Icon />
                   </span>
-                  <h3 className="mt-4 text-lg font-semibold text-slate-900">
+                  <h3 className="mt-4 text-lg font-semibold text-brand-dark">
                     {benefit.title}
                   </h3>
-                  <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
+                  <p className="mt-2 text-[15px] leading-relaxed text-[#6b7280]">
                     {benefit.description}
                   </p>
                 </li>
@@ -164,10 +175,10 @@ export default async function HomePage() {
       >
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">
+            <h2 className="text-2xl font-bold text-brand-dark sm:text-3xl lg:text-4xl">
               {dict.home.howTitle}
             </h2>
-            <p className="mt-4 text-base leading-relaxed text-slate-600 sm:text-lg">
+            <p className="mt-4 text-base leading-relaxed text-[#6b7280] sm:text-lg">
               {dict.home.howSubtitle}
             </p>
           </div>
@@ -176,18 +187,18 @@ export default async function HomePage() {
             {steps.map((item) => (
               <li
                 key={item.step}
-                className="relative rounded-2xl border border-slate-100 bg-slate-50/80 p-6 text-center md:text-start"
+                className="relative rounded-2xl border border-brand-secondary/40 bg-white p-6 text-center shadow-sm md:text-start"
               >
                 <span
-                  className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-slate-900 text-base font-bold text-white shadow-sm"
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-dark text-base font-bold text-white shadow-sm"
                   aria-hidden
                 >
                   {item.step}
                 </span>
-                <h3 className="mt-5 text-lg font-semibold text-slate-900">
+                <h3 className="mt-5 text-lg font-semibold text-brand-dark">
                   {item.title}
                 </h3>
-                <p className="mt-2 text-[15px] leading-relaxed text-slate-600">
+                <p className="mt-2 text-[15px] leading-relaxed text-[#6b7280]">
                   {item.description}
                 </p>
               </li>
@@ -197,10 +208,10 @@ export default async function HomePage() {
       </section>
 
       {/* What's included */}
-      <section className="bg-stone-50 py-16 sm:py-20 lg:py-24">
+      <section className="bg-brand-bg py-16 sm:py-20 lg:py-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl lg:text-4xl">
+            <h2 className="text-2xl font-bold text-brand-dark sm:text-3xl lg:text-4xl">
               {dict.home.includedTitle}
             </h2>
           </div>
@@ -209,10 +220,10 @@ export default async function HomePage() {
             {includedItems.map((item) => (
               <li
                 key={item}
-                className="flex items-start gap-3 rounded-xl border border-slate-200/80 bg-white px-4 py-3.5 text-[15px] text-slate-700 shadow-sm"
+                className="flex items-start gap-3 rounded-xl border border-brand-secondary/40 bg-white px-4 py-3.5 text-[15px] text-brand-dark shadow-sm"
               >
                 <span
-                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-50 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100"
+                  className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[#15803d]/10 text-xs font-bold text-[#15803d] ring-1 ring-[#15803d]/20"
                   aria-hidden
                 >
                   ✓
@@ -225,34 +236,34 @@ export default async function HomePage() {
       </section>
 
       {/* Final CTA */}
-      <section className="pb-16 sm:pb-20 lg:pb-24">
+      <section className="bg-brand-bg pb-16 sm:pb-20 lg:pb-24">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="rounded-3xl bg-slate-900 px-6 py-12 text-center shadow-[0_20px_60px_rgba(15,23,42,0.2)] sm:px-12 sm:py-16">
+          <div className="rounded-3xl bg-brand-dark px-6 py-12 text-center shadow-[0_20px_60px_rgba(59,67,80,0.25)] sm:px-12 sm:py-16">
             <h2 className="text-2xl font-bold text-white sm:text-3xl lg:text-4xl">
               {dict.home.ctaFinalTitle}
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-slate-300 sm:text-lg">
+            <p className="mx-auto mt-4 max-w-xl text-base leading-relaxed text-[#f5f5f4]/80 sm:text-lg">
               {dict.home.ctaFinalDesc}
             </p>
             <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/request"
-                className="flex min-h-12 w-full items-center justify-center rounded-xl bg-white px-8 text-base font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100 active:scale-[0.98] sm:w-auto"
+                className={`flex min-h-12 w-full items-center justify-center rounded-xl bg-white px-8 text-base font-semibold text-brand-dark shadow-sm transition hover:bg-[#f5f5f4] active:scale-[0.98] sm:w-auto ${linkFocus}`}
               >
                 {dict.hero.getStarted}
               </Link>
               <Link
                 href="/pricing"
-                className="flex min-h-12 w-full items-center justify-center rounded-xl border border-slate-600 px-8 text-base font-semibold text-white transition hover:bg-slate-800 active:scale-[0.98] sm:w-auto"
+                className={`flex min-h-12 w-full items-center justify-center rounded-xl border border-white/35 px-8 text-base font-semibold text-white transition hover:bg-white/10 active:scale-[0.98] sm:w-auto ${linkFocus}`}
               >
                 {dict.hero.viewPricing}
               </Link>
             </div>
-            <p className="mt-6 text-sm text-slate-400">
+            <p className="mt-6 text-sm text-[#f5f5f4]/65">
               {dict.home.ctaLoginPrompt}{" "}
               <Link
                 href="/auth/login"
-                className="font-medium text-slate-200 underline-offset-2 hover:text-white hover:underline"
+                className={`font-medium text-white underline-offset-2 hover:underline ${linkFocus} rounded-sm`}
               >
                 {dict.home.ctaLogin}
               </Link>
@@ -261,25 +272,36 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-slate-200 bg-white">
+      <footer className="border-t border-brand-secondary/40 bg-white">
         <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6">
           <div className="flex flex-col items-center gap-6 text-center sm:gap-8">
-            <p className="max-w-xl text-sm leading-relaxed text-slate-600">
+            <BelAfiaLogo variant="compact" className="h-9 w-9" />
+
+            <p className="max-w-xl text-sm leading-relaxed text-[#6b7280]">
               {dict.home.footer}
             </p>
 
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
               <nav
-                className="flex flex-wrap justify-center gap-4 text-sm text-slate-600"
+                className="flex flex-wrap justify-center gap-4 text-sm text-[#6b7280]"
                 aria-label={dict.nav.site}
               >
-                <Link href="/pricing" className="hover:text-slate-900">
+                <Link
+                  href="/pricing"
+                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
+                >
                   {dict.nav.plans}
                 </Link>
-                <Link href="/request" className="hover:text-slate-900">
+                <Link
+                  href="/request"
+                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
+                >
                   {dict.nav.requestService}
                 </Link>
-                <Link href="/auth/login" className="hover:text-slate-900">
+                <Link
+                  href="/auth/login"
+                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
+                >
                   {dict.common.login}
                 </Link>
               </nav>
@@ -288,16 +310,16 @@ export default async function HomePage() {
                   href={footerWhatsAppUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-sm font-medium text-emerald-700 hover:text-emerald-900"
+                  className={`text-sm font-medium text-[#15803d] hover:text-[#166534] ${linkFocus} rounded-sm`}
                 >
                   {dict.home.footerContact}
                 </a>
               ) : (
-                <span className="text-sm text-slate-600">{dict.home.footerContact}</span>
+                <span className="text-sm text-[#6b7280]">{dict.home.footerContact}</span>
               )}
             </div>
 
-            <p className="text-xs text-slate-400">{dict.home.footerCopyright}</p>
+            <p className="text-xs text-[#6b7280]">{footerCopyright}</p>
           </div>
         </div>
       </footer>

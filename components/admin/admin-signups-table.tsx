@@ -332,10 +332,10 @@ function CopyRow({
 function PlanBadge({ plan }: { plan: PendingSignupRow["plan"] }) {
   const styles = {
     basic: "bg-stone-100 text-stone-700",
-    pro: "bg-amber-100 text-amber-900",
+    pro: "bg-brand-dark/10 text-brand-dark",
     premium: "bg-purple-100 text-purple-900",
     small: "bg-stone-100 text-stone-700",
-    medium: "bg-amber-100 text-amber-900",
+    medium: "bg-brand-dark/10 text-brand-dark",
     large: "bg-purple-100 text-purple-900",
   } as const;
 

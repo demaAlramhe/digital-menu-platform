@@ -1,11 +1,11 @@
 {
-  "name": "Digital Menu",
-  "short_name": "Menu",
-  "description": "Scan QR to view our menu",
+  "name": "Bel Afia — QR Menu",
+  "short_name": "Bel Afia",
+  "description": "Scan QR to view our digital menu",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#1c1917",
-  "theme_color": "#1c1917",
+  "background_color": "#d7d7d4",
+  "theme_color": "#3b4350",
   "orientation": "portrait",
   "icons": [
     {

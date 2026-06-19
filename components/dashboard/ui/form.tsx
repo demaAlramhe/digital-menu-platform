@@ -102,7 +102,7 @@ export function CheckboxField({
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="mt-0.5 h-4 w-4 rounded border-stone-300 text-stone-900 focus:ring-stone-900/15"
+        className="mt-0.5 h-4 w-4 rounded border-stone-300 text-brand-dark focus:ring-brand-dark/20"
       />
       <span className="text-sm font-medium leading-snug text-stone-800">{label}</span>
     </label>

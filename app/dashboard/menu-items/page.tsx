@@ -201,7 +201,7 @@ export default async function DashboardMenuItemsPage({
                       inactiveLabel={dict.common.inactive}
                     />
                     {item.is_featured && (
-                      <span className="inline-flex rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-900 ring-1 ring-amber-200/80">
+                      <span className="inline-flex rounded-full bg-brand-dark/8 px-2.5 py-0.5 text-xs font-semibold text-brand-dark ring-1 ring-brand-dark/20">
                         {dict.common.featured}
                       </span>
                     )}
