@@ -108,6 +108,19 @@ export const adminUserProfilePatchSchema = z.object({
   email: z.string().trim().email("A valid email is required."),
 });
 
+export const adminUserPasswordPatchSchema = z
+  .object({
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters.")
+      .max(72, "Password is too long."),
+    confirmPassword: z.string().min(1, "Please confirm the password."),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
+    path: ["confirmPassword"],
+  });
+
 export const signupPlanSchema = z.enum(["small", "medium", "large"]);
 
 export const signupPostSchema = z.object({

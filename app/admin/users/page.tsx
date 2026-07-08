@@ -6,6 +6,7 @@ import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { AdminUserRoleSelect } from "@/components/admin/admin-user-role-select";
 import { AdminUserStoreSelect } from "@/components/admin/admin-user-store-select";
 import { AdminUserProfileEdit } from "@/components/admin/admin-user-profile-edit";
+import { AdminUserPasswordChange } from "@/components/admin/admin-user-password-change";
 import { AdminUserDeleteButton } from "@/components/admin/admin-user-delete-button";
 import { StatCard } from "@/components/dashboard/ui/stat-card";
 import { RoleBadge } from "@/components/dashboard/ui/role-badge";
@@ -250,6 +251,10 @@ export default async function AdminUsersPage({
                           userId={user.id}
                           initialFullName={user.full_name}
                           initialEmail={user.email}
+                        />
+                        <AdminUserPasswordChange
+                          userId={user.id}
+                          userLabel={displayName}
                         />
                         <AdminUserDeleteButton
                           userId={user.id}
