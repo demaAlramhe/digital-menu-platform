@@ -465,6 +465,7 @@ export const ar: Dictionary = {
     secondaryColor: "اللون الثانوي",
     saveSettings: "حفظ الإعدادات",
     savedSuccess: "تم حفظ الإعدادات بنجاح.",
+    waitForUpload: "انتظر حتى يكتمل رفع الصورة قبل الحفظ.",
     welcomeSection: "شاشة ترحيب للعملاء",
     welcomeSectionDesc:
       "يرى العملاء هذه الصفحة أولاً عبر الرابط أو مسح QR، ثم يضغطون «ابدأ الآن» لاختيار الفئات.",

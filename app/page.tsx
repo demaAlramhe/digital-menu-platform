@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
 import { HeroLogoTilt } from "@/components/marketing/hero-logo-tilt";
 import { TrustSection } from "@/components/home/trust-section";
@@ -122,8 +122,9 @@ export default async function HomePage() {
 
             <div className="w-full shrink-0 lg:w-auto">
               <HeroMenuMockup
-                imageSrc="/images/hero-menu.jpeg"
+                imageSrc="/images/demoLogo.jpeg"
                 ariaLabel={dict.home.mockupAriaLabel}
+                href="https://bel-afia-menu.com/haifa-restaurant/menu"
               />
             </div>
           </div>

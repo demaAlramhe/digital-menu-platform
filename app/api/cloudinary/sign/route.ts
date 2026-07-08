@@ -4,6 +4,27 @@ import { requireApiStoreOwnerOrSuperAdmin } from "@/lib/auth/api-auth";
 import { parseJsonBody } from "@/lib/api/validation";
 import { cloudinarySignSchema } from "@/lib/api/schemas";
 
+/**
+ * Build a Cloudinary authentication signature.
+ * Sign every upload param except file / cloud_name / resource_type / api_key.
+ * Params must be alphabetical key=value pairs, then API secret appended.
+ * @see https://cloudinary.com/documentation/authentication_signatures
+ */
+function createCloudinarySignature(
+  params: Record<string, string | number>,
+  apiSecret: string
+) {
+  const toSign = Object.keys(params)
+    .sort()
+    .map((key) => `${key}=${params[key]}`)
+    .join("&");
+
+  return crypto
+    .createHash("sha1")
+    .update(`${toSign}${apiSecret}`)
+    .digest("hex");
+}
+
 export async function POST(req: Request) {
   try {
     const auth = await requireApiStoreOwnerOrSuperAdmin();
@@ -17,11 +38,12 @@ export async function POST(req: Request) {
     }
 
     const { folder } = parsed.data;
+    const folderTrimmed = folder.trim();
 
-    const timestamp = Math.floor(Date.now() / 1000).toString();
-    const apiKey = process.env.CLOUDINARY_API_KEY;
-    const apiSecret = process.env.CLOUDINARY_API_SECRET;
-    const cloudName = process.env.CLOUDINARY_CLOUD_NAME;
+    const timestamp = Math.floor(Date.now() / 1000);
+    const apiKey = process.env.CLOUDINARY_API_KEY?.trim();
+    const apiSecret = process.env.CLOUDINARY_API_SECRET?.trim();
+    const cloudName = process.env.CLOUDINARY_CLOUD_NAME?.trim();
 
     if (!apiKey || !apiSecret || !cloudName) {
       return NextResponse.json(
@@ -30,18 +52,17 @@ export async function POST(req: Request) {
       );
     }
 
-    const paramsToSign = `folder=${folder}&timestamp=${timestamp}${apiSecret}`;
-    const signature = crypto
-      .createHash("sha1")
-      .update(paramsToSign)
-      .digest("hex");
+    const signature = createCloudinarySignature(
+      { folder: folderTrimmed, timestamp },
+      apiSecret
+    );
 
     return NextResponse.json({
-      timestamp,
+      timestamp: String(timestamp),
       signature,
       apiKey,
       cloudName,
-      folder,
+      folder: folderTrimmed,
     });
   } catch (error) {
     return NextResponse.json(

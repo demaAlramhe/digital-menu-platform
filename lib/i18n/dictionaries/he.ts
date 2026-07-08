@@ -464,6 +464,7 @@ export const he = {
     secondaryColor: "צבע משני",
     saveSettings: "שמירת הגדרות",
     savedSuccess: "ההגדרות נשמרו בהצלחה.",
+    waitForUpload: "המתינו להשלמת העלאת התמונה לפני השמירה.",
     welcomeSection: "מסך פתיחה ללקוחות",
     welcomeSectionDesc:
       "הלקוחות רואים דף זה ראשון בקישור או בסריקת QR, ואז לוחצים «התחל עכשיו» לבחירת קטגוריות.",

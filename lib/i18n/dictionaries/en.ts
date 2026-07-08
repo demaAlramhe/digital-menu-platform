@@ -465,6 +465,7 @@ export const en = {
     secondaryColor: "Secondary color",
     saveSettings: "Save settings",
     savedSuccess: "Settings saved successfully.",
+    waitForUpload: "Wait for the image upload to finish before saving.",
     welcomeSection: "Customer welcome screen",
     welcomeSectionDesc:
       "Customers see this page first at your store link or QR scan, then tap Start Now to open categories.",
