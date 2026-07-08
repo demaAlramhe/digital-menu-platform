@@ -2,11 +2,9 @@ import Link from "next/link";
 import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
 import { marketingLinkFocus } from "@/components/marketing/marketing-form-styles";
 import { getTranslations } from "@/lib/i18n/server";
-import { buildWhatsAppUrl, getBusinessWhatsAppNumber } from "@/lib/utils/whatsapp";
 
 export async function MarketingFooter() {
   const { locale, dict } = await getTranslations();
-  const footerWhatsAppUrl = buildWhatsAppUrl(getBusinessWhatsAppNumber());
 
   const footerCopyright =
     locale === "ar"
@@ -25,43 +23,29 @@ export async function MarketingFooter() {
             {dict.home.footer}
           </p>
 
-          <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
-            <nav
-              className="flex flex-wrap justify-center gap-4 text-sm text-[#6b7280]"
-              aria-label={dict.nav.site}
+          <nav
+            className="flex flex-wrap justify-center gap-4 text-sm text-[#6b7280]"
+            aria-label={dict.nav.site}
+          >
+            <Link
+              href="/pricing"
+              className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
             >
-              <Link
-                href="/pricing"
-                className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
-              >
-                {dict.nav.plans}
-              </Link>
-              <Link
-                href="/request"
-                className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
-              >
-                {dict.nav.requestService}
-              </Link>
-              <Link
-                href="/auth/login"
-                className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
-              >
-                {dict.common.login}
-              </Link>
-            </nav>
-            {footerWhatsAppUrl ? (
-              <a
-                href={footerWhatsAppUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={`text-sm font-medium text-[#15803d] hover:text-[#166534] ${marketingLinkFocus} rounded-sm`}
-              >
-                {dict.home.footerContact}
-              </a>
-            ) : (
-              <span className="text-sm text-[#6b7280]">{dict.home.footerContact}</span>
-            )}
-          </div>
+              {dict.nav.plans}
+            </Link>
+            <Link
+              href="/request"
+              className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
+            >
+              {dict.nav.requestService}
+            </Link>
+            <Link
+              href="/auth/login"
+              className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
+            >
+              {dict.common.login}
+            </Link>
+          </nav>
 
           <p className="text-xs text-[#6b7280]">{footerCopyright}</p>
         </div>

@@ -112,6 +112,27 @@ html.a11y-reduce-motion .a11y-panel-enter {
   }
 }
 
+@keyframes hero-logo-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hero-logo-tilt--alive .hero-logo-tilt__card {
+    animation: hero-logo-float 5.5s ease-in-out infinite;
+  }
+
+  .hero-logo-tilt--alive:hover .hero-logo-tilt__card,
+  .hero-logo-tilt--alive:active .hero-logo-tilt__card {
+    animation: none;
+  }
+}
+
 :focus-visible {
   outline: 2px solid #1d4ed8;
   outline-offset: 2px;

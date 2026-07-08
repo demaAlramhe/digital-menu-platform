@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
+import { HeroLogoTilt } from "@/components/marketing/hero-logo-tilt";
 import { TrustSection } from "@/components/home/trust-section";
 import { SiteHeader } from "@/components/i18n/site-header";
 import { HeroMenuMockup } from "@/components/marketing/hero-menu-mockup";
 import { getTranslations } from "@/lib/i18n/server";
-import { buildWhatsAppUrl, getBusinessWhatsAppNumber } from "@/lib/utils/whatsapp";
 
 const FEATURE_ICONS = [
   GlobeIcon,
@@ -20,7 +20,6 @@ const linkFocus =
 
 export default async function HomePage() {
   const { locale, dict } = await getTranslations();
-  const footerWhatsAppUrl = buildWhatsAppUrl(getBusinessWhatsAppNumber());
 
   const benefits = [
     { title: dict.home.benefit1Title, description: dict.home.benefit1Desc },
@@ -75,19 +74,23 @@ export default async function HomePage() {
         />
         <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
           <div className="flex flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-16">
-            <div className="w-full max-w-2xl lg:flex-1">
-              <p className="mb-5 inline-flex items-center rounded-full bg-brand-secondary/30 px-4 py-1.5 text-sm font-semibold text-brand-dark ring-1 ring-brand-secondary/50">
-                {dict.home.badge}
-              </p>
+            <div className="flex w-full max-w-2xl flex-col items-center justify-center text-center lg:flex-1 lg:self-stretch">
+              <HeroLogoTilt
+                className="h-40 w-auto sm:h-48 md:h-56 lg:h-60"
+                priority
+              />
               <h1 className="text-4xl font-bold leading-tight tracking-tight text-brand-dark sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
                 <span className="block">{dict.home.headlineLine1}</span>
                 <span className="block">{dict.home.headlineLine2}</span>
               </h1>
-              <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[#6b7280] sm:text-xl">
+              <p className="mt-3 text-center text-sm text-[#6b7280]">
+                {dict.home.badge}
+              </p>
+              <p className="mt-6 max-w-2xl text-lg leading-relaxed text-[#6b7280] sm:text-xl">
                 {dict.home.subheadline}
               </p>
 
-              <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
+              <div className="mt-10 flex w-full flex-col items-center justify-center gap-3 sm:flex-row">
                 <Link
                   href="/request"
                   className={`flex min-h-12 w-full items-center justify-center rounded-xl bg-brand-dark px-8 text-base font-semibold text-white shadow-[0_8px_24px_rgba(59,67,80,0.22)] transition hover:bg-brand-dark-hover active:scale-[0.98] sm:w-auto ${linkFocus}`}
@@ -281,43 +284,29 @@ export default async function HomePage() {
               {dict.home.footer}
             </p>
 
-            <div className="flex flex-col items-center gap-4 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
-              <nav
-                className="flex flex-wrap justify-center gap-4 text-sm text-[#6b7280]"
-                aria-label={dict.nav.site}
+            <nav
+              className="flex flex-wrap justify-center gap-4 text-sm text-[#6b7280]"
+              aria-label={dict.nav.site}
+            >
+              <Link
+                href="/pricing"
+                className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
               >
-                <Link
-                  href="/pricing"
-                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
-                >
-                  {dict.nav.plans}
-                </Link>
-                <Link
-                  href="/request"
-                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
-                >
-                  {dict.nav.requestService}
-                </Link>
-                <Link
-                  href="/auth/login"
-                  className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
-                >
-                  {dict.common.login}
-                </Link>
-              </nav>
-              {footerWhatsAppUrl ? (
-                <a
-                  href={footerWhatsAppUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`text-sm font-medium text-[#15803d] hover:text-[#166534] ${linkFocus} rounded-sm`}
-                >
-                  {dict.home.footerContact}
-                </a>
-              ) : (
-                <span className="text-sm text-[#6b7280]">{dict.home.footerContact}</span>
-              )}
-            </div>
+                {dict.nav.plans}
+              </Link>
+              <Link
+                href="/request"
+                className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
+              >
+                {dict.nav.requestService}
+              </Link>
+              <Link
+                href="/auth/login"
+                className={`hover:text-brand-dark ${linkFocus} rounded-sm`}
+              >
+                {dict.common.login}
+              </Link>
+            </nav>
 
             <p className="text-xs text-[#6b7280]">{footerCopyright}</p>
           </div>

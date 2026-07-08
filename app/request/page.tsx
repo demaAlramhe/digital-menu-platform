@@ -1,4 +1,4 @@
-import Link from "next/link";
+﻿import Link from "next/link";
 import { MarketingFooter } from "@/components/marketing/marketing-footer";
 import { marketingLinkFocus } from "@/components/marketing/marketing-form-styles";
 import { SignupRequestForm } from "@/components/signups/signup-request-form";
@@ -25,7 +25,7 @@ export default async function RequestPage({ searchParams }: RequestPageProps) {
               ← العودة للباقات
             </Link>
             <h1 className="mt-4 text-3xl font-bold text-brand-dark">
-              اطلب منيوك الرقمي
+              ابدأ إعداد قائمتك الرقمية
             </h1>
             <p className="mt-2 text-sm leading-relaxed text-[#6b7280]">
               عبّي البيانات وسنتواصل معك خلال 24 ساعة
