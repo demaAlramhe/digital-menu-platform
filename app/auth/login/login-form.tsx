@@ -2,7 +2,6 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import { BelAfiaLogo } from "@/components/marketing/bel-afia-logo";
 import {
   marketingCardClass,
   marketingErrorClass,
@@ -79,10 +78,7 @@ export function LoginForm() {
       </div>
 
       <div className="w-full max-w-[26rem] text-center">
-        <div className="flex justify-center">
-          <BelAfiaLogo className="!h-12 !scale-100 sm:!h-14" />
-        </div>
-        <h1 className="mt-4 text-2xl font-semibold tracking-tight text-brand-dark sm:text-3xl">
+        <h1 className="text-2xl font-semibold tracking-tight text-brand-dark sm:text-3xl">
           {dict.auth.title}
         </h1>
         <p className="mx-auto mt-2 max-w-sm text-[15px] leading-relaxed text-[#6b7280]">
