@@ -107,9 +107,17 @@ export function AdminCreateStoreForm() {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">{dict.admin.ownerFullName}</label>
+        <label
+          htmlFor="create-store-owner-full-name"
+          className="mb-1 block font-medium"
+        >
+          {dict.admin.ownerFullName}
+        </label>
         <input
+          id="create-store-owner-full-name"
+          name="ownerFullName"
           type="text"
+          autoComplete="name"
           value={ownerFullName}
           onChange={(e) => setOwnerFullName(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
@@ -118,9 +126,17 @@ export function AdminCreateStoreForm() {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">{dict.admin.ownerEmail}</label>
+        <label
+          htmlFor="create-store-owner-email"
+          className="mb-1 block font-medium"
+        >
+          {dict.admin.ownerEmail}
+        </label>
         <input
+          id="create-store-owner-email"
+          name="ownerEmail"
           type="email"
+          autoComplete="email"
           value={ownerEmail}
           onChange={(e) => setOwnerEmail(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
@@ -129,9 +145,17 @@ export function AdminCreateStoreForm() {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">{dict.admin.ownerPassword}</label>
+        <label
+          htmlFor="create-store-owner-password"
+          className="mb-1 block font-medium"
+        >
+          {dict.admin.ownerPassword}
+        </label>
         <input
+          id="create-store-owner-password"
+          name="ownerPassword"
           type="password"
+          autoComplete="new-password"
           value={ownerPassword}
           onChange={(e) => setOwnerPassword(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
@@ -151,9 +175,17 @@ export function AdminCreateStoreForm() {
       </div>
 
       <div>
-        <label className="mb-1 block font-medium">{dict.common.email}</label>
+        <label
+          htmlFor="create-store-email"
+          className="mb-1 block font-medium"
+        >
+          {dict.common.email}
+        </label>
         <input
+          id="create-store-email"
+          name="storeEmail"
           type="email"
+          autoComplete="off"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full rounded-lg border px-3 py-2"
