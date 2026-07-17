@@ -199,7 +199,9 @@ test.describe("Cross-tenant isolation", () => {
       `/dashboard/categories/${ownerBCategoryId}/edit`
     );
     expect(verify?.status()).toBe(200);
-    await expect(ownerBPage.getByText(OWNER_B_CATEGORY_NAME)).toBeVisible();
+    await expect(
+      ownerBPage.getByRole("textbox").first()
+    ).toHaveValue(OWNER_B_CATEGORY_NAME);
   });
 
   test("Owner A cannot update Owner B's menu item", async () => {
