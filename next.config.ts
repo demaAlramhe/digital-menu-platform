@@ -8,6 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   outputFileTracingRoot: __dirname,
+  // Disables the Next.js dev indicator/overlay (dev-only; no production effect).
+  devIndicators: false,
 };
 
 const pwaConfig = withPWA({

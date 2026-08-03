@@ -28,7 +28,7 @@ export function InternalShell({
   topbarActions,
   badges,
 }: InternalShellProps) {
-  const { dict } = useLocale();
+  const { dict, dir } = useLocale();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [ready, setReady] = useState(false);
@@ -89,7 +89,13 @@ export function InternalShell({
 
       <div
         className={`flex min-h-screen w-full min-w-0 flex-col transition-[padding] duration-200 ${
-          collapsed ? "md:ps-[68px]" : "md:ps-64"
+          dir === "rtl"
+            ? collapsed
+              ? "md:pr-[68px]"
+              : "md:pr-64"
+            : collapsed
+              ? "md:pl-[68px]"
+              : "md:pl-64"
         }`}
       >
         <header className="sticky top-0 z-30 border-b border-brand-secondary/40 bg-white/80 backdrop-blur-sm print:hidden">

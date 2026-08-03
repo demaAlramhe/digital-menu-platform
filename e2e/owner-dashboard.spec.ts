@@ -35,15 +35,15 @@ test.describe("Owner dashboard flow", () => {
 
     await page.goto("/dashboard/categories/new");
     const categoryForm = page.locator("form").first();
-    await categoryForm.locator('input[type="text"]').nth(0).fill(categoryName);
-    await categoryForm.locator('input[type="text"]').nth(1).fill(categorySlug);
+    await categoryForm.getByRole("textbox").nth(0).fill(categoryName);
+    await categoryForm.getByRole("textbox").nth(1).fill(categorySlug);
     await categoryForm.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/dashboard\/categories/);
 
     await page.goto("/dashboard/menu-items/new");
     const itemForm = page.locator("form").first();
-    await itemForm.locator('input[type="text"]').nth(0).fill(itemName);
-    await itemForm.locator('input[type="text"]').nth(1).fill(itemSlug);
+    await itemForm.getByRole("textbox").nth(0).fill(itemName);
+    await itemForm.getByRole("textbox").nth(1).fill(itemSlug);
     await itemForm.locator('input[type="number"]').first().fill(initialPrice);
     await itemForm.locator('button[type="submit"]').click();
     await expect(page).toHaveURL(/\/dashboard\/menu-items/);

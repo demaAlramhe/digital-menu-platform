@@ -14,7 +14,12 @@ for (const { name, path } of publicPages) {
     test("main CTAs and accessibility widget are visible", async ({ page }) => {
       await page.goto(path);
 
-      await expect(page.locator('a[href="/pricing"]').first()).toBeVisible();
+      const menuToggle = page.locator('button[aria-controls="site-mobile-nav"]');
+      if (await menuToggle.isVisible()) {
+        await menuToggle.click();
+      }
+      const pricingLink = page.locator('a[href="/pricing"]:visible').first();
+      await expect(pricingLink).toBeVisible();
 
       const a11yButton = page.getByRole("button", {
         name: /accessibility|נגישות|إمكانية الوصول/i,
