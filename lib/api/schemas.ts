@@ -131,4 +131,5 @@ export const signupPostSchema = z.object({
   plan: z.enum(["small", "medium", "large"]),
   notes: z.string().trim().optional().nullable(),
   estimated_items: z.string().optional().nullable(),
+  turnstileToken: z.string().min(1, "CAPTCHA verification is required."),
 });

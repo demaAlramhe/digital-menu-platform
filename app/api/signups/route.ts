@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { signupPostSchema } from "@/lib/api/schemas";
 import { parseJsonBody } from "@/lib/api/validation";
+import { verifyTurnstileToken } from "@/lib/security/verify-turnstile";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(req: Request) {
@@ -10,8 +11,27 @@ export async function POST(req: Request) {
       return parsed.error;
     }
 
-    const { full_name, restaurant_name, email, whatsapp, plan, notes, estimated_items } =
-      parsed.data;
+    const {
+      full_name,
+      restaurant_name,
+      email,
+      whatsapp,
+      plan,
+      notes,
+      estimated_items,
+      turnstileToken,
+    } = parsed.data;
+
+    const turnstileOk = await verifyTurnstileToken(
+      turnstileToken,
+      req.headers.get("x-forwarded-for") ?? undefined
+    );
+    if (!turnstileOk) {
+      return NextResponse.json(
+        { error: "فشل التحقق الأمني. حاول مرة أخرى." },
+        { status: 400 }
+      );
+    }
 
     const supabase = createAdminClient();
     const normalizedEmail = email.trim().toLowerCase();

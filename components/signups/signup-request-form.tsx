@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import Script from "next/script";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import {
   marketingCardClass,
@@ -22,6 +23,25 @@ type EstimatedItems = "up_to_25" | "26_50" | "51_80" | "over_80";
 type SignupRequestFormProps = {
   initialPlan?: string | null;
 };
+
+type TurnstileApi = {
+  render: (
+    container: string | HTMLElement,
+    options: {
+      sitekey: string;
+      callback: (token: string) => void;
+      "expired-callback"?: () => void;
+      "error-callback"?: () => void;
+    }
+  ) => string;
+  remove?: (widgetId: string) => void;
+};
+
+declare global {
+  interface Window {
+    turnstile?: TurnstileApi;
+  }
+}
 
 const PLAN_OPTIONS: { id: PlanId; label: string }[] = [
   { id: "small", label: "صغير — حتى 25 صنف" },
@@ -59,6 +79,8 @@ function labelForEstimatedItems(value: EstimatedItems): string {
 
 export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
   const { dict } = useLocale();
+  const turnstileWidgetId = useRef<string | null>(null);
+  const turnstileRendered = useRef(false);
 
   const defaultPlan = useMemo(
     () => (isPlanId(initialPlan) ? initialPlan : "medium"),
@@ -74,10 +96,58 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
     planToEstimatedItems(defaultPlan)
   );
   const [notes, setNotes] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [scriptReady, setScriptReady] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
+
+  const siteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+
+  useEffect(() => {
+    if (window.turnstile) {
+      setScriptReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!scriptReady || !siteKey || turnstileRendered.current) {
+      return;
+    }
+    if (!window.turnstile) {
+      return;
+    }
+
+    const container = document.getElementById("turnstile-widget");
+    if (!container) {
+      return;
+    }
+
+    turnstileWidgetId.current = window.turnstile.render(container, {
+      sitekey: siteKey,
+      callback: (token) => {
+        setTurnstileToken(token);
+        setFieldErrors((prev) => {
+          if (!prev.turnstileToken) return prev;
+          const next = { ...prev };
+          delete next.turnstileToken;
+          return next;
+        });
+      },
+      "expired-callback": () => setTurnstileToken(""),
+      "error-callback": () => setTurnstileToken(""),
+    });
+    turnstileRendered.current = true;
+
+    return () => {
+      if (turnstileWidgetId.current && window.turnstile?.remove) {
+        window.turnstile.remove(turnstileWidgetId.current);
+      }
+      turnstileWidgetId.current = null;
+      turnstileRendered.current = false;
+    };
+  }, [scriptReady, siteKey]);
 
   const whatsappConfirmUrl = useMemo(() => {
     if (!success) return null;
@@ -117,6 +187,9 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
     if (!restaurantName.trim()) nextFieldErrors.restaurant_name = "اسم المطعم مطلوب";
     if (!email.trim()) nextFieldErrors.email = "الإيميل مطلوب";
     if (!whatsapp.trim()) nextFieldErrors.whatsapp = "رقم الواتساب مطلوب";
+    if (!turnstileToken.trim()) {
+      nextFieldErrors.turnstileToken = "الرجاء إكمال التحقق الأمني";
+    }
 
     if (Object.keys(nextFieldErrors).length > 0) {
       setFieldErrors(nextFieldErrors);
@@ -136,6 +209,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
           plan,
           notes: notes.trim() || null,
           estimated_items: estimatedItems || null,
+          turnstileToken,
         }),
       });
 
@@ -196,128 +270,146 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className={marketingCardClass}>
-      <div className="space-y-5">
-        <Field
-          label="الاسم الكامل"
-          error={fieldErrors.full_name}
-          input={
-            <input
-              type="text"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              className={inputClass}
-              disabled={loading}
-            />
-          }
-        />
+    <>
+      <Script
+        src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"
+        async
+        defer
+        strategy="afterInteractive"
+        onLoad={() => setScriptReady(true)}
+      />
+      <form onSubmit={handleSubmit} className={marketingCardClass}>
+        <div className="space-y-5">
+          <Field
+            label="الاسم الكامل"
+            error={fieldErrors.full_name}
+            input={
+              <input
+                type="text"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                className={inputClass}
+                disabled={loading}
+              />
+            }
+          />
 
-        <Field
-          label="اسم المطعم"
-          error={fieldErrors.restaurant_name}
-          input={
-            <input
-              type="text"
-              value={restaurantName}
-              onChange={(e) => setRestaurantName(e.target.value)}
-              className={inputClass}
-              disabled={loading}
-            />
-          }
-        />
+          <Field
+            label="اسم المطعم"
+            error={fieldErrors.restaurant_name}
+            input={
+              <input
+                type="text"
+                value={restaurantName}
+                onChange={(e) => setRestaurantName(e.target.value)}
+                className={inputClass}
+                disabled={loading}
+              />
+            }
+          />
 
-        <Field
-          label="البريد الإلكتروني"
-          error={fieldErrors.email}
-          input={
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className={inputClass}
-              disabled={loading}
-              dir="ltr"
-            />
-          }
-        />
+          <Field
+            label="البريد الإلكتروني"
+            error={fieldErrors.email}
+            input={
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className={inputClass}
+                disabled={loading}
+                dir="ltr"
+              />
+            }
+          />
 
-        <Field
-          label="واتساب"
-          error={fieldErrors.whatsapp}
-          input={
-            <input
-              type="text"
-              value={whatsapp}
-              onChange={(e) => setWhatsapp(e.target.value)}
-              placeholder="+972501234567"
-              className={inputClass}
-              disabled={loading}
-              dir="ltr"
-            />
-          }
-        />
+          <Field
+            label="واتساب"
+            error={fieldErrors.whatsapp}
+            input={
+              <input
+                type="text"
+                value={whatsapp}
+                onChange={(e) => setWhatsapp(e.target.value)}
+                placeholder="+972501234567"
+                className={inputClass}
+                disabled={loading}
+                dir="ltr"
+              />
+            }
+          />
 
-        <Field
-          label="فئة الحجم"
-          input={
-            <select
-              value={plan}
-              onChange={(e) => handlePlanChange(e.target.value as PlanId)}
-              className={inputClass}
-              disabled={loading}
-            >
-              {PLAN_OPTIONS.map((option) => (
-                <option key={option.id} value={option.id}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          }
-        />
+          <Field
+            label="فئة الحجم"
+            input={
+              <select
+                value={plan}
+                onChange={(e) => handlePlanChange(e.target.value as PlanId)}
+                className={inputClass}
+                disabled={loading}
+              >
+                {PLAN_OPTIONS.map((option) => (
+                  <option key={option.id} value={option.id}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            }
+          />
 
-        <Field
-          label="ملاحظات (اختياري)"
-          input={
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="أي تفاصيل إضافية..."
-              rows={4}
-              className={`${inputClass} resize-y`}
-              disabled={loading}
-            />
-          }
-        />
+          <Field
+            label="ملاحظات (اختياري)"
+            input={
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="أي تفاصيل إضافية..."
+                rows={4}
+                className={`${inputClass} resize-y`}
+                disabled={loading}
+              />
+            }
+          />
 
-        <Field
-          label="تقريباً قديش عندك صنف بالمنيو؟ (اختياري)"
-          input={
-            <select
-              value={estimatedItems}
-              onChange={(e) => setEstimatedItems(e.target.value as EstimatedItems)}
-              className={inputClass}
-              disabled={loading}
-            >
-              {ESTIMATED_ITEMS_OPTIONS.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {option.label}
-                </option>
-              ))}
-            </select>
-          }
-        />
+          <Field
+            label="تقريباً قديش عندك صنف بالمنيو؟ (اختياري)"
+            input={
+              <select
+                value={estimatedItems}
+                onChange={(e) => setEstimatedItems(e.target.value as EstimatedItems)}
+                className={inputClass}
+                disabled={loading}
+              >
+                {ESTIMATED_ITEMS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            }
+          />
 
-        {error && (
-          <p className={marketingErrorClass} role="alert">
-            {error}
-          </p>
-        )}
+          <div>
+            <div id="turnstile-widget" />
+            {fieldErrors.turnstileToken && (
+              <p className={marketingFieldErrorClass} role="alert">
+                {fieldErrors.turnstileToken}
+              </p>
+            )}
+          </div>
 
-        <button type="submit" disabled={loading} className={marketingPrimaryBtnClass}>
-          {loading ? "جارٍ الإرسال..." : "إرسال الطلب"}
-        </button>
-      </div>
-    </form>
+          {error && (
+            <p className={marketingErrorClass} role="alert">
+              {error}
+            </p>
+          )}
+
+          <button type="submit" disabled={loading} className={marketingPrimaryBtnClass}>
+            {loading ? "جارٍ الإرسال..." : "إرسال الطلب"}
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
 

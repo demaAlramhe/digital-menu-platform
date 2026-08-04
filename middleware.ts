@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { resolvePostLoginPath } from "@/lib/auth/resolve-post-login-path";
 import {
   applyPublicLocaleFromQuery,
   isPublicStorePath,
@@ -88,10 +89,33 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if ((isDashboardRoute || isAdminRoute) && !user) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/auth/login";
-    return NextResponse.redirect(url);
+  if (isDashboardRoute || isAdminRoute) {
+    if (!user) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/auth/login";
+      return NextResponse.redirect(url);
+    }
+
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    // Fail open on a genuine query error (network/transient) — let the page-level guard
+    // (require-super-admin.ts / require-store-owner.ts) handle it, don't bounce a
+    // legitimate user due to a transient failure here.
+    if (!profileError) {
+      const requiredRole = isAdminRoute ? "super_admin" : "store_owner";
+      if (profile?.role !== requiredRole) {
+        const target = resolvePostLoginPath(profile);
+        const [path, query] = target.split("?");
+        const url = request.nextUrl.clone();
+        url.pathname = path;
+        url.search = query ? `?${query}` : "";
+        return NextResponse.redirect(url);
+      }
+    }
   }
 
   if (isLoginRoute && user && !request.nextUrl.searchParams.has("error")) {
