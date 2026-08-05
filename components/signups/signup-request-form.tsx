@@ -404,9 +404,16 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
             </p>
           )}
 
-          <button type="submit" disabled={loading} className={marketingPrimaryBtnClass}>
+          <button
+            type="submit"
+            disabled={loading || !turnstileToken}
+            className={marketingPrimaryBtnClass}
+          >
             {loading ? "جارٍ الإرسال..." : "إرسال الطلب"}
           </button>
+          {!loading && !turnstileToken && (
+            <p className="text-center text-xs text-[#6b7280]">جارٍ التحقق الأمني...</p>
+          )}
         </div>
       </form>
     </>

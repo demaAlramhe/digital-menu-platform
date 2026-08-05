@@ -422,6 +422,8 @@ export const en = {
     importButton: "Import {count} items",
     importing: "Please wait — auto-translation may take a moment.",
     importingProgress: "Importing... {current}/{total}",
+    largeImportHint:
+      "Large imports may take longer. Consider splitting into smaller batches if this feels slow.",
     success: "{count} items imported successfully",
     failed: "{count} items failed",
     goToItems: "Go to menu items",

@@ -421,6 +421,8 @@ export const he = {
     importButton: "ייבא {count} פריטים",
     importing: "אנא המתינו — התרגום האוטומטי עשוי לקחת זמן.",
     importingProgress: "מייבא... {current}/{total}",
+    largeImportHint:
+      "ייבוא גדול עשוי לקחת יותר זמן. אפשר לפצל לקבצים קטנים יותר אם צריך.",
     success: "יובאו {count} פריטים בהצלחה",
     failed: "נכשלו {count} פריטים",
     goToItems: "עבור לרשימת הפריטים",

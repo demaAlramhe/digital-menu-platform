@@ -197,6 +197,11 @@ export function MenuItemCsvImport() {
                   count: validRows.length,
                 })}
               </PrimaryButton>
+              {validRows.length > 50 && (
+                <p className="text-sm text-stone-500">
+                  {dict.csvImport.largeImportHint}
+                </p>
+              )}
             </div>
           )}
         </>

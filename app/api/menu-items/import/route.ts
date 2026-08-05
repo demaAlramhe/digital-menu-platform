@@ -21,7 +21,10 @@ const csvRowSchema = z.object({
 });
 
 const menuItemImportSchema = z.object({
-  rows: z.array(csvRowSchema).min(1),
+  rows: z
+    .array(csvRowSchema)
+    .min(1)
+    .max(300, "Too many rows — please split into smaller files of 300 items or fewer."),
 });
 
 function slugFromName(name: string, fallbackIndex: number): string {

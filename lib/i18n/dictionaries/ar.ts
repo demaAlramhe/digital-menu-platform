@@ -422,6 +422,8 @@ export const ar: Dictionary = {
     importButton: "استيراد {count} عناصر",
     importing: "يرجى الانتظار — الترجمة التلقائية قد تستغرق وقتاً.",
     importingProgress: "جارٍ الاستيراد... {current}/{total}",
+    largeImportHint:
+      "الاستيراد الكبير قد يستغرق وقتاً أطول. يمكنك تقسيم الملف إلى دفعات أصغر إذا لزم الأمر.",
     success: "تم استيراد {count} عناصر بنجاح",
     failed: "فشل استيراد {count} عناصر",
     goToItems: "الانتقال لقائمة العناصر",
