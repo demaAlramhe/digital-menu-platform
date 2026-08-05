@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../lib/supabase/admin";
 
 export async function DELETE(
@@ -87,6 +88,18 @@ export async function DELETE(
         );
       }
 
+      await logAdminAction(supabase, {
+        actorId: auth.auth.user.id,
+        actorEmail: auth.auth.user.email,
+        action: "user.delete",
+        targetType: "profile",
+        targetId: userId,
+        metadata: {
+          role: targetProfile?.role ?? null,
+          orphanedProfile: false,
+        },
+      });
+
       return NextResponse.json({ success: true });
     }
 
@@ -105,6 +118,18 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "user.delete",
+      targetType: "profile",
+      targetId: userId,
+      metadata: {
+        role: targetProfile?.role ?? null,
+        orphanedProfile: true,
+      },
+    });
 
     return NextResponse.json({ success: true, orphanedProfile: true });
   } catch (error) {

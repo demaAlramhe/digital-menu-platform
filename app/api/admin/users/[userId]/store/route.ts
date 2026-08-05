@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
 import { parseJsonBody } from "@/lib/api/validation";
 import { adminUserStoreSchema } from "@/lib/api/schemas";
@@ -97,6 +98,15 @@ export async function PATCH(
         { status: 500 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "user.store_assignment_change",
+      targetType: "profile",
+      targetId: userId,
+      metadata: { from: existingProfile.store_id, to: storeId },
+    });
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { generateSecurePassword } from "@/lib/signups/generate-password";
 import { generateUniqueStoreSlug } from "@/lib/signups/generate-store-slug";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
@@ -131,6 +132,19 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "signup.approve",
+      targetType: "pending_signup",
+      targetId: id,
+      metadata: {
+        storeId: store.id,
+        storeSlug: slug,
+        ownerEmail: normalizedEmail,
+      },
+    });
 
     return NextResponse.json({
       success: true,

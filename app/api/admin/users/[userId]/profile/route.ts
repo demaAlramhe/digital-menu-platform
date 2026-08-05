@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
 import { parseJsonBody } from "@/lib/api/validation";
 import { adminUserProfilePatchSchema } from "@/lib/api/schemas";
@@ -142,6 +143,15 @@ export async function PATCH(
         );
       }
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "user.profile_update",
+      targetType: "profile",
+      targetId: userId,
+      metadata: { nameChanged, emailChanged },
+    });
 
     return NextResponse.json({
       success: true,

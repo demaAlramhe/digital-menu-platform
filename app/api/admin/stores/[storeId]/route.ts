@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../lib/supabase/admin";
 import { parseJsonBody } from "@/lib/api/validation";
 import { adminPatchStoreSchema } from "@/lib/api/schemas";
@@ -67,6 +68,15 @@ export async function PATCH(
       );
     }
 
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "store.update",
+      targetType: "store",
+      targetId: storeId,
+      metadata: { changes: parsed.data },
+    });
+
     return NextResponse.json({
       success: true,
       store: updatedStore,
@@ -120,6 +130,15 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "store.delete",
+      targetType: "store",
+      targetId: storeId,
+      metadata: { storeName: store.name },
+    });
 
     return NextResponse.json({ success: true, storeName: store.name });
   } catch (error) {

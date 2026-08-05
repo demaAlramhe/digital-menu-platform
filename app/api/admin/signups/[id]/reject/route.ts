@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
 
 export async function POST(
@@ -50,6 +51,15 @@ export async function POST(
         { status: 500 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "signup.reject",
+      targetType: "pending_signup",
+      targetId: id,
+      metadata: {},
+    });
 
     return NextResponse.json({ success: true });
   } catch {

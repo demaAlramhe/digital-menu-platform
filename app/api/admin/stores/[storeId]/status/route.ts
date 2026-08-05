@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
+import { logAdminAction } from "@/lib/auth/audit-log";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
 import { parseJsonBody } from "@/lib/api/validation";
 import { adminStoreStatusSchema } from "@/lib/api/schemas";
@@ -75,6 +76,19 @@ export async function PATCH(
         { status: 404 }
       );
     }
+
+    await logAdminAction(supabase, {
+      actorId: auth.auth.user.id,
+      actorEmail: auth.auth.user.email,
+      action: "store.status_change",
+      targetType: "store",
+      targetId: storeId,
+      metadata: {
+        from: existingStore.status,
+        to: status,
+        storeName: existingStore.name,
+      },
+    });
 
     return NextResponse.json({
       success: true,
