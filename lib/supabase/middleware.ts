@@ -3,7 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import { getSupabaseUrl } from "./url";
 
 export async function updateSession(request: NextRequest) {
-  let supabaseResponse = NextResponse.next({ request });
+  const supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     getSupabaseUrl(),
