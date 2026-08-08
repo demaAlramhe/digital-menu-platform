@@ -81,7 +81,9 @@ export default async function HomePage() {
               />
               <h1 className="text-4xl font-bold leading-tight tracking-tight text-brand-dark sm:text-5xl lg:text-[3.25rem] lg:leading-[1.15]">
                 <span className="block">{dict.home.headlineLine1}</span>
-                <span className="block">{dict.home.headlineLine2}</span>
+                <span className="mt-2 block text-2xl font-semibold sm:text-3xl lg:text-4xl">
+                  {dict.home.headlineLine2}
+                </span>
               </h1>
               <p className="mt-3 text-center text-sm text-[#6b7280]">
                 {dict.home.badge}
