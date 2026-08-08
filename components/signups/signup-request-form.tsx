@@ -96,6 +96,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
     planToEstimatedItems(defaultPlan)
   );
   const [notes, setNotes] = useState("");
+  const [acceptedLegal, setAcceptedLegal] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState("");
   const [scriptReady, setScriptReady] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -189,6 +190,9 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
     if (!whatsapp.trim()) nextFieldErrors.whatsapp = "رقم الواتساب مطلوب";
     if (!turnstileToken.trim()) {
       nextFieldErrors.turnstileToken = "الرجاء إكمال التحقق الأمني";
+    }
+    if (!acceptedLegal) {
+      nextFieldErrors.acceptedLegal = dict.signup.consentRequired;
     }
 
     if (Object.keys(nextFieldErrors).length > 0) {
@@ -398,6 +402,52 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
             )}
           </div>
 
+          <div>
+            <label className="flex items-start gap-3 text-sm leading-relaxed text-[#374151]">
+              <input
+                type="checkbox"
+                checked={acceptedLegal}
+                onChange={(e) => {
+                  setAcceptedLegal(e.target.checked);
+                  setFieldErrors((prev) => {
+                    if (!prev.acceptedLegal) return prev;
+                    const next = { ...prev };
+                    delete next.acceptedLegal;
+                    return next;
+                  });
+                }}
+                disabled={loading}
+                className="mt-1 h-4 w-4 shrink-0 rounded border-stone-300 text-brand-dark focus:ring-brand-dark/30"
+                data-testid="signup-legal-consent"
+              />
+              <span>
+                {dict.signup.consentBefore}{" "}
+                <Link
+                  href="/terms"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`font-semibold text-brand-dark underline underline-offset-2 hover:text-brand-dark-hover ${marketingLinkFocus} rounded-sm`}
+                >
+                  {dict.signup.consentTerms}
+                </Link>
+                {dict.signup.consentAnd}
+                <Link
+                  href="/privacy"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`font-semibold text-brand-dark underline underline-offset-2 hover:text-brand-dark-hover ${marketingLinkFocus} rounded-sm`}
+                >
+                  {dict.signup.consentPrivacy}
+                </Link>
+              </span>
+            </label>
+            {fieldErrors.acceptedLegal && (
+              <p className={marketingFieldErrorClass} role="alert">
+                {fieldErrors.acceptedLegal}
+              </p>
+            )}
+          </div>
+
           {error && (
             <p className={marketingErrorClass} role="alert">
               {error}
@@ -406,7 +456,7 @@ export function SignupRequestForm({ initialPlan }: SignupRequestFormProps) {
 
           <button
             type="submit"
-            disabled={loading || !turnstileToken}
+            disabled={loading || !turnstileToken || !acceptedLegal}
             className={marketingPrimaryBtnClass}
           >
             {loading ? "جارٍ الإرسال..." : "إرسال الطلب"}

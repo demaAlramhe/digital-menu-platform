@@ -66,6 +66,8 @@ export const en = {
     users: "Users",
     signups: "Signups",
     system: "System",
+    terms: "Terms of Service",
+    privacy: "Privacy Policy",
     manageMenu: "Manage menu",
     plans: "Plans",
     pricing: "Plans",
@@ -264,6 +266,14 @@ export const en = {
     whatsappConfirm: "Confirm via WhatsApp",
     whatsappConfirmHint:
       "Tap to send your request details directly — this helps us respond faster",
+    consentBefore: "I agree to the",
+    consentTerms: "Terms of Service",
+    consentAnd: " and ",
+    consentPrivacy: "Privacy Policy",
+    consentRequired: "You must agree to the Terms of Service and Privacy Policy.",
+  },
+  legal: {
+    englishComingSoon: "English version coming soon",
   },
   auth: {
     title: "Sign in",

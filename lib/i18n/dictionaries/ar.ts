@@ -68,6 +68,8 @@ export const ar: Dictionary = {
     users: "المستخدمون",
     signups: "طلبات التسجيل",
     system: "النظام",
+    terms: "شروط الاستخدام",
+    privacy: "سياسة الخصوصية",
     manageMenu: "إدارة القائمة",
     plans: "الباقات",
     pricing: "الباقات",
@@ -264,6 +266,14 @@ export const ar: Dictionary = {
     whatsappConfirm: "تأكيد الطلب على واتساب",
     whatsappConfirmHint:
       "اضغط لإرسال تفاصيل طلبك مباشرة — هذا يساعدنا نرد عليك بسرعة",
+    consentBefore: "أوافق على",
+    consentTerms: "شروط الاستخدام",
+    consentAnd: " و",
+    consentPrivacy: "سياسة الخصوصية",
+    consentRequired: "يجب الموافقة على شروط الاستخدام وسياسة الخصوصية.",
+  },
+  legal: {
+    englishComingSoon: "English version coming soon",
   },
   auth: {
     title: "تسجيل الدخول",

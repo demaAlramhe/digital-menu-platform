@@ -35,6 +35,7 @@ test.describe("Admin signups flow", () => {
       await page.getByLabel("اسم المطعم").fill("E2E Approve Restaurant");
       await page.getByLabel("البريد الإلكتروني").fill(targetEmail);
       await page.getByLabel("واتساب").fill("+972509999999");
+      await page.getByTestId("signup-legal-consent").check();
       await page.getByRole("button", { name: "إرسال الطلب" }).click();
       await expect(page.getByTestId("signup-success")).toBeVisible();
 

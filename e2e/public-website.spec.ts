@@ -24,6 +24,7 @@ test.describe("Public website flow", () => {
     await page.getByLabel("اسم المطعم").fill("E2E Test Restaurant");
     await page.getByLabel("البريد الإلكتروني").fill(testEmail);
     await page.getByLabel("واتساب").fill("+972501234567");
+    await page.getByTestId("signup-legal-consent").check();
     await page.getByRole("button", { name: "إرسال الطلب" }).click();
 
     await expect(page.getByTestId("signup-success")).toBeVisible();

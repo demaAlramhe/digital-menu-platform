@@ -45,6 +45,18 @@ export async function MarketingFooter() {
             >
               {dict.common.login}
             </Link>
+            <Link
+              href="/terms"
+              className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
+            >
+              {dict.nav.terms}
+            </Link>
+            <Link
+              href="/privacy"
+              className={`hover:text-brand-dark ${marketingLinkFocus} rounded-sm`}
+            >
+              {dict.nav.privacy}
+            </Link>
           </nav>
 
           <p className="text-xs text-[#6b7280]">{footerCopyright}</p>

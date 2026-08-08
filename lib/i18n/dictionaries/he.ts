@@ -66,6 +66,8 @@ export const he = {
     users: "משתמשים",
     signups: "בקשות הצטרפות",
     system: "מערכת",
+    terms: "תנאי שימוש",
+    privacy: "מדיניות פרטיות",
     manageMenu: "לניהול התפריט",
     plans: "חבילות",
     pricing: "מסלולים",
@@ -264,6 +266,14 @@ export const he = {
     whatsappConfirm: "אישור הבקשה ב-WhatsApp",
     whatsappConfirmHint:
       "לחץ לשליחת פרטי הבקשה שלך — זה עוזר לנו להגיב מהר יותר",
+    consentBefore: "אני מסכים/ה ל",
+    consentTerms: "תנאי השימוש",
+    consentAnd: " ול",
+    consentPrivacy: "מדיניות הפרטיות",
+    consentRequired: "יש לאשר את תנאי השימוש ואת מדיניות הפרטיות.",
+  },
+  legal: {
+    englishComingSoon: "English version coming soon",
   },
   auth: {
     title: "כניסה למערכת",
