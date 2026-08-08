@@ -137,3 +137,54 @@ export const signupPostSchema = z.object({
   estimated_items: z.string().optional().nullable(),
   turnstileToken: z.string().min(1, "CAPTCHA verification is required."),
 });
+
+export const systemIntegrationCategorySchema = z.enum([
+  "hosting",
+  "database",
+  "email",
+  "ai",
+  "security",
+  "other",
+]);
+
+export const systemIntegrationStatusSchema = z.enum([
+  "active",
+  "expiring_soon",
+  "expired",
+  "inactive",
+]);
+
+const emptyToNull = (value: unknown) => (value === "" ? null : value);
+
+const optionalNullableUrl = z.preprocess(
+  emptyToNull,
+  z.string().trim().url("A valid URL is required.").nullable().optional()
+);
+
+const optionalNullableDatetime = z.preprocess(emptyToNull, z
+  .string()
+  .trim()
+  .refine((value) => !Number.isNaN(Date.parse(value)), {
+    message: "A valid datetime is required.",
+  })
+  .transform((value) => new Date(value).toISOString())
+  .nullable()
+  .optional());
+
+export const systemIntegrationPostSchema = z.object({
+  name: z.string().trim().min(1, "Name is required."),
+  category: systemIntegrationCategorySchema,
+  status: systemIntegrationStatusSchema.optional(),
+  expires_at: optionalNullableDatetime,
+  renewal_url: optionalNullableUrl,
+  notes: z.preprocess(emptyToNull, z.string().trim().nullable().optional()),
+});
+
+export const systemIntegrationPatchSchema = z.object({
+  name: z.string().trim().min(1, "Name is required.").optional(),
+  category: systemIntegrationCategorySchema.optional(),
+  status: systemIntegrationStatusSchema.optional(),
+  expires_at: optionalNullableDatetime,
+  renewal_url: optionalNullableUrl,
+  notes: z.preprocess(emptyToNull, z.string().trim().nullable().optional()),
+});

@@ -376,6 +376,42 @@ export type Database = {
         }
         Relationships: []
       }
+      system_integrations: {
+        Row: {
+          category: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          name: string
+          notes: string | null
+          renewal_url: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          renewal_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          renewal_url?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

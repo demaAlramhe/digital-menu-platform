@@ -65,6 +65,7 @@ export const en = {
     stores: "Stores",
     users: "Users",
     signups: "Signups",
+    system: "System",
     manageMenu: "Manage menu",
     plans: "Plans",
     pricing: "Plans",

@@ -86,6 +86,12 @@ export const adminSidebarNav: SidebarNavGroup[] = [
         icon: "Inbox",
         badgeId: "signups",
       },
+      {
+        id: "system",
+        labelKey: "nav.system",
+        href: "/admin/system",
+        icon: "Server",
+      },
     ],
   },
 ];

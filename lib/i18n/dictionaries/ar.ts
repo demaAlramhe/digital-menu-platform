@@ -67,6 +67,7 @@ export const ar: Dictionary = {
     stores: "المتاجر",
     users: "المستخدمون",
     signups: "طلبات التسجيل",
+    system: "النظام",
     manageMenu: "إدارة القائمة",
     plans: "الباقات",
     pricing: "الباقات",

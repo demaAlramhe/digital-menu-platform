@@ -65,6 +65,7 @@ export const he = {
     stores: "עסקים",
     users: "משתמשים",
     signups: "בקשות הצטרפות",
+    system: "מערכת",
     manageMenu: "לניהול התפריט",
     plans: "חבילות",
     pricing: "מסלולים",
