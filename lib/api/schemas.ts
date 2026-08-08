@@ -63,6 +63,8 @@ export const localePostSchema = z.object({
   locale: contentLocaleSchema,
 });
 
+export const storePlanSchema = z.enum(["small", "medium", "large", "custom"]);
+
 export const adminCreateStoreSchema = z.object({
   storeName: z.string().trim().min(1),
   storeSlug: z.string().trim().min(1),
@@ -72,6 +74,7 @@ export const adminCreateStoreSchema = z.object({
   phone: optionalString,
   email: z.string().email().or(z.literal("")).optional(),
   address: optionalString,
+  plan: storePlanSchema.optional(),
 });
 
 export const adminPatchStoreSchema = z.object({
@@ -85,6 +88,7 @@ export const adminPatchStoreSchema = z.object({
   email: z.string().email().or(z.literal("")).optional(),
   address: optionalString,
   status: z.enum(["active", "inactive", "archived"]).optional(),
+  plan: storePlanSchema.optional(),
 });
 
 export const adminStoreStatusSchema = z.object({

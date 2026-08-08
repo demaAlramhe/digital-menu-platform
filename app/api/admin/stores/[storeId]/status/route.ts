@@ -29,6 +29,7 @@ export async function PATCH(
       .from("stores")
       .select("id, name, status")
       .eq("id", storeId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (existingStoreError) {
@@ -54,6 +55,7 @@ export async function PATCH(
         status,
       })
       .eq("id", storeId)
+      .is("deleted_at", null)
       .select()
       .maybeSingle();
 

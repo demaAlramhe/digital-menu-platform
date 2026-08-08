@@ -10,7 +10,10 @@ export default async function TestPage() {
 
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("stores").select("*");
+  const { data, error } = await supabase
+    .from("stores")
+    .select("*")
+    .is("deleted_at", null);
 
   return (
     <main className="p-8">

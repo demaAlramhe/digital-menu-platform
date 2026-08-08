@@ -11,6 +11,7 @@ import {
 import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
+import { getPlanItemLimit } from "@/lib/billing/plan-limits";
 
 const csvRowSchema = z.object({
   category: z.string(),
@@ -147,11 +148,51 @@ export async function POST(req: Request) {
 
     const supabase = createAdminClient();
 
+    const { data: store, error: storeError } = await supabase
+      .from("stores")
+      .select("plan")
+      .eq("id", storeId)
+      .single();
+
+    if (storeError || !store) {
+      return NextResponse.json(
+        { error: "Failed to load store plan.", details: storeError },
+        { status: 500 }
+      );
+    }
+
+    const { count: currentItemCount, error: countError } = await supabase
+      .from("menu_items")
+      .select("id", { count: "exact", head: true })
+      .eq("store_id", storeId)
+      .is("deleted_at", null);
+
+    if (countError) {
+      return NextResponse.json(
+        { error: "Failed to count menu items.", details: countError },
+        { status: 500 }
+      );
+    }
+
+    const limit = getPlanItemLimit(store.plan ?? "large");
+    if (
+      limit !== null &&
+      (currentItemCount ?? 0) + parsed.data.rows.length > limit
+    ) {
+      return NextResponse.json(
+        {
+          error: `Reached the item limit for your current plan (${limit} items). Contact us to upgrade.`,
+        },
+        { status: 400 }
+      );
+    }
+
     const { data: defaultCategory, error: defaultCategoryError } =
       await supabase
         .from("menu_categories")
         .select("id")
         .eq("store_id", storeId)
+        .is("deleted_at", null)
         .order("sort_order", { ascending: true })
         .limit(1)
         .single();
@@ -169,7 +210,8 @@ export async function POST(req: Request) {
     const { data: categories } = await supabase
       .from("menu_categories")
       .select("id, name")
-      .eq("store_id", storeId);
+      .eq("store_id", storeId)
+      .is("deleted_at", null);
 
     const categoryMap = new Map<string, string>();
     for (const category of categories ?? []) {

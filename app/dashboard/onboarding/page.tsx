@@ -23,18 +23,21 @@ export default async function OnboardingPage() {
       .from("stores")
       .select("name, logo_url, phone, primary_color, whatsapp_number")
       .eq("id", storeId)
+      .is("deleted_at", null)
       .single(),
     supabase
       .from("menu_categories")
       .select("*", { count: "exact", head: true })
       .eq("store_id", storeId)
-      .eq("is_active", true),
+      .eq("is_active", true)
+      .is("deleted_at", null),
     supabase
       .from("menu_items")
       .select("*", { count: "exact", head: true })
       .eq("store_id", storeId)
       .not("image_url", "is", null)
-      .eq("is_active", true),
+      .eq("is_active", true)
+      .is("deleted_at", null),
   ]);
 
   const progress = getOnboardingProgress(storeResult.data ?? {}, {

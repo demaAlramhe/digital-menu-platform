@@ -59,6 +59,7 @@ export default async function AdminStoresPage({
   const { data: allStores, error: allStoresError } = await supabase
     .from("stores")
     .select("*")
+    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   const counters = {

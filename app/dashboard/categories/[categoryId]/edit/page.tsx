@@ -26,6 +26,7 @@ export default async function EditCategoryPage({ params }: EditCategoryPageProps
     .select("*")
     .eq("id", categoryId)
     .eq("store_id", storeId)
+    .is("deleted_at", null)
     .single();
 
   if (error || !category) {

@@ -29,11 +29,13 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
       .select("*")
       .eq("id", menuItemId)
       .eq("store_id", storeId)
+      .is("deleted_at", null)
       .single(),
     supabase
       .from("menu_categories")
       .select("id, name")
       .eq("store_id", storeId)
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true }),
   ]);
 

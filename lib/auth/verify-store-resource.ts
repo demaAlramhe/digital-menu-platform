@@ -11,6 +11,7 @@ export async function categoryBelongsToStore(
     .from("menu_categories")
     .select("store_id")
     .eq("id", categoryId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   return data?.store_id === storeId;
@@ -25,6 +26,7 @@ export async function menuItemBelongsToStore(
     .from("menu_items")
     .select("store_id")
     .eq("id", menuItemId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   return data?.store_id === storeId;

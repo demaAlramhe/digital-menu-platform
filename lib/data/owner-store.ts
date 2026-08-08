@@ -59,6 +59,7 @@ export async function loadOwnerStoreBasic(
     .from("stores")
     .select("id, name, slug, show_welcome_screen")
     .eq("id", storeId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (!withWelcome.error && withWelcome.data?.slug) {
@@ -78,6 +79,7 @@ export async function loadOwnerStoreBasic(
       .from("stores")
       .select("id, name, slug")
       .eq("id", storeId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!basic.error && basic.data?.slug) {
@@ -109,6 +111,7 @@ export async function loadOwnerStoreForQr(
       "id, name, slug, status, logo_url, phone, primary_color, show_welcome_screen"
     )
     .eq("id", storeId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   if (!withWelcome.error && withWelcome.data?.slug) {
@@ -132,6 +135,7 @@ export async function loadOwnerStoreForQr(
       .from("stores")
       .select("id, name, slug, status, logo_url, phone, primary_color")
       .eq("id", storeId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!basic.error && basic.data?.slug) {

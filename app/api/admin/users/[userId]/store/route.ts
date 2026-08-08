@@ -60,6 +60,7 @@ export async function PATCH(
         .from("stores")
         .select("id")
         .eq("id", storeId)
+        .is("deleted_at", null)
         .maybeSingle();
 
       if (storeError) {

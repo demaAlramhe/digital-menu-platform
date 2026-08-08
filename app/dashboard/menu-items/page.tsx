@@ -74,6 +74,7 @@ export default async function DashboardMenuItemsPage({
       .select("id, name")
       .eq("id", categoryId)
       .eq("store_id", storeId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (category) {
@@ -85,6 +86,7 @@ export default async function DashboardMenuItemsPage({
     .from("menu_items")
     .select("*, menu_categories(name)")
     .eq("store_id", store.id)
+    .is("deleted_at", null)
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 

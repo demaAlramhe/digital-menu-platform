@@ -64,12 +64,14 @@ export default async function DashboardCategoriesPage({
       .from("menu_categories")
       .select("*")
       .eq("store_id", storeId)
+      .is("deleted_at", null)
       .order("sort_order", { ascending: true }),
     supabase
       .from("menu_items")
       .select("category_id")
       .eq("store_id", storeId)
-      .eq("is_active", true),
+      .eq("is_active", true)
+      .is("deleted_at", null),
   ]);
 
   const { store: ownerStore } = await loadOwnerStoreBasic(storeId);

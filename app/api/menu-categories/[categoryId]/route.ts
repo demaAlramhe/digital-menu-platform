@@ -32,6 +32,7 @@ export async function PATCH(
       .from("menu_categories")
       .select("store_id")
       .eq("id", categoryId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!existing?.store_id || existing.store_id !== auth.storeId) {
@@ -98,17 +99,21 @@ export async function DELETE(
       .from("menu_categories")
       .select("store_id")
       .eq("id", categoryId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!existing?.store_id || existing.store_id !== auth.storeId) {
       return NextResponse.json({ error: "Category not found." }, { status: 404 });
     }
 
+    const deletedAt = new Date().toISOString();
+
     const { error } = await supabase
       .from("menu_categories")
-      .delete()
+      .update({ deleted_at: deletedAt })
       .eq("id", categoryId)
-      .eq("store_id", auth.storeId);
+      .eq("store_id", auth.storeId)
+      .is("deleted_at", null);
 
     if (error) {
       return NextResponse.json(
@@ -116,6 +121,12 @@ export async function DELETE(
         { status: 500 }
       );
     }
+
+    await supabase
+      .from("menu_items")
+      .update({ deleted_at: deletedAt })
+      .eq("category_id", categoryId)
+      .is("deleted_at", null);
 
     return NextResponse.json({ success: true });
   } catch (error) {

@@ -47,7 +47,11 @@ export default async function AdminSignupsPage({
     .filter((id): id is string => Boolean(id));
 
   const { data: stores } = storeIds.length
-    ? await supabase.from("stores").select("id, slug").in("id", storeIds)
+    ? await supabase
+        .from("stores")
+        .select("id, slug")
+        .in("id", storeIds)
+        .is("deleted_at", null)
     : { data: [] as { id: string; slug: string }[] };
 
   const storeSlugMap = Object.fromEntries(

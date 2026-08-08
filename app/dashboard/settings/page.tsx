@@ -20,6 +20,7 @@ export default async function DashboardSettingsPage() {
     .from("stores")
     .select("*")
     .eq("id", storeId)
+    .is("deleted_at", null)
     .single();
 
   if (error || !store) {

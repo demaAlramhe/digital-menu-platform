@@ -45,6 +45,14 @@ export async function POST(
     const slug = await generateUniqueStoreSlug(supabase, signup.restaurant_name);
     const password = generateSecurePassword(12);
     const normalizedEmail = signup.email.trim().toLowerCase();
+    const signupPlan = typeof signup.plan === "string" ? signup.plan : "";
+    const knownPlans = ["small", "medium", "large"] as const;
+    const planAssignedDefault = !(knownPlans as readonly string[]).includes(
+      signupPlan
+    );
+    const storePlan = planAssignedDefault
+      ? "large"
+      : (signupPlan as (typeof knownPlans)[number]);
 
     const { data: authLookup } = await supabase.auth.admin.listUsers();
     const emailTaken = authLookup?.users?.some(
@@ -82,6 +90,7 @@ export async function POST(
         phone: signup.whatsapp.trim(),
         whatsapp_number: signup.whatsapp.trim(),
         email: normalizedEmail,
+        plan: storePlan,
       })
       .select("id, slug, name")
       .single();
@@ -143,6 +152,8 @@ export async function POST(
         storeId: store.id,
         storeSlug: slug,
         ownerEmail: normalizedEmail,
+        plan: storePlan,
+        planAssignedDefault,
       },
     });
 
@@ -156,6 +167,7 @@ export async function POST(
         store_name: store.name,
         dashboard_url: "/dashboard",
         menu_url: `/${slug}`,
+        ...(planAssignedDefault ? { planAssignedDefault: true } : {}),
       },
     });
   } catch (error) {

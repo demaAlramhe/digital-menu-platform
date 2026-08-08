@@ -41,7 +41,8 @@ export async function retranslateStoreContent(
   const { data: categories } = await supabase
     .from("menu_categories")
     .select("id, name")
-    .eq("store_id", storeId);
+    .eq("store_id", storeId)
+    .is("deleted_at", null);
 
   let categoriesUpdated = 0;
 
@@ -71,7 +72,8 @@ export async function retranslateStoreContent(
   const { data: items } = await supabase
     .from("menu_items")
     .select("id, name, description")
-    .eq("store_id", storeId);
+    .eq("store_id", storeId)
+    .is("deleted_at", null);
 
   let itemsUpdated = 0;
 
@@ -114,6 +116,7 @@ export async function retranslateStoreContent(
     .from("stores")
     .select("welcome_title, welcome_subtitle, welcome_button_text")
     .eq("id", storeId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   let welcomeUpdated = false;

@@ -24,6 +24,7 @@ export default async function NewMenuItemPage({ searchParams }: NewMenuItemPageP
     .from("menu_categories")
     .select("id, name")
     .eq("store_id", storeId)
+    .is("deleted_at", null)
     .order("sort_order", { ascending: true });
 
   const categoryList = categories ?? [];

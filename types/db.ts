@@ -31,7 +31,9 @@ export type Database = {
           phone: string | null;
           whatsapp_number: string | null;
           address: string | null;
+          plan: "small" | "medium" | "large" | "custom";
           created_at: string;
+          deleted_at: string | null;
         };
         Insert: {
           id?: string;
@@ -62,7 +64,9 @@ export type Database = {
           phone?: string | null;
           whatsapp_number?: string | null;
           address?: string | null;
+          plan?: "small" | "medium" | "large" | "custom";
           created_at?: string;
+          deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["stores"]["Insert"]>;
       };
@@ -78,6 +82,7 @@ export type Database = {
           sort_order: number;
           is_active: boolean;
           created_at: string;
+          deleted_at: string | null;
         };
         Insert: {
           id?: string;
@@ -90,6 +95,7 @@ export type Database = {
           sort_order?: number;
           is_active?: boolean;
           created_at?: string;
+          deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["menu_categories"]["Insert"]>;
       };
@@ -114,6 +120,7 @@ export type Database = {
           is_featured: boolean;
           sort_order: number;
           created_at: string;
+          deleted_at: string | null;
         };
         Insert: {
           id?: string;
@@ -135,6 +142,7 @@ export type Database = {
           is_featured?: boolean;
           sort_order?: number;
           created_at?: string;
+          deleted_at?: string | null;
         };
         Update: Partial<Database["public"]["Tables"]["menu_items"]["Insert"]>;
       };

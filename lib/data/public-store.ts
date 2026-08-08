@@ -41,6 +41,7 @@ export async function getActiveStoreBySlug(slug: string) {
     .select("*")
     .eq("slug", slug)
     .eq("status", "active")
+    .is("deleted_at", null)
     .maybeSingle();
 
   return { store, error };
@@ -54,6 +55,7 @@ export async function getPublicMenuForStore(storeId: string) {
     .select(CATEGORY_SELECT_FULL)
     .eq("store_id", storeId)
     .eq("is_active", true)
+    .is("deleted_at", null)
     .order("sort_order", { ascending: true });
 
   const categories =
@@ -64,6 +66,7 @@ export async function getPublicMenuForStore(storeId: string) {
             .select(CATEGORY_SELECT_LEGACY)
             .eq("store_id", storeId)
             .eq("is_active", true)
+            .is("deleted_at", null)
             .order("sort_order", { ascending: true })
         ).data ?? []
       : (categoriesFull.data ?? []);
@@ -78,6 +81,7 @@ export async function getPublicMenuForStore(storeId: string) {
     .select(ITEM_SELECT_FULL)
     .eq("store_id", storeId)
     .eq("is_active", true)
+    .is("deleted_at", null)
     .order("sort_order", { ascending: true });
 
   const menuItems =
@@ -88,6 +92,7 @@ export async function getPublicMenuForStore(storeId: string) {
             .select(ITEM_SELECT_LEGACY)
             .eq("store_id", storeId)
             .eq("is_active", true)
+            .is("deleted_at", null)
             .order("sort_order", { ascending: true })
         ).data ?? []
       : (itemsFull.data ?? []);

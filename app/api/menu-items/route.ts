@@ -11,6 +11,7 @@ import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuItemPostSchema } from "@/lib/api/schemas";
+import { getPlanItemLimit } from "@/lib/billing/plan-limits";
 
 export async function POST(req: Request) {
   try {
@@ -37,6 +38,44 @@ export async function POST(req: Request) {
       return errorResponse;
     }
 
+    const supabase = createAdminClient();
+
+    const { data: store, error: storeError } = await supabase
+      .from("stores")
+      .select("plan")
+      .eq("id", storeId)
+      .single();
+
+    if (storeError || !store) {
+      return NextResponse.json(
+        { error: "Failed to load store plan.", details: storeError },
+        { status: 500 }
+      );
+    }
+
+    const { count: currentItemCount, error: countError } = await supabase
+      .from("menu_items")
+      .select("id", { count: "exact", head: true })
+      .eq("store_id", storeId)
+      .is("deleted_at", null);
+
+    if (countError) {
+      return NextResponse.json(
+        { error: "Failed to count menu items.", details: countError },
+        { status: 500 }
+      );
+    }
+
+    const limit = getPlanItemLimit(store.plan ?? "large");
+    if (limit !== null && (currentItemCount ?? 0) + 1 > limit) {
+      return NextResponse.json(
+        {
+          error: `Reached the item limit for your current plan (${limit} items). Contact us to upgrade.`,
+        },
+        { status: 400 }
+      );
+    }
+
     const sourceLocale = await getStoreDefaultContentLanguage(storeId);
     const nameTrimmed = name.trim();
     const descriptionTrimmed = description?.trim() ?? "";
@@ -58,8 +97,6 @@ export async function POST(req: Request) {
     const nameT = translations.name;
     const descT = translations.description;
 
-    const supabase = createAdminClient();
-
     let resolvedCategoryId = categoryId ?? null;
 
     if (resolvedCategoryId) {
@@ -78,6 +115,7 @@ export async function POST(req: Request) {
         .select("id")
         .eq("store_id", storeId)
         .eq("slug", "general")
+        .is("deleted_at", null)
         .maybeSingle();
 
       resolvedCategoryId = category?.id ?? null;

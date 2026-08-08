@@ -37,25 +37,37 @@ export default async function AdminPage() {
     { data: categoriesData },
     { data: storesData },
   ] = await Promise.all([
-    supabase.from("stores").select("*", { count: "exact", head: true }),
     supabase
       .from("stores")
       .select("*", { count: "exact", head: true })
-      .eq("status", "active"),
+      .is("deleted_at", null),
     supabase
       .from("stores")
       .select("*", { count: "exact", head: true })
-      .eq("status", "inactive"),
+      .eq("status", "active")
+      .is("deleted_at", null),
     supabase
       .from("stores")
       .select("*", { count: "exact", head: true })
-      .eq("status", "archived"),
+      .eq("status", "inactive")
+      .is("deleted_at", null),
+    supabase
+      .from("stores")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "archived")
+      .is("deleted_at", null),
     supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase.from("menu_items").select("*", { count: "exact", head: true }),
-    supabase.from("menu_categories").select("*", { count: "exact", head: true }),
-    supabase.from("menu_items").select("store_id"),
-    supabase.from("menu_categories").select("store_id"),
-    supabase.from("stores").select("id, name, slug"),
+    supabase
+      .from("menu_items")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null),
+    supabase
+      .from("menu_categories")
+      .select("*", { count: "exact", head: true })
+      .is("deleted_at", null),
+    supabase.from("menu_items").select("store_id").is("deleted_at", null),
+    supabase.from("menu_categories").select("store_id").is("deleted_at", null),
+    supabase.from("stores").select("id, name, slug").is("deleted_at", null),
   ]);
 
   const summariesMap = new Map<string, StoreMenuSummary>();

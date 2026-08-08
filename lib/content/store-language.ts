@@ -16,6 +16,7 @@ export async function getStoreDefaultContentLanguage(
     .from("stores")
     .select("default_content_language")
     .eq("id", storeId)
+    .is("deleted_at", null)
     .maybeSingle();
 
   return parseContentLocale(data?.default_content_language) ?? DEFAULT_SOURCE;

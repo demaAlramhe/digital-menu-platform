@@ -39,6 +39,7 @@ export async function PATCH(
       email,
       address,
       status,
+      plan,
     } = parsed.data;
 
     const supabase = createAdminClient();
@@ -56,8 +57,10 @@ export async function PATCH(
         email: email || null,
         address: address || null,
         status: status || "active",
+        ...(plan !== undefined ? { plan } : {}),
       })
       .eq("id", storeId)
+      .is("deleted_at", null)
       .select()
       .single();
 
@@ -106,6 +109,7 @@ export async function DELETE(
       .from("stores")
       .select("id, name")
       .eq("id", storeId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (loadError) {
@@ -119,17 +123,34 @@ export async function DELETE(
       return NextResponse.json({ error: "Store not found." }, { status: 404 });
     }
 
-    const { error: deleteError } = await supabase
-      .from("stores")
-      .delete()
-      .eq("id", storeId);
+    const deletedAt = new Date().toISOString();
 
-    if (deleteError) {
+    const { data: softDeleted, error: deleteError } = await supabase
+      .from("stores")
+      .update({ deleted_at: deletedAt })
+      .eq("id", storeId)
+      .is("deleted_at", null)
+      .select("id, deleted_at")
+      .maybeSingle();
+
+    if (deleteError || !softDeleted?.deleted_at) {
       return NextResponse.json(
         { error: "Failed to delete store.", details: deleteError },
         { status: 500 }
       );
     }
+
+    await supabase
+      .from("menu_categories")
+      .update({ deleted_at: deletedAt })
+      .eq("store_id", storeId)
+      .is("deleted_at", null);
+
+    await supabase
+      .from("menu_items")
+      .update({ deleted_at: deletedAt })
+      .eq("store_id", storeId)
+      .is("deleted_at", null);
 
     await logAdminAction(supabase, {
       actorId: auth.auth.user.id,

@@ -63,6 +63,7 @@ export default async function AdminUsersPage({
   const { data: allStores } = await supabase
     .from("stores")
     .select("id, name, slug")
+    .is("deleted_at", null)
     .order("name", { ascending: true });
 
   const storeOptions: StoreOption[] = allStores ?? [];
@@ -79,6 +80,7 @@ export default async function AdminUsersPage({
           .from("stores")
           .select("id, name, slug")
           .in("id", storeIds)
+          .is("deleted_at", null)
       : { data: [] as { id: string; name: string; slug: string }[] };
 
     const storesMap = Object.fromEntries(

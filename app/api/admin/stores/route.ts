@@ -69,11 +69,13 @@ export async function POST(req: Request) {
       phone,
       email,
       address,
+      plan,
     } = parsed.data;
 
     const supabase = createAdminClient();
     const failAt = readTestFailAt(req);
     const normalizedSlug = normalizeSlug(storeSlug);
+    const storePlan = plan ?? "large";
 
     const { data: existingStore } = await supabase
       .from("stores")
@@ -123,6 +125,7 @@ export async function POST(req: Request) {
         status: "active",
         primary_color: "#111827",
         secondary_color: "#f59e0b",
+        plan: storePlan,
       })
       .select()
       .single();

@@ -47,6 +47,7 @@ export async function PATCH(
       .from("menu_items")
       .select("store_id")
       .eq("id", menuItemId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!existing?.store_id || existing.store_id !== auth.storeId) {
@@ -142,17 +143,21 @@ export async function DELETE(
       .from("menu_items")
       .select("store_id")
       .eq("id", menuItemId)
+      .is("deleted_at", null)
       .maybeSingle();
 
     if (!existing?.store_id || existing.store_id !== auth.storeId) {
       return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
     }
 
+    const deletedAt = new Date().toISOString();
+
     const { error } = await supabase
       .from("menu_items")
-      .delete()
+      .update({ deleted_at: deletedAt })
       .eq("id", menuItemId)
-      .eq("store_id", auth.storeId);
+      .eq("store_id", auth.storeId)
+      .is("deleted_at", null);
 
     if (error) {
       return NextResponse.json(
