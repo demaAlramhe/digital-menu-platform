@@ -278,6 +278,19 @@ export const ar: Dictionary = {
     noProfileError:
       "الحساب مسجّل الدخول لكن لا يوجد ملف شخصي. تواصل مع مدير النظام.",
     unsupportedRoleError: "هذا الحساب غير مصرح له بالوصول إلى النظام.",
+    inviteFailedError:
+      "رابط الدعوة غير صالح أو منتهي الصلاحية. اطلب من المدير إعادة إرسال الدعوة.",
+    setPasswordTitle: "تعيين كلمة المرور",
+    setPasswordSubtitle: "اختر كلمة مرور لإكمال تفعيل حسابك.",
+    setPasswordPassword: "كلمة المرور الجديدة",
+    setPasswordConfirm: "تأكيد كلمة المرور",
+    setPasswordHint: "6 أحرف على الأقل.",
+    setPasswordSubmit: "حفظ كلمة المرور والمتابعة",
+    setPasswordSaving: "جارٍ الحفظ...",
+    setPasswordRequired: "يرجى تعبئة حقلي كلمة المرور.",
+    setPasswordMismatch: "كلمتا المرور غير متطابقتين.",
+    setPasswordTooShort: "يجب أن تكون كلمة المرور 6 أحرف على الأقل.",
+    setPasswordError: "تعذّر تحديث كلمة المرور. حاول مرة أخرى.",
   },
   store: {
     welcome: "أهلاً بكم — سعداء بزيارتكم.",

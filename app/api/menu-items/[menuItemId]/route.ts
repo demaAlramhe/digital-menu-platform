@@ -54,14 +54,39 @@ export async function PATCH(
       return NextResponse.json({ error: "Menu item not found." }, { status: 404 });
     }
 
-    if (categoryId) {
-      const validCategory = await categoryBelongsToStore(categoryId, auth.storeId);
-      if (!validCategory) {
-        return NextResponse.json(
-          { error: "Category does not belong to this store." },
-          { status: 400 }
-        );
-      }
+    let resolvedCategoryId = categoryId ?? null;
+
+    if (!resolvedCategoryId) {
+      const { data: category } = await supabase
+        .from("menu_categories")
+        .select("id")
+        .eq("store_id", auth.storeId)
+        .eq("slug", "general")
+        .is("deleted_at", null)
+        .maybeSingle();
+
+      resolvedCategoryId = category?.id ?? null;
+    }
+
+    if (!resolvedCategoryId) {
+      return NextResponse.json(
+        {
+          error:
+            "No categories found. Please create at least one category first.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const validCategory = await categoryBelongsToStore(
+      resolvedCategoryId,
+      auth.storeId
+    );
+    if (!validCategory) {
+      return NextResponse.json(
+        { error: "Category does not belong to this store." },
+        { status: 400 }
+      );
     }
 
     const sourceLocale = await getStoreDefaultContentLanguage(existing.store_id);
@@ -99,7 +124,7 @@ export async function PATCH(
         is_active: isActive ?? true,
         is_featured: isFeatured ?? false,
         sort_order: sortOrder ?? 0,
-        category_id: categoryId ?? null,
+        category_id: resolvedCategoryId,
       })
       .eq("id", menuItemId)
       .eq("store_id", auth.storeId)

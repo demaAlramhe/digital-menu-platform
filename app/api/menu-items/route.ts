@@ -121,6 +121,16 @@ export async function POST(req: Request) {
       resolvedCategoryId = category?.id ?? null;
     }
 
+    if (!resolvedCategoryId) {
+      return NextResponse.json(
+        {
+          error:
+            "No categories found. Please create at least one category first.",
+        },
+        { status: 400 }
+      );
+    }
+
     const { data: menuItem, error: menuItemError } = await supabase
       .from("menu_items")
       .insert({

@@ -6,7 +6,9 @@ import { useState } from "react";
 import { dash } from "@/components/dashboard/ui/styles";
 import { PrimaryButton } from "@/components/dashboard/ui/buttons";
 import { buildWhatsAppUrl } from "@/lib/utils/whatsapp";
-import type { PendingSignupRow } from "@/types/db";
+import type { Tables } from "@/types/db";
+
+type PendingSignupRow = Tables<"pending_signups">;
 
 type SignupWithStore = PendingSignupRow & {
   store_slug: string | null;
@@ -15,7 +17,6 @@ type SignupWithStore = PendingSignupRow & {
 type ApprovedCredentials = {
   full_name: string;
   email: string;
-  password: string;
   store_slug: string;
   store_name: string;
   dashboard_url: string;
@@ -104,9 +105,8 @@ export function AdminSignupsTable({
 مرحبا ${credentials.full_name} 👋
 منيوك الرقمي جاهز!
 
-رابط تسجيل الدخول: ${siteUrl}/auth/login
-إيميل: ${credentials.email}
-كلمة السر: ${credentials.password}
+أرسلنا دعوة تفعيل إلى بريدك: ${credentials.email}
+افتح الإيميل واضغط رابط الدعوة لتعيين كلمة المرور وتسجيل الدخول.
 
 رابط المنيو: ${siteUrl}${credentials.menu_url}
 
@@ -258,10 +258,16 @@ export function AdminSignupsTable({
               ✅ تم إنشاء الحساب بنجاح
             </h2>
 
+            <p className="mt-3 text-sm leading-relaxed text-stone-700">
+              تم إرسال دعوة تفعيل الحساب إلى{" "}
+              <span className="font-medium" dir="ltr">
+                {credentials.email}
+              </span>
+            </p>
+
             <dl className="mt-4 space-y-3 text-sm">
               <Row label="المطعم" value={credentials.store_name} />
               <CopyRow label="الإيميل" value={credentials.email} />
-              <CopyRow label="كلمة السر" value={credentials.password} />
               <CopyRow
                 label="رابط المنيو"
                 value={credentials.menu_url}
@@ -349,8 +355,8 @@ function PlanBadge({ plan }: { plan: PendingSignupRow["plan"] }) {
   } as const;
 
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles[plan]}`}>
-      {labels[plan]}
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles[plan as keyof typeof styles] ?? styles.large}`}>
+      {labels[plan as keyof typeof labels] ?? plan}
     </span>
   );
 }
@@ -384,8 +390,8 @@ function StatusBadge({ status }: { status: PendingSignupRow["status"] }) {
   } as const;
 
   return (
-    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles[status]}`}>
-      {labels[status]}
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${styles[status as keyof typeof styles] ?? styles.pending}`}>
+      {labels[status as keyof typeof labels] ?? status}
     </span>
   );
 }

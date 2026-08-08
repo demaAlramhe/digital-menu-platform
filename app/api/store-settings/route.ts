@@ -11,8 +11,7 @@ import {
   type ContentLocale,
 } from "@/lib/content/pick-localized";
 import { updateStoreOmittingMissingColumns } from "@/lib/supabase/column-errors";
-
-type StoreSettingsUpdate = Record<string, unknown>;
+import type { TablesUpdate } from "@/types/db";
 
 export async function PATCH(req: Request) {
   try {
@@ -86,7 +85,7 @@ export async function PATCH(req: Request) {
 
     const supabase = createAdminClient();
 
-    const updatePayload: StoreSettingsUpdate = {
+    const updatePayload: TablesUpdate<"stores"> = {
       name: name.trim(),
       logo_url: logoUrl || null,
       banner_url: bannerUrl || null,

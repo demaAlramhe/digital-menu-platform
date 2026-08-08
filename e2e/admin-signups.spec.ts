@@ -52,8 +52,10 @@ test.describe("Admin signups flow", () => {
 
     await expect(page.getByRole("dialog")).toBeVisible();
     await expect(page.getByRole("heading", { name: /تم إنشاء الحساب بنجاح/ })).toBeVisible();
+    await expect(page.getByText(/تم إرسال دعوة تفعيل الحساب إلى/)).toBeVisible();
     await expect(
       page.getByRole("button", { name: "نسخ كل المعلومات" })
     ).toBeVisible();
+    await expect(page.getByText("كلمة السر")).toHaveCount(0);
   });
 });

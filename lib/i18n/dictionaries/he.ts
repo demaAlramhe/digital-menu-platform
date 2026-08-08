@@ -278,6 +278,19 @@ export const he = {
     noProfileError:
       "החשבון מחובר אך חסר פרופיל במערכת. פנו למנהל המערכת.",
     unsupportedRoleError: "לחשבון זה אין הרשאה לגשת למערכת.",
+    inviteFailedError:
+      "קישור ההזמנה אינו תקין או שפג תוקפו. בקשו מהמנהל לשלוח הזמנה מחדש.",
+    setPasswordTitle: "הגדרת סיסמה",
+    setPasswordSubtitle: "בחרו סיסמה כדי להשלים את הפעלת החשבון.",
+    setPasswordPassword: "סיסמה חדשה",
+    setPasswordConfirm: "אימות סיסמה",
+    setPasswordHint: "לפחות 6 תווים.",
+    setPasswordSubmit: "שמירת סיסמה והמשך",
+    setPasswordSaving: "שומרים...",
+    setPasswordRequired: "יש למלא את שני שדות הסיסמה.",
+    setPasswordMismatch: "הסיסמאות אינן תואמות.",
+    setPasswordTooShort: "הסיסמה חייבת להכיל לפחות 6 תווים.",
+    setPasswordError: "לא ניתן לעדכן את הסיסמה. נסו שוב.",
   },
   store: {
     welcome: "ברוכים הבאים — שמחים שבאתם.",

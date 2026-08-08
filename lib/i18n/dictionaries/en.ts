@@ -278,6 +278,19 @@ export const en = {
     noProfileError:
       "Your account is connected but has no profile in the system. Contact your administrator.",
     unsupportedRoleError: "This account does not have permission to access the system.",
+    inviteFailedError:
+      "The invite link is invalid or expired. Ask your administrator to resend the invite.",
+    setPasswordTitle: "Set your password",
+    setPasswordSubtitle: "Choose a password to finish activating your account.",
+    setPasswordPassword: "New password",
+    setPasswordConfirm: "Confirm password",
+    setPasswordHint: "At least 6 characters.",
+    setPasswordSubmit: "Save password and continue",
+    setPasswordSaving: "Saving...",
+    setPasswordRequired: "Please fill in both password fields.",
+    setPasswordMismatch: "Passwords do not match.",
+    setPasswordTooShort: "Password must be at least 6 characters.",
+    setPasswordError: "Could not update password. Please try again.",
   },
   store: {
     welcome: "Welcome — glad you're here.",

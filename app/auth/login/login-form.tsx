@@ -33,11 +33,14 @@ export function LoginForm() {
       setMessage(dict.common.noStore);
     } else if (error === "unsupported_role") {
       setMessage(dict.auth.unsupportedRoleError);
+    } else if (error === "invite_failed") {
+      setMessage(dict.auth.inviteFailedError);
     }
   }, [
     searchParams,
     dict.auth.noProfileError,
     dict.auth.unsupportedRoleError,
+    dict.auth.inviteFailedError,
     dict.common.noStore,
   ]);
 

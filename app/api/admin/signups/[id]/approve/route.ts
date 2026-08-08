@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { requireApiSuperAdmin } from "@/lib/auth/api-auth";
 import { logAdminAction } from "@/lib/auth/audit-log";
-import { generateSecurePassword } from "@/lib/signups/generate-password";
 import { generateUniqueStoreSlug } from "@/lib/signups/generate-store-slug";
 import { createAdminClient } from "../../../../../../lib/supabase/admin";
+import { getSiteOrigin } from "@/lib/utils/public-menu-url";
 
 export async function POST(
   _req: Request,
@@ -43,7 +43,6 @@ export async function POST(
     }
 
     const slug = await generateUniqueStoreSlug(supabase, signup.restaurant_name);
-    const password = generateSecurePassword(12);
     const normalizedEmail = signup.email.trim().toLowerCase();
     const signupPlan = typeof signup.plan === "string" ? signup.plan : "";
     const knownPlans = ["small", "medium", "large"] as const;
@@ -66,16 +65,15 @@ export async function POST(
       );
     }
 
+    const origin = await getSiteOrigin();
     const { data: createdUser, error: userError } =
-      await supabase.auth.admin.createUser({
-        email: normalizedEmail,
-        password,
-        email_confirm: true,
+      await supabase.auth.admin.inviteUserByEmail(normalizedEmail, {
+        redirectTo: `${origin}/auth/callback?next=/auth/set-password`,
       });
 
     if (userError || !createdUser.user) {
       return NextResponse.json(
-        { error: "Failed to create owner user.", details: userError },
+        { error: "Failed to invite owner user.", details: userError },
         { status: 500 }
       );
     }
@@ -162,7 +160,6 @@ export async function POST(
       credentials: {
         full_name: signup.full_name,
         email: normalizedEmail,
-        password,
         store_slug: slug,
         store_name: store.name,
         dashboard_url: "/dashboard",

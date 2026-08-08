@@ -1,5 +1,7 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createClient } from "@/lib/supabase/server";
+import type { Database } from "@/types/db";
 
 const PROFILE_SELECT = "id, full_name, role, store_id";
 
@@ -10,9 +12,13 @@ type ProfileRow = {
   store_id: string | null;
 };
 
+type ProfileQueryClient = {
+  from: SupabaseClient<Database>["from"];
+};
+
 async function fetchProfileByUserId(
   userId: string,
-  client: Awaited<ReturnType<typeof createClient>>
+  client: ProfileQueryClient
 ) {
   const { data, error } = await client
     .from("profiles")

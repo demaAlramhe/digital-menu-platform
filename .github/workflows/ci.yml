@@ -19,3 +19,9 @@ jobs:
       - run: npm run lint
       - run: npm run typecheck
       - run: npm run build
+      - name: Generate types from live schema
+        run: npx supabase gen types typescript --project-id rfugdsubimdlakmvqyjm --schema public > /tmp/generated-types.ts
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      - name: Fail if types/db.ts is out of date
+        run: diff types/db.ts /tmp/generated-types.ts

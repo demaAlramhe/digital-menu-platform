@@ -9,6 +9,7 @@ import { DEFAULT_WELCOME_CTA } from "@/lib/content/default-welcome-cta";
 import type { ContentLocale } from "@/lib/content/pick-localized";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { TranslationStatus } from "@/lib/i18n/translation-status";
+import type { TablesUpdate } from "@/types/db";
 
 export type RetranslateStoreResult = {
   categoriesUpdated: number;
@@ -168,7 +169,7 @@ export async function retranslateStoreContent(
       buttonT = DEFAULT_WELCOME_CTA;
     }
 
-    const updatePayload: Record<string, unknown> = {
+    const updatePayload: TablesUpdate<"stores"> = {
       welcome_button_text: button || DEFAULT_WELCOME_CTA[sourceLocale],
       ...trilingualColumns("welcome_button_text", buttonT),
     };

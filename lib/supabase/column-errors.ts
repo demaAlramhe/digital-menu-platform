@@ -1,3 +1,5 @@
+import type { TablesUpdate } from "@/types/db";
+
 /** Postgres undefined_column */
 const PG_UNDEFINED_COLUMN = "42703";
 /** PostgREST: column missing from schema cache (common after ALTER without reload) */
@@ -35,15 +37,15 @@ export function isPostgresMissingColumnError(
 
 type SupabaseLikeError = { message?: string; code?: string } | null;
 
+type StoreUpdatePayload = TablesUpdate<"stores">;
+
 /**
  * Updates `stores` while omitting columns that are not migrated yet.
  * PostgREST returns PGRST204 when a column is absent from the schema cache.
  */
-export async function updateStoreOmittingMissingColumns<
-  T extends Record<string, unknown>,
->(
-  payload: T,
-  runUpdate: (payload: T) => Promise<{
+export async function updateStoreOmittingMissingColumns(
+  payload: StoreUpdatePayload,
+  runUpdate: (payload: StoreUpdatePayload) => Promise<{
     data: unknown;
     error: SupabaseLikeError;
   }>
@@ -52,7 +54,7 @@ export async function updateStoreOmittingMissingColumns<
   error: SupabaseLikeError;
   skippedColumns: string[];
 }> {
-  let current = { ...payload };
+  let current: StoreUpdatePayload = { ...payload };
   const skippedColumns: string[] = [];
   const maxAttempts = 20;
 
@@ -72,8 +74,9 @@ export async function updateStoreOmittingMissingColumns<
       return { data, error, skippedColumns };
     }
 
-    const { [missingColumn]: _removed, ...rest } = current;
-    current = rest as T;
+    const { [missingColumn]: _removed, ...rest } = current as StoreUpdatePayload &
+      Record<string, unknown>;
+    current = rest as StoreUpdatePayload;
     skippedColumns.push(missingColumn);
   }
 

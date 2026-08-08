@@ -5,13 +5,15 @@ import { dash } from "@/components/dashboard/ui/styles";
 import { createAdminClient } from "../../../lib/supabase/admin";
 import { requireSuperAdmin } from "@/lib/auth/require-super-admin";
 import { getTranslations } from "@/lib/i18n/server";
-import type { PendingSignupRow } from "@/types/db";
+import type { Tables } from "@/types/db";
 
 export const dynamic = "force-dynamic";
 
 type AdminSignupsPageProps = {
   searchParams: Promise<{ status?: string }>;
 };
+
+type PendingSignupRow = Tables<"pending_signups">;
 
 type SignupWithStore = PendingSignupRow & {
   store_slug: string | null;
