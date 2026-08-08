@@ -126,14 +126,6 @@ export default async function PricingPage() {
             </ul>
           </section>
 
-          <section className="mb-14 rounded-2xl border border-brand-secondary/40 bg-white p-6 text-center shadow-sm sm:mb-16 sm:p-8">
-            <p className="mx-auto max-w-2xl text-base leading-relaxed text-[#6b7280]">
-              <span dir="ltr" className="inline-block">
-                {pricing.monthlyFeeExplanation}
-              </span>
-            </p>
-          </section>
-
           <section className="rounded-3xl bg-brand-dark px-6 py-10 text-center shadow-[0_20px_60px_rgba(59,67,80,0.25)] sm:px-12 sm:py-12">
             <h2 className="text-xl font-bold text-white sm:text-2xl">
               {pricing.ctaUnsureTitle}

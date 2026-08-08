@@ -124,6 +124,7 @@ export default async function HomePage() {
               <HeroMenuMockup
                 imageSrc="/images/demoLogo.jpeg"
                 ariaLabel={dict.home.mockupAriaLabel}
+                tryLabel={dict.home.mockupTryLabel}
                 href="https://bel-afia-menu.com/haifa-restaurant/menu"
               />
             </div>

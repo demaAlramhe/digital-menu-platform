@@ -92,8 +92,6 @@ export const en = {
     largeMenuNote:
       "Menu larger than 80 items? Contact us for a custom quote",
     includedHeading: "Every tier includes the same full system",
-    monthlyFeeExplanation:
-      "₪99/month for all restaurants — includes hosting, AI translation, and basic support",
     ctaUnsureTitle: "Not sure which tier fits your menu?",
     ctaUnsureSubtitle:
       "Send us your item count and we'll get back to you with an exact price within hours",
@@ -247,6 +245,7 @@ export const en = {
     included9: "Import menu from Excel file",
     included10: "Save menu directly to phone home screen",
     mockupAriaLabel: "Preview of a digital menu on a phone",
+    mockupTryLabel: "Tap to try the menu",
     mockupStoreName: "Taste Kitchen",
     mockupItem1: "Shawarma",
     mockupItem2: "Classic Burger",

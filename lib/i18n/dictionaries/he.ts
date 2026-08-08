@@ -92,8 +92,6 @@ export const he = {
     largeMenuNote:
       "תפריט גדול מ-80 פריטים? צרו קשר לקבלת הצעת מחיר מותאמת",
     includedHeading: "כל הקטגוריות כוללות את אותה מערכת מלאה",
-    monthlyFeeExplanation:
-      "99₪ לחודש לכל המסעדות — כולל: אחסון, תרגום בבינה מלאכותית ותמיכה בסיסית",
     ctaUnsureTitle: "לא בטוחים באיזו קטגוריה התפריט שלכם?",
     ctaUnsureSubtitle:
       "שלחו לנו את מספר הפריטים ונחזור אליכם עם מחיר מדויק תוך שעות",
@@ -247,6 +245,7 @@ export const he = {
     included9: "ייבוא התפריט מקובץ Excel",
     included10: "שמירת התפריט ישירות על מסך הטלפון",
     mockupAriaLabel: "תצוגה מקדימה של תפריט דיגיטלי בטלפון",
+    mockupTryLabel: "לחצו לניסיון התפריט",
     mockupStoreName: "מסעדת הטעם",
     mockupItem1: "שווארמה",
     mockupItem2: "המבורגר",
