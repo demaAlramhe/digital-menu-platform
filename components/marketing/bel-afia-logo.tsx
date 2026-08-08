@@ -34,7 +34,7 @@ export function BelAfiaLogo({
       className={
         className
           ? `w-auto object-contain object-start ${className}`.trim()
-          : "h-10 w-auto object-contain object-start sm:h-12"
+          : "h-14 w-auto object-contain object-start sm:h-16"
       }
       priority={priority}
     />
