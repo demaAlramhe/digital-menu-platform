@@ -249,17 +249,13 @@ export default async function StoreMenuPage({ params }: MenuPageProps) {
 
   const featuredItems = items.filter((item) => item.is_featured);
 
-  const nonFeatured = items.filter((item) => !item.is_featured);
-
-
-
   const itemsByCategory = new Map<string, ResolvedMenuItem[]>();
 
   const uncategorized: ResolvedMenuItem[] = [];
 
 
 
-  for (const item of nonFeatured) {
+  for (const item of items) {
 
     if (item.category_id && activeCategoryIds.has(item.category_id)) {
 
