@@ -2,7 +2,11 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
 import { categoryBelongsToStore } from "@/lib/auth/verify-store-resource";
-import { normalizeSlug } from "@/lib/utils/slug";
+import {
+  ensureUniqueSlug,
+  normalizeSlug,
+  slugFromName,
+} from "@/lib/utils/slug";
 import {
   translateContentFields,
   type TranslateFieldInput,
@@ -131,6 +135,17 @@ export async function POST(req: Request) {
       );
     }
 
+    const providedSlug = slug?.trim();
+    const baseSlug = providedSlug
+      ? normalizeSlug(providedSlug)
+      : slugFromName(nameTrimmed);
+    const uniqueSlug = await ensureUniqueSlug(
+      supabase,
+      "menu_items",
+      storeId,
+      baseSlug || slugFromName(nameTrimmed)
+    );
+
     const { data: menuItem, error: menuItemError } = await supabase
       .from("menu_items")
       .insert({
@@ -138,7 +153,7 @@ export async function POST(req: Request) {
         category_id: resolvedCategoryId,
         name: nameTrimmed,
         ...trilingualColumns("name", nameT),
-        slug: normalizeSlug(slug),
+        slug: uniqueSlug,
         description: descriptionTrimmed || null,
         ...trilingualColumns("description", descT),
         image_url: imageUrl || null,

@@ -19,7 +19,6 @@ import {
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
 import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
-import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = { id: string; name: string };
 
@@ -45,7 +44,6 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
   const { dict } = useLocale();
 
   const [name, setName] = useState(menuItem.name);
-  const [slug, setSlug] = useState(menuItem.slug);
   const [description, setDescription] = useState(menuItem.description);
   const [price, setPrice] = useState(String(menuItem.price));
   const [originalPrice, setOriginalPrice] = useState(
@@ -63,7 +61,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
     e.preventDefault();
     setMessage("");
 
-    if (!name.trim() || !slug.trim() || !price.trim()) {
+    if (!name.trim() || !price.trim()) {
       setMessage(dict.menuItems.requiredFields);
       return;
     }
@@ -75,7 +73,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          slug: normalizeSlug(slug),
+          slug: menuItem.slug,
           description,
           price: Number(price),
           original_price:
@@ -111,9 +109,6 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
       <FormSection title={dict.menuItems.editTitle}>
         <FormField label={dict.common.name}>
           <FormInput value={name} onChange={(e) => setName(e.target.value)} />
-        </FormField>
-        <FormField label={dict.common.slug}>
-          <FormInput value={slug} onChange={(e) => setSlug(e.target.value)} />
         </FormField>
         <FormField label={dict.common.description}>
           <FormTextarea value={description} onChange={(e) => setDescription(e.target.value)} rows={4} />

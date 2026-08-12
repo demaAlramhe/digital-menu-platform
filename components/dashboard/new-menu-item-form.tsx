@@ -18,7 +18,6 @@ import {
 import { CLOUDINARY_FOLDERS } from "@/lib/cloudinary/folders";
 import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
 import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
-import { normalizeSlug } from "@/lib/utils/slug";
 
 type CategoryOption = {
   id: string;
@@ -38,7 +37,6 @@ export function NewMenuItemForm({
   const { dict } = useLocale();
 
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [sortOrder, setSortOrder] = useState("0");
@@ -57,7 +55,7 @@ export function NewMenuItemForm({
     e.preventDefault();
     setMessage("");
 
-    if (!name.trim() || !slug.trim() || !price.trim()) {
+    if (!name.trim() || !price.trim()) {
       setMessage(dict.menuItems.requiredFields);
       return;
     }
@@ -70,7 +68,6 @@ export function NewMenuItemForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          slug: normalizeSlug(slug),
           description,
           price: Number(price),
           sortOrder: Number(sortOrder || 0),
@@ -113,15 +110,6 @@ export function NewMenuItemForm({
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={dict.menuItems.placeholders.name}
-          />
-        </FormField>
-
-        <FormField label={dict.common.slug}>
-          <FormInput
-            type="text"
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder={dict.menuItems.placeholders.slug}
           />
         </FormField>
 

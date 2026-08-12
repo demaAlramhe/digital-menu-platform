@@ -14,14 +14,12 @@ import {
 } from "@/components/dashboard/ui/form";
 import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
 import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
-import { normalizeSlug } from "@/lib/utils/slug";
 
 export function NewCategoryForm() {
   const router = useRouter();
   const { dict } = useLocale();
 
   const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
   const [sortOrder, setSortOrder] = useState("0");
   const [isActive, setIsActive] = useState(true);
   const [loading, setLoading] = useState(false);
@@ -31,7 +29,7 @@ export function NewCategoryForm() {
     e.preventDefault();
     setMessage("");
 
-    if (!name.trim() || !slug.trim()) {
+    if (!name.trim()) {
       setMessage(dict.categories.requiredFields);
       return;
     }
@@ -43,7 +41,6 @@ export function NewCategoryForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          slug: normalizeSlug(slug),
           sortOrder: Number(sortOrder || 0),
           isActive,
         }),
@@ -75,13 +72,6 @@ export function NewCategoryForm() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder={dict.categories.placeholders.name}
-          />
-        </FormField>
-        <FormField label={dict.common.slug}>
-          <FormInput
-            value={slug}
-            onChange={(e) => setSlug(e.target.value)}
-            placeholder={dict.categories.placeholders.slug}
           />
         </FormField>
         <FormField label={dict.common.sortOrder}>

@@ -15,7 +15,6 @@ import {
 } from "@/components/dashboard/ui/form";
 import { buildSuccessQuery } from "@/lib/dashboard/build-success-query";
 import { getTranslationStatusFromResponse } from "@/lib/dashboard/parse-save-response";
-import { normalizeSlug } from "@/lib/utils/slug";
 
 type EditCategoryFormProps = {
   category: {
@@ -32,7 +31,6 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
   const { dict } = useLocale();
 
   const [name, setName] = useState(category.name);
-  const [slug, setSlug] = useState(category.slug);
   const [sortOrder, setSortOrder] = useState(String(category.sortOrder));
   const [isActive, setIsActive] = useState(category.isActive);
   const [loading, setLoading] = useState(false);
@@ -42,7 +40,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
     e.preventDefault();
     setMessage("");
 
-    if (!name.trim() || !slug.trim()) {
+    if (!name.trim()) {
       setMessage(dict.categories.requiredFields);
       return;
     }
@@ -54,7 +52,7 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: name.trim(),
-          slug: normalizeSlug(slug),
+          slug: category.slug,
           sortOrder: Number(sortOrder || 0),
           isActive,
         }),
@@ -83,9 +81,6 @@ export function EditCategoryForm({ category }: EditCategoryFormProps) {
       <FormSection title={dict.categories.editTitle}>
         <FormField label={dict.common.name}>
           <FormInput value={name} onChange={(e) => setName(e.target.value)} />
-        </FormField>
-        <FormField label={dict.common.slug}>
-          <FormInput value={slug} onChange={(e) => setSlug(e.target.value)} />
         </FormField>
         <FormField label={dict.common.sortOrder}>
           <FormInput type="number" value={sortOrder} onChange={(e) => setSortOrder(e.target.value)} />

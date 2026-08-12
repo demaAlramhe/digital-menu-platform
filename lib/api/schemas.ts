@@ -28,14 +28,32 @@ export const storeSettingsPatchSchema = z.object({
 
 export const menuCategoryPostSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
+  slug: z.string().trim().optional(),
+  sortOrder: z.number().int().optional(),
+  isActive: z.boolean().optional(),
+});
+
+export const menuCategoryPatchSchema = z.object({
+  name: z.string().trim().min(1, "Name is required."),
   slug: z.string().trim().min(1, "Slug is required."),
   sortOrder: z.number().int().optional(),
   isActive: z.boolean().optional(),
 });
 
-export const menuCategoryPatchSchema = menuCategoryPostSchema;
-
 export const menuItemPostSchema = z.object({
+  name: z.string().trim().min(1, "Name is required."),
+  slug: z.string().trim().optional(),
+  description: optionalString,
+  price: z.number({ message: "Price is required." }).nonnegative(),
+  original_price: z.number().positive().optional().nullable(),
+  isActive: z.boolean().optional(),
+  isFeatured: z.boolean().optional(),
+  sortOrder: z.number().int().optional(),
+  imageUrl: optionalUrl,
+  categoryId: z.string().uuid().nullable().optional(),
+});
+
+export const menuItemPatchSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
   slug: z.string().trim().min(1, "Slug is required."),
   description: optionalString,
@@ -47,8 +65,6 @@ export const menuItemPostSchema = z.object({
   imageUrl: optionalUrl,
   categoryId: z.string().uuid().nullable().optional(),
 });
-
-export const menuItemPatchSchema = menuItemPostSchema;
 
 export const cloudinarySignSchema = z.object({
   folder: z

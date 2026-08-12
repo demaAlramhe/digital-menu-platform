@@ -3,7 +3,7 @@ import { z } from "zod";
 import type { CSVRow } from "@/lib/dashboard/csv-import";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
-import { normalizeSlug } from "@/lib/utils/slug";
+import { ensureUniqueSlug, slugFromName } from "@/lib/utils/slug";
 import {
   translateContentFields,
   type TranslateFieldInput,
@@ -27,36 +27,6 @@ const menuItemImportSchema = z.object({
     .min(1)
     .max(300, "Too many rows — please split into smaller files of 300 items or fewer."),
 });
-
-function slugFromName(name: string, fallbackIndex: number): string {
-  const normalized = normalizeSlug(name);
-  return normalized || `item-${fallbackIndex}`;
-}
-
-async function ensureUniqueSlug(
-  supabase: ReturnType<typeof createAdminClient>,
-  storeId: string,
-  baseSlug: string
-): Promise<string> {
-  let slug = baseSlug;
-  let suffix = 2;
-
-  while (true) {
-    const { data } = await supabase
-      .from("menu_items")
-      .select("id")
-      .eq("store_id", storeId)
-      .eq("slug", slug)
-      .maybeSingle();
-
-    if (!data) {
-      return slug;
-    }
-
-    slug = `${baseSlug}-${suffix}`;
-    suffix++;
-  }
-}
 
 async function importMenuItemRow(
   storeId: string,
@@ -107,7 +77,12 @@ async function importMenuItemRow(
   }
 
   const baseSlug = slugFromName(nameTrimmed, rowIndex);
-  const slug = await ensureUniqueSlug(supabase, storeId, baseSlug);
+  const slug = await ensureUniqueSlug(
+    supabase,
+    "menu_items",
+    storeId,
+    baseSlug
+  );
 
   const { error: menuItemError } = await supabase.from("menu_items").insert({
     store_id: storeId,

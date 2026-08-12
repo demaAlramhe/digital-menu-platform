@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { resolveOwnerStoreIdForApi } from "@/lib/auth/resolve-owner-store";
-import { normalizeSlug } from "@/lib/utils/slug";
+import {
+  ensureUniqueSlug,
+  normalizeSlug,
+  slugFromName,
+} from "@/lib/utils/slug";
 import { translateContentFields } from "@/lib/ai/translate-content";
 import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
@@ -33,13 +37,24 @@ export async function POST(req: Request) {
     const nameT = translations.name;
     const supabase = createAdminClient();
 
+    const providedSlug = slug?.trim();
+    const baseSlug = providedSlug
+      ? normalizeSlug(providedSlug)
+      : slugFromName(nameTrimmed);
+    const uniqueSlug = await ensureUniqueSlug(
+      supabase,
+      "menu_categories",
+      storeId,
+      baseSlug || slugFromName(nameTrimmed)
+    );
+
     const { data: category, error: categoryError } = await supabase
       .from("menu_categories")
       .insert({
         store_id: storeId,
         name: nameTrimmed,
         ...trilingualColumns("name", nameT),
-        slug: normalizeSlug(slug),
+        slug: uniqueSlug,
         sort_order: sortOrder ?? 0,
         is_active: isActive ?? true,
       })
