@@ -110,7 +110,7 @@ export async function middleware(request: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax" as const,
       path: "/",
-      maxAge: Math.floor(idleTimeoutMs / 1000),
+      maxAge: Math.floor(idleTimeoutMs / 1000) + 5 * 60, // +5 min buffer
     };
 
     const lastActivity = request.cookies.get("last_activity")?.value;
