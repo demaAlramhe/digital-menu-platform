@@ -96,6 +96,57 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(url);
     }
 
+    const parsedIdleMinutes = Number.parseInt(
+      process.env.IDLE_TIMEOUT_MINUTES ?? "",
+      10
+    );
+    const idleTimeoutMinutes =
+      Number.isFinite(parsedIdleMinutes) && parsedIdleMinutes > 0
+        ? parsedIdleMinutes
+        : 30;
+    const idleTimeoutMs = idleTimeoutMinutes * 60 * 1000;
+    const lastActivityCookieOptions = {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax" as const,
+      path: "/",
+      maxAge: Math.floor(idleTimeoutMs / 1000),
+    };
+
+    const lastActivity = request.cookies.get("last_activity")?.value;
+    if (!lastActivity) {
+      response.cookies.set(
+        "last_activity",
+        String(Date.now()),
+        lastActivityCookieOptions
+      );
+    } else {
+      const lastActivityAt = Number(lastActivity);
+      if (Date.now() - lastActivityAt > idleTimeoutMs) {
+        const url = request.nextUrl.clone();
+        url.pathname = "/auth/login";
+        url.search = "?error=session_expired";
+        const redirectResponse = NextResponse.redirect(url);
+
+        // signOut() writes session-clearing cookies via setAll onto `response`.
+        // Point that binding at the redirect first, and copy cookies already
+        // set on the next() response (locale, token refresh) so they are not lost.
+        for (const cookie of response.cookies.getAll()) {
+          redirectResponse.cookies.set(cookie);
+        }
+        response = redirectResponse;
+        await supabase.auth.signOut();
+        response.cookies.delete("last_activity");
+        return response;
+      }
+
+      response.cookies.set(
+        "last_activity",
+        String(Date.now()),
+        lastActivityCookieOptions
+      );
+    }
+
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")

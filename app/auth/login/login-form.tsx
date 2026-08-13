@@ -35,12 +35,15 @@ export function LoginForm() {
       setMessage(dict.auth.unsupportedRoleError);
     } else if (error === "invite_failed") {
       setMessage(dict.auth.inviteFailedError);
+    } else if (error === "session_expired") {
+      setMessage(dict.auth.sessionExpiredError);
     }
   }, [
     searchParams,
     dict.auth.noProfileError,
     dict.auth.unsupportedRoleError,
     dict.auth.inviteFailedError,
+    dict.auth.sessionExpiredError,
     dict.common.noStore,
   ]);
 

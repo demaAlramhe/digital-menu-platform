@@ -290,6 +290,8 @@ export const he = {
     unsupportedRoleError: "לחשבון זה אין הרשאה לגשת למערכת.",
     inviteFailedError:
       "קישור ההזמנה אינו תקין או שפג תוקפו. בקשו מהמנהל לשלוח הזמנה מחדש.",
+    sessionExpiredError:
+      "פג תוקף ההפעלה שלך עקב חוסר פעילות, נא להתחבר מחדש",
     setPasswordTitle: "הגדרת סיסמה",
     setPasswordSubtitle: "בחרו סיסמה כדי להשלים את הפעלת החשבון.",
     setPasswordPassword: "סיסמה חדשה",

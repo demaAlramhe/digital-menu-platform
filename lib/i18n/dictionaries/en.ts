@@ -290,6 +290,8 @@ export const en = {
     unsupportedRoleError: "This account does not have permission to access the system.",
     inviteFailedError:
       "The invite link is invalid or expired. Ask your administrator to resend the invite.",
+    sessionExpiredError:
+      "Your session expired due to inactivity. Please sign in again.",
     setPasswordTitle: "Set your password",
     setPasswordSubtitle: "Choose a password to finish activating your account.",
     setPasswordPassword: "New password",

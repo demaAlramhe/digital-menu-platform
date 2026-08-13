@@ -290,6 +290,8 @@ export const ar: Dictionary = {
     unsupportedRoleError: "هذا الحساب غير مصرح له بالوصول إلى النظام.",
     inviteFailedError:
       "رابط الدعوة غير صالح أو منتهي الصلاحية. اطلب من المدير إعادة إرسال الدعوة.",
+    sessionExpiredError:
+      "انتهت جلستك بسبب عدم النشاط، الرجاء تسجيل الدخول مجدداً",
     setPasswordTitle: "تعيين كلمة المرور",
     setPasswordSubtitle: "اختر كلمة مرور لإكمال تفعيل حسابك.",
     setPasswordPassword: "كلمة المرور الجديدة",
