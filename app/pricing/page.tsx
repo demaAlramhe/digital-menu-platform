@@ -47,7 +47,7 @@ export default async function PricingPage() {
                 const highlight = SIZE_TIER_HIGHLIGHT[tierId];
                 const monthlyPlus = pricing.monthlyPlus.replace(
                   "{fee}",
-                  pricing.monthlyFee
+                  tier.monthlyFee
                 );
 
                 return (

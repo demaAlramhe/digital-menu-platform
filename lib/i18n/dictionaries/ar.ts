@@ -97,22 +97,24 @@ export const ar: Dictionary = {
     ctaUnsureSubtitle:
       "ابعتلنا عدد الأصناف وبنرجعلك بالسعر الدقيق خلال ساعات",
     ctaUnsureButton: "اطلب الخدمة",
-    monthlyFee: "99₪",
     tiers: {
       small: {
         name: "صغير",
         itemRange: "حتى 25 صنف",
         setupPrice: "499₪",
+        monthlyFee: "99₪",
       },
       medium: {
         name: "متوسط",
         itemRange: "26-50 صنف",
         setupPrice: "799₪",
+        monthlyFee: "149₪",
       },
       large: {
         name: "كبير",
         itemRange: "51-80 صنف",
         setupPrice: "1,199₪",
+        monthlyFee: "199₪",
       },
     },
     includedFeatures: [

@@ -96,22 +96,24 @@ export const en = {
     ctaUnsureSubtitle:
       "Send us your item count and we'll get back to you with an exact price within hours",
     ctaUnsureButton: "Request service",
-    monthlyFee: "99₪",
     tiers: {
       small: {
         name: "Small",
         itemRange: "Up to 25 items",
         setupPrice: "499₪",
+        monthlyFee: "99₪",
       },
       medium: {
         name: "Medium",
         itemRange: "26–50 items",
         setupPrice: "799₪",
+        monthlyFee: "149₪",
       },
       large: {
         name: "Large",
         itemRange: "51–80 items",
         setupPrice: "1,199₪",
+        monthlyFee: "199₪",
       },
     },
     includedFeatures: [

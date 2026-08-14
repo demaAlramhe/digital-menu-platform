@@ -96,22 +96,24 @@ export const he = {
     ctaUnsureSubtitle:
       "שלחו לנו את מספר הפריטים ונחזור אליכם עם מחיר מדויק תוך שעות",
     ctaUnsureButton: "בקשת שירות",
-    monthlyFee: "99₪",
     tiers: {
       small: {
         name: "קטן",
         itemRange: "עד 25 פריטים",
         setupPrice: "499₪",
+        monthlyFee: "99₪",
       },
       medium: {
         name: "בינוני",
         itemRange: "26–50 פריטים",
         setupPrice: "799₪",
+        monthlyFee: "149₪",
       },
       large: {
         name: "גדול",
         itemRange: "51–80 פריטים",
         setupPrice: "1,199₪",
+        monthlyFee: "199₪",
       },
     },
     includedFeatures: [
