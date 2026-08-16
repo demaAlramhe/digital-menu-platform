@@ -26,7 +26,7 @@ export default async function RootLayout({
   const dir = getDirection(locale);
 
   return (
-    <html lang={locale} dir={dir}>
+    <html lang={locale} dir={dir} suppressHydrationWarning>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <meta name="theme-color" content="#3b4350" />
@@ -41,7 +41,7 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: getAccessibilityBootScript() }}
         />
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <LocaleProvider locale={locale} dict={dict}>
           {children}
           <AccessibilityWidget />
