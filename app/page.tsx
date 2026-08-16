@@ -101,7 +101,7 @@ export default async function HomePage() {
                 </Link>
                 <Link
                   href="/pricing"
-                  className={`flex min-h-12 w-full items-center justify-center rounded-xl border border-brand-dark bg-white px-8 text-base font-semibold text-brand-dark shadow-sm transition hover:bg-brand-dark/5 active:scale-[0.98] sm:w-auto ${linkFocus}`}
+                  className={`flex min-h-12 w-full items-center justify-center rounded-xl border border-brand-dark bg-white px-8 text-base font-semibold text-brand-dark shadow-sm transition hover:bg-brand-dark/5 active:scale-[0.98] sm:w-auto motion-safe:animate-[pricing-cta-glow_2.5s_ease-in-out_infinite] ${linkFocus}`}
                 >
                   {dict.hero.viewPricing}
                 </Link>

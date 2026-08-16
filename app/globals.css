@@ -162,3 +162,13 @@ html.a11y-reduce-motion .a11y-panel-enter {
     transform: translateY(-5px);
   }
 }
+
+@keyframes pricing-cta-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(212, 184, 122, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(212, 184, 122, 0);
+  }
+}
