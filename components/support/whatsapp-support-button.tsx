@@ -44,7 +44,7 @@ export function WhatsAppSupportButton() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={dict.support.ariaLabel}
-      className="fixed z-50 end-4 bottom-[max(5.25rem,calc(env(safe-area-inset-bottom)+4.25rem))] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-[filter,transform] hover:brightness-110 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C7E]"
+      className="fixed z-50 start-4 bottom-[max(1rem,env(safe-area-inset-bottom))] flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-[0_8px_24px_rgba(0,0,0,0.28)] transition-[filter,transform] hover:brightness-110 active:scale-[0.97] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#128C7E] sm:start-5"
     >
       <WhatsAppIcon className="h-7 w-7 shrink-0 text-white" />
     </a>
