@@ -72,7 +72,7 @@ export default async function HomePage() {
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(59,67,80,0.06),_transparent_55%)]"
           aria-hidden
         />
-        <div className="relative mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20 lg:py-24">
+        <div className="relative mx-auto max-w-6xl px-4 pt-8 pb-16 sm:px-6 sm:py-20 lg:py-24">
           <div className="flex flex-col items-center gap-12 text-center lg:flex-row lg:items-center lg:justify-between lg:gap-16">
             <div className="flex w-full max-w-2xl flex-col items-center justify-center text-center lg:flex-1 lg:self-stretch">
               <HeroLogoTilt
