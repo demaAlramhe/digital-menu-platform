@@ -660,4 +660,9 @@ export const he = {
       storeAddress: "כתובת העסק",
     },
   },
+  support: {
+    ariaLabel: "צרו קשר בוואטסאפ",
+    preSaleMessage: "שלום, רציתי לשמוע עוד על Bel Afia לפני ההרשמה",
+    postSaleMessage: "שלום, יש לי שאלה לגבי החשבון שלי ב-Bel Afia",
+  },
 } as const;

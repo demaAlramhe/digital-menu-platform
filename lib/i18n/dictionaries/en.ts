@@ -662,4 +662,9 @@ export const en = {
       storeAddress: "Store address",
     },
   },
+  support: {
+    ariaLabel: "Contact us on WhatsApp",
+    preSaleMessage: "Hi, I'd like to learn more about Bel Afia before signing up",
+    postSaleMessage: "Hi, I have a question about my Bel Afia account",
+  },
 } as const;

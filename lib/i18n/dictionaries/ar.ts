@@ -661,4 +661,9 @@ export const ar: Dictionary = {
       storeAddress: "عنوان المتجر",
     },
   },
+  support: {
+    ariaLabel: "تواصل معنا عبر واتساب",
+    preSaleMessage: "مرحباً، بدي أستفسر عن خدمة Bel Afia قبل الاشتراك",
+    postSaleMessage: "مرحباً، عندي استفسار بخصوص حسابي بـ Bel Afia",
+  },
 };

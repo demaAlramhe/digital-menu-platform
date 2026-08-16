@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { AccessibilityWidget } from "@/components/accessibility/accessibility-widget";
 import { LocaleProvider } from "@/components/i18n/locale-provider";
+import { WhatsAppSupportButton } from "@/components/support/whatsapp-support-button";
 import { getAccessibilityBootScript } from "@/lib/accessibility/boot-script";
 import { getDirection } from "@/lib/i18n";
 import { getTranslations } from "@/lib/i18n/server";
@@ -44,6 +45,7 @@ export default async function RootLayout({
         <LocaleProvider locale={locale} dict={dict}>
           {children}
           <AccessibilityWidget />
+          <WhatsAppSupportButton />
         </LocaleProvider>
       </body>
     </html>
