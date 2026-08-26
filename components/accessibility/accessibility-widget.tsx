@@ -270,7 +270,7 @@ function AccessibilityControlUI({
 
   return (
     <div
-      className="a11y-widget-root fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[90] flex flex-col items-end gap-2 sm:end-5"
+      className="a11y-widget-root fixed end-4 bottom-[max(1rem,env(safe-area-inset-bottom))] z-[90] flex flex-col items-end gap-2 sm:end-5 print:hidden"
       dir={dir}
     >
       {panel}
