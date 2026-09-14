@@ -1,7 +1,6 @@
 "use client";
 
 import { useLocale } from "@/components/i18n/locale-provider";
-import { formatMessage } from "@/lib/i18n";
 import { calculateDiscount } from "@/lib/storefront/discount";
 import {
   premiumGlassTileStyle,
@@ -53,9 +52,6 @@ export function MenuItemCard({
   const showDiscountUi = showDiscount || hasDiscount;
   const variants = item.variants ?? [];
   const hasVariants = variants.length > 0;
-  const minVariantPrice = hasVariants
-    ? Math.min(...variants.map((variant) => variant.price))
-    : item.price;
 
   if (layout === "scroll") {
     return (
@@ -98,10 +94,10 @@ export function MenuItemCard({
         </h3>
 
         {hasVariants ? (
-          <p className="text-sm font-bold text-amber-400">
-            {formatMessage(dict.menu.fromPrice, {
-              price: formatPrice(minVariantPrice),
-            })}
+          <p className="line-clamp-2 text-xs font-semibold leading-snug text-amber-400">
+            {variants
+              .map((v) => `${v.name} ${dict.common.currency}${formatPrice(v.price)}`)
+              .join(" · ")}
           </p>
         ) : showDiscountUi && hasDiscount && item.original_price != null ? (
           <div className="flex flex-wrap items-center gap-1.5">
