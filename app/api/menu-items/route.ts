@@ -15,6 +15,10 @@ import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuItemPostSchema } from "@/lib/api/schemas";
+import {
+  insertMenuItemVariants,
+  variantTranslateInputs,
+} from "@/lib/api/menu-item-variants";
 import { getPlanItemLimit } from "@/lib/billing/plan-limits";
 
 export async function POST(req: Request) {
@@ -35,6 +39,7 @@ export async function POST(req: Request) {
       sortOrder,
       imageUrl,
       categoryId,
+      variants,
     } = parsed.data;
 
     const { storeId, errorResponse } = await resolveOwnerStoreIdForApi();
@@ -84,6 +89,8 @@ export async function POST(req: Request) {
     const nameTrimmed = name.trim();
     const descriptionTrimmed = description?.trim() ?? "";
 
+    const variantsToInsert = variants ?? [];
+
     const translateInputs: TranslateFieldInput[] = [
       { key: "name", text: nameTrimmed, kind: "menu_item_name" },
     ];
@@ -94,6 +101,7 @@ export async function POST(req: Request) {
         kind: "menu_item_description",
       });
     }
+    translateInputs.push(...variantTranslateInputs(variantsToInsert));
 
     const { translations, status: translationStatus } =
       await translateContentFields(sourceLocale, translateInputs);
@@ -171,6 +179,26 @@ export async function POST(req: Request) {
         { error: "Failed to create menu item.", details: menuItemError },
         { status: 500 }
       );
+    }
+
+    if (variantsToInsert.length > 0) {
+      const { error: variantsError } = await insertMenuItemVariants(
+        supabase,
+        menuItem.id,
+        variantsToInsert,
+        translations
+      );
+
+      if (variantsError) {
+        await supabase.from("menu_items").delete().eq("id", menuItem.id);
+        return NextResponse.json(
+          {
+            error: "Failed to create menu item variants.",
+            details: variantsError,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({

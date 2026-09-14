@@ -23,21 +23,28 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
   const { menuItemId } = await params;
   const supabase = getOwnerStoreAdminClient();
 
-  const [{ data: menuItem, error }, { data: categories }] = await Promise.all([
-    supabase
-      .from("menu_items")
-      .select("*")
-      .eq("id", menuItemId)
-      .eq("store_id", storeId)
-      .is("deleted_at", null)
-      .single(),
-    supabase
-      .from("menu_categories")
-      .select("id, name")
-      .eq("store_id", storeId)
-      .is("deleted_at", null)
-      .order("sort_order", { ascending: true }),
-  ]);
+  const [{ data: menuItem, error }, { data: categories }, { data: variants }] =
+    await Promise.all([
+      supabase
+        .from("menu_items")
+        .select("*")
+        .eq("id", menuItemId)
+        .eq("store_id", storeId)
+        .is("deleted_at", null)
+        .single(),
+      supabase
+        .from("menu_categories")
+        .select("id, name")
+        .eq("store_id", storeId)
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true }),
+      supabase
+        .from("menu_item_variants")
+        .select("id, name, price, sort_order")
+        .eq("menu_item_id", menuItemId)
+        .is("deleted_at", null)
+        .order("sort_order", { ascending: true }),
+    ]);
 
   if (error || !menuItem) {
     notFound();
@@ -74,6 +81,11 @@ export default async function EditMenuItemPage({ params }: EditMenuItemPageProps
           isActive: menuItem.is_active,
           isFeatured: menuItem.is_featured ?? false,
           imageUrl: menuItem.image_url ?? "",
+          variants: (variants ?? []).map((variant) => ({
+            id: variant.id,
+            name: variant.name,
+            price: Number(variant.price),
+          })),
         }}
         categories={(categories ?? []).map((c) => ({
           id: c.id,

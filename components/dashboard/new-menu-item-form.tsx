@@ -4,6 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import {
+  collectValidVariants,
+  MenuItemVariantsFields,
+  type VariantDraft,
+} from "@/components/dashboard/menu-item-variants-fields";
 import { PrimarySubmitButton } from "@/components/dashboard/ui/buttons";
 import {
   CheckboxField,
@@ -48,6 +53,8 @@ export function NewMenuItemForm({
   const [isActive, setIsActive] = useState(true);
   const [isFeatured, setIsFeatured] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [hasVariants, setHasVariants] = useState(false);
+  const [variantRows, setVariantRows] = useState<VariantDraft[]>([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -57,6 +64,12 @@ export function NewMenuItemForm({
 
     if (!name.trim() || !price.trim()) {
       setMessage(dict.menuItems.requiredFields);
+      return;
+    }
+
+    const variants = hasVariants ? collectValidVariants(variantRows) : undefined;
+    if (hasVariants && (!variants || variants.length === 0)) {
+      setMessage(dict.menuItems.variantsRequired);
       return;
     }
 
@@ -75,6 +88,7 @@ export function NewMenuItemForm({
           isActive,
           isFeatured,
           imageUrl,
+          ...(variants && variants.length > 0 ? { variants } : {}),
         }),
       });
 
@@ -169,7 +183,16 @@ export function NewMenuItemForm({
             />
           </FormField>
         </div>
+      </FormSection>
 
+      <MenuItemVariantsFields
+        enabled={hasVariants}
+        onEnabledChange={setHasVariants}
+        rows={variantRows}
+        onRowsChange={setVariantRows}
+      />
+
+      <FormSection>
         <CheckboxField
           id="isActive"
           label={dict.menuItems.activeItem}

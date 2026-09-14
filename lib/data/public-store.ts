@@ -24,12 +24,28 @@ function isMissingColumnError(error: { message?: string; code?: string } | null)
   );
 }
 
+function isMissingRelationError(error: { message?: string; code?: string } | null) {
+  if (!error) return false;
+  const message = (error.message ?? "").toLowerCase();
+  return (
+    error.code === "PGRST200" ||
+    error.code === "PGRST205" ||
+    error.code === "42P01" ||
+    message.includes("could not find a relationship") ||
+    message.includes("could not find the table") ||
+    message.includes("menu_item_variants")
+  );
+}
+
 const CATEGORY_SELECT_FULL =
   "id, name, name_ar, name_he, name_en, slug, sort_order";
 const CATEGORY_SELECT_LEGACY = "id, name, slug, sort_order";
 
+const VARIANT_SELECT =
+  "id, name, name_ar, name_he, name_en, price, sort_order, is_active, deleted_at";
 const ITEM_SELECT_FULL =
   "id, name, name_ar, name_he, name_en, description, description_ar, description_he, description_en, price, image_url, is_featured, sort_order, category_id";
+const ITEM_SELECT_FULL_WITH_VARIANTS = `${ITEM_SELECT_FULL}, menu_item_variants(${VARIANT_SELECT})`;
 const ITEM_SELECT_LEGACY =
   "id, name, description, price, image_url, is_featured, sort_order, category_id";
 
@@ -76,13 +92,30 @@ export async function getPublicMenuForStore(storeId: string) {
       ? categoriesFull.error
       : null;
 
-  const itemsFull = await supabase
+  const itemsWithVariants = await supabase
     .from("menu_items")
-    .select(ITEM_SELECT_FULL)
+    .select(ITEM_SELECT_FULL_WITH_VARIANTS)
     .eq("store_id", storeId)
     .eq("is_active", true)
     .is("deleted_at", null)
-    .order("sort_order", { ascending: true });
+    .eq("menu_item_variants.is_active", true)
+    .is("menu_item_variants.deleted_at", null)
+    .order("sort_order", { ascending: true })
+    .order("sort_order", {
+      referencedTable: "menu_item_variants",
+      ascending: true,
+    });
+
+  const itemsFull =
+    itemsWithVariants.error && isMissingRelationError(itemsWithVariants.error)
+      ? await supabase
+          .from("menu_items")
+          .select(ITEM_SELECT_FULL)
+          .eq("store_id", storeId)
+          .eq("is_active", true)
+          .is("deleted_at", null)
+          .order("sort_order", { ascending: true })
+      : itemsWithVariants;
 
   const menuItems =
     itemsFull.error && isMissingColumnError(itemsFull.error)

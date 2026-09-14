@@ -91,6 +91,12 @@ function toMenuItemDisplay(item: ResolvedMenuItem): MenuItemDisplay {
 
     is_featured: item.is_featured,
 
+    ...(item.variants && item.variants.length > 0
+
+      ? { variants: item.variants }
+
+      : {}),
+
   };
 
 }

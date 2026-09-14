@@ -40,6 +40,19 @@ export const menuCategoryPatchSchema = z.object({
   isActive: z.boolean().optional(),
 });
 
+export const menuItemVariantSchema = z.object({
+  id: z.string().uuid().optional(),
+  name: z.string().trim().min(1, "Variant name is required."),
+  price: z.number().nonnegative(),
+  sortOrder: z.number().int().optional(),
+});
+
+export const menuItemVariantsSchema = z
+  .array(menuItemVariantSchema)
+  .min(0)
+  .max(6)
+  .optional();
+
 export const menuItemPostSchema = z.object({
   name: z.string().trim().min(1, "Name is required."),
   slug: z.string().trim().optional(),
@@ -51,6 +64,7 @@ export const menuItemPostSchema = z.object({
   sortOrder: z.number().int().optional(),
   imageUrl: optionalUrl,
   categoryId: z.string().uuid().nullable().optional(),
+  variants: menuItemVariantsSchema,
 });
 
 export const menuItemPatchSchema = z.object({
@@ -64,6 +78,7 @@ export const menuItemPatchSchema = z.object({
   sortOrder: z.number().int().optional(),
   imageUrl: optionalUrl,
   categoryId: z.string().uuid().nullable().optional(),
+  variants: menuItemVariantsSchema,
 });
 
 export const cloudinarySignSchema = z.object({

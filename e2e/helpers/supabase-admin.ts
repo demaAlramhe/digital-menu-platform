@@ -20,6 +20,27 @@ export function createE2EAdminClient() {
   });
 }
 
+/** Authenticated user client (anon key + password) so RLS policies are enforced. */
+export async function createE2EUserClient(email: string, password: string) {
+  const client = createClient(
+    getSupabaseUrl(),
+    requireEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY"),
+    {
+      auth: {
+        autoRefreshToken: false,
+        persistSession: false,
+      },
+    }
+  );
+
+  const { error } = await client.auth.signInWithPassword({ email, password });
+  if (error) {
+    throw new Error(`signInWithPassword failed: ${error.message}`);
+  }
+
+  return client;
+}
+
 export async function findAuthUserByEmail(
   email: string
 ): Promise<User | null> {

@@ -11,6 +11,10 @@ import { trilingualColumns } from "@/lib/ai/trilingual-db";
 import { getStoreDefaultContentLanguage } from "@/lib/content/store-language";
 import { parseJsonBody } from "@/lib/api/validation";
 import { menuItemPatchSchema } from "@/lib/api/schemas";
+import {
+  replaceMenuItemVariants,
+  variantTranslateInputs,
+} from "@/lib/api/menu-item-variants";
 
 export async function PATCH(
   req: Request,
@@ -39,6 +43,7 @@ export async function PATCH(
       sortOrder,
       imageUrl,
       categoryId,
+      variants,
     } = parsed.data;
 
     const supabase = createAdminClient();
@@ -103,6 +108,9 @@ export async function PATCH(
         kind: "menu_item_description",
       });
     }
+    if (variants) {
+      translateInputs.push(...variantTranslateInputs(variants));
+    }
 
     const { translations, status: translationStatus } =
       await translateContentFields(sourceLocale, translateInputs);
@@ -136,6 +144,25 @@ export async function PATCH(
         { error: "Failed to update menu item.", details: error },
         { status: 500 }
       );
+    }
+
+    if (variants) {
+      const { error: variantsError } = await replaceMenuItemVariants(
+        supabase,
+        menuItemId,
+        variants,
+        translations
+      );
+
+      if (variantsError) {
+        return NextResponse.json(
+          {
+            error: "Failed to update menu item variants.",
+            details: variantsError,
+          },
+          { status: 500 }
+        );
+      }
     }
 
     return NextResponse.json({

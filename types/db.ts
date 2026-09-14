@@ -189,6 +189,56 @@ export type Database = {
           },
         ]
       }
+      menu_item_variants: {
+        Row: {
+          created_at: string
+          deleted_at: string | null
+          id: string
+          is_active: boolean
+          menu_item_id: string
+          name: string
+          name_ar: string | null
+          name_en: string | null
+          name_he: string | null
+          price: number
+          sort_order: number
+        }
+        Insert: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          menu_item_id: string
+          name: string
+          name_ar?: string | null
+          name_en?: string | null
+          name_he?: string | null
+          price: number
+          sort_order?: number
+        }
+        Update: {
+          created_at?: string
+          deleted_at?: string | null
+          id?: string
+          is_active?: boolean
+          menu_item_id?: string
+          name?: string
+          name_ar?: string | null
+          name_en?: string | null
+          name_he?: string | null
+          price?: number
+          sort_order?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "menu_item_variants_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pending_signups: {
         Row: {
           approved_store_id: string | null

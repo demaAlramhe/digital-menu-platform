@@ -336,6 +336,7 @@ export const he = {
     messageOnWhatsApp: "שליחת הודעה בוואטסאפ",
     orderViaWhatsapp: "הזמן דרך WhatsApp",
     offersTitle: "מבצעים",
+    fromPrice: "מ-{price}₪",
   },
   dashboard: {
     welcome: "שלום",
@@ -430,6 +431,13 @@ export const he = {
     originalPricePlaceholder: "לדוגמה: 50",
     originalPriceHelp:
       "השאר ריק אם אין הנחה. חייב להיות גבוה ממחיר המכירה",
+    variantsSection: "גדלים (אופציונלי)",
+    variantsToggle: "לפריט הזה יש יותר מגודל אחד?",
+    addVariant: "+ הוספת גודל",
+    variantName: "שם הגודל",
+    variantPrice: "מחיר",
+    variantNamePlaceholder: "למשל: קטן",
+    variantsRequired: "יש להוסיף לפחות גודל אחד תקין.",
     placeholders: {
       name: "שם הפריט",
       slug: "מזהה-פריט",

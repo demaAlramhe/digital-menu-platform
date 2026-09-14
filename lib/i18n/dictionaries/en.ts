@@ -337,6 +337,7 @@ export const en = {
     messageOnWhatsApp: "Message on WhatsApp",
     orderViaWhatsapp: "Order via WhatsApp",
     offersTitle: "Special Offers",
+    fromPrice: "From {price}₪",
   },
   dashboard: {
     welcome: "Hello",
@@ -431,6 +432,13 @@ export const en = {
     originalPricePlaceholder: "e.g. 50",
     originalPriceHelp:
       "Leave empty if no discount. Must be higher than the current price",
+    variantsSection: "Sizes (optional)",
+    variantsToggle: "Does this item have more than one size?",
+    addVariant: "+ Add size",
+    variantName: "Size name",
+    variantPrice: "Price",
+    variantNamePlaceholder: "e.g. Small",
+    variantsRequired: "Add at least one valid size.",
     placeholders: {
       name: "Item name",
       slug: "item-slug",

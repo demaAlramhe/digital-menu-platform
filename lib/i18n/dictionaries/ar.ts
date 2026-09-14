@@ -337,6 +337,7 @@ export const ar: Dictionary = {
     messageOnWhatsApp: "مراسلة عبر واتساب",
     orderViaWhatsapp: "اطلب عبر واتساب",
     offersTitle: "العروض",
+    fromPrice: "من {price}₪",
   },
   dashboard: {
     welcome: "مرحباً",
@@ -431,6 +432,13 @@ export const ar: Dictionary = {
     originalPricePlaceholder: "مثال: 50",
     originalPriceHelp:
       "اتركه فارغاً إذا ما في خصم. لازم يكون أكبر من السعر الحالي",
+    variantsSection: "الأحجام (اختياري)",
+    variantsToggle: "هذا الصنف إلو أكثر من حجم؟",
+    addVariant: "+ إضافة حجم",
+    variantName: "اسم الحجم",
+    variantPrice: "السعر",
+    variantNamePlaceholder: "مثال: صغير",
+    variantsRequired: "لازم تضيف حجم واحد على الأقل مع اسم وسعر.",
     placeholders: {
       name: "اسم العنصر",
       slug: "معرف-العنصر",

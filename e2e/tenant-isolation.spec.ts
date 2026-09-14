@@ -1,6 +1,7 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
 import { loginWithCredentials } from "./helpers/auth";
 import { requireEnv, uniqueTestSlug } from "./helpers/env";
+import { createE2EUserClient } from "./helpers/supabase-admin";
 
 const hasIsolationCredentials = Boolean(
   process.env.E2E_OWNER_EMAIL?.trim() &&
@@ -11,6 +12,7 @@ const hasIsolationCredentials = Boolean(
 
 const OWNER_B_CATEGORY_NAME = "Isolation Test Category";
 const OWNER_B_ITEM_NAME = "Isolation Test Item";
+const OWNER_B_VARIANT_NAME = "Isolation Test Small";
 const OWNER_A_CATEGORY_NAME = "Isolation Owner A Category";
 const OWNER_A_ITEM_NAME = "Isolation Owner A Item";
 
@@ -56,7 +58,8 @@ async function createMenuItem(
   name: string,
   slug: string,
   price: number,
-  categoryId: string
+  categoryId: string,
+  variants?: { name: string; price: number; sortOrder?: number }[]
 ): Promise<string> {
   const response = await page.request.post("/api/menu-items", {
     data: {
@@ -67,6 +70,7 @@ async function createMenuItem(
       isActive: true,
       isFeatured: false,
       sortOrder: 0,
+      ...(variants && variants.length > 0 ? { variants } : {}),
     },
   });
   const body = (await response.json()) as ApiJson;
@@ -125,7 +129,11 @@ test.describe("Cross-tenant isolation", () => {
       OWNER_B_ITEM_NAME,
       uniqueTestSlug("iso-item"),
       10,
-      ownerBCategoryId
+      ownerBCategoryId,
+      [
+        { name: OWNER_B_VARIANT_NAME, price: 10, sortOrder: 0 },
+        { name: "Isolation Test Large", price: 18, sortOrder: 1 },
+      ]
     );
 
     const ownerA = await createAuthenticatedContext(
@@ -279,5 +287,105 @@ test.describe("Cross-tenant isolation", () => {
     );
     expect(itemResponse?.status()).toBe(404);
     await expect(ownerAPage.getByText(OWNER_B_ITEM_NAME)).toHaveCount(0);
+    await expect(ownerAPage.getByText(OWNER_B_VARIANT_NAME)).toHaveCount(0);
+  });
+
+  test("Owner A cannot read or write Owner B's menu item variants", async () => {
+    const ownerAEmail = requireEnv("E2E_OWNER_EMAIL");
+    const ownerAPassword = requireEnv("E2E_OWNER_PASSWORD");
+    const ownerBEmail = requireEnv("E2E_OWNER_B_EMAIL");
+    const ownerBPassword = requireEnv("E2E_OWNER_B_PASSWORD");
+
+    const ownerBClient = await createE2EUserClient(ownerBEmail, ownerBPassword);
+    const { data: ownerBVariants, error: ownerBReadError } = await ownerBClient
+      .from("menu_item_variants")
+      .select("id, name, price, menu_item_id")
+      .eq("menu_item_id", ownerBMenuItemId)
+      .is("deleted_at", null);
+
+    expect(ownerBReadError).toBeNull();
+    expect(ownerBVariants?.length).toBeGreaterThan(0);
+    const target = ownerBVariants!.find(
+      (row) => row.name === OWNER_B_VARIANT_NAME
+    );
+    expect(target?.id).toBeTruthy();
+
+    const response = await ownerAPage.request.patch(
+      `/api/menu-items/${ownerBMenuItemId}`,
+      {
+        data: {
+          name: "Hijacked Item",
+          slug: "hijacked-item",
+          price: 1,
+          categoryId: null,
+          variants: [{ id: target!.id, name: "Hijacked Size", price: 1 }],
+        },
+      }
+    );
+    const body = (await response.json()) as ApiJson;
+    const payload = JSON.stringify(body);
+
+    expect(response.status()).toBe(404);
+    expect(body.error).toBe("Menu item not found.");
+    expect(payload).not.toContain(OWNER_B_VARIANT_NAME);
+    expect(payload).not.toContain(target!.id);
+
+    const ownerAClient = await createE2EUserClient(ownerAEmail, ownerAPassword);
+
+    const { data: inserted, error: insertError } = await ownerAClient
+      .from("menu_item_variants")
+      .insert({
+        menu_item_id: ownerBMenuItemId,
+        name: "Stolen Size",
+        price: 1,
+      })
+      .select("id")
+      .maybeSingle();
+
+    expect(inserted).toBeFalsy();
+    expect(insertError).toBeTruthy();
+
+    const { data: updated } = await ownerAClient
+      .from("menu_item_variants")
+      .update({ name: "Hijacked Size", price: 1 })
+      .eq("id", target!.id)
+      .select("id");
+
+    expect(updated ?? []).toHaveLength(0);
+
+    const { data: deleted } = await ownerAClient
+      .from("menu_item_variants")
+      .delete()
+      .eq("id", target!.id)
+      .select("id");
+
+    expect(deleted ?? []).toHaveLength(0);
+
+    const { error: hideError } = await ownerBClient
+      .from("menu_item_variants")
+      .update({ is_active: false })
+      .eq("id", target!.id);
+    expect(hideError).toBeNull();
+
+    const { data: hiddenRead } = await ownerAClient
+      .from("menu_item_variants")
+      .select("id, name")
+      .eq("id", target!.id);
+
+    expect(hiddenRead ?? []).toHaveLength(0);
+
+    const { data: stillOwned } = await ownerBClient
+      .from("menu_item_variants")
+      .select("id, name, price")
+      .eq("id", target!.id)
+      .maybeSingle();
+
+    expect(stillOwned?.name).toBe(OWNER_B_VARIANT_NAME);
+    expect(Number(stillOwned?.price)).toBe(10);
+
+    await ownerBClient
+      .from("menu_item_variants")
+      .update({ is_active: true })
+      .eq("id", target!.id);
   });
 });

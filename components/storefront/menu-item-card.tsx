@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale } from "@/components/i18n/locale-provider";
+import { formatMessage } from "@/lib/i18n";
 import { calculateDiscount } from "@/lib/storefront/discount";
 import {
   premiumGlassTileStyle,
@@ -16,6 +17,7 @@ export type MenuItemDisplay = {
   original_price?: number | null;
   image_url: string | null;
   is_featured?: boolean;
+  variants?: { id: string; name: string; price: number }[];
 };
 
 type MenuItemCardProps = {
@@ -49,6 +51,11 @@ export function MenuItemCard({
     item.original_price ?? null
   );
   const showDiscountUi = showDiscount || hasDiscount;
+  const variants = item.variants ?? [];
+  const hasVariants = variants.length > 0;
+  const minVariantPrice = hasVariants
+    ? Math.min(...variants.map((variant) => variant.price))
+    : item.price;
 
   if (layout === "scroll") {
     return (
@@ -90,7 +97,13 @@ export function MenuItemCard({
           {item.name}
         </h3>
 
-        {showDiscountUi && hasDiscount && item.original_price != null ? (
+        {hasVariants ? (
+          <p className="text-sm font-bold text-amber-400">
+            {formatMessage(dict.menu.fromPrice, {
+              price: formatPrice(minVariantPrice),
+            })}
+          </p>
+        ) : showDiscountUi && hasDiscount && item.original_price != null ? (
           <div className="flex flex-wrap items-center gap-1.5">
             <span className="text-xs line-through text-white/40">
               {dict.common.currency}
@@ -207,7 +220,25 @@ export function MenuItemCard({
             <span className="line-clamp-2">{item.name}</span>
           </h3>
 
-          {showDiscountUi && hasDiscount && item.original_price != null ? (
+          {hasVariants ? (
+            <ul className="space-y-1">
+              {variants.map((size) => (
+                <li
+                  key={size.id}
+                  className={`tabular-nums ${
+                    isPremium ? "text-amber-400" : "text-amber-600"
+                  } ${
+                    variant === "featured"
+                      ? "text-sm sm:text-base"
+                      : "text-xs sm:text-sm"
+                  }`}
+                >
+                  {size.name} — {dict.common.currency}
+                  {formatPrice(size.price)}
+                </li>
+              ))}
+            </ul>
+          ) : showDiscountUi && hasDiscount && item.original_price != null ? (
             <div className="flex items-center gap-2">
               <span
                 className={`text-sm line-through ${

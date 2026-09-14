@@ -4,6 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { useLocale } from "@/components/i18n/locale-provider";
 import { MenuItemImageUpload } from "@/components/dashboard/menu-item-image-upload";
+import {
+  collectValidVariants,
+  MenuItemVariantsFields,
+  type VariantDraft,
+} from "@/components/dashboard/menu-item-variants-fields";
 import { PrimarySubmitButton, SecondaryLink } from "@/components/dashboard/ui/buttons";
 import {
   CheckboxField,
@@ -35,6 +40,7 @@ type EditMenuItemFormProps = {
     isActive: boolean;
     isFeatured: boolean;
     imageUrl: string;
+    variants?: { id: string; name: string; price: number }[];
   };
   categories: CategoryOption[];
 };
@@ -54,6 +60,17 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
   const [isActive, setIsActive] = useState(menuItem.isActive);
   const [isFeatured, setIsFeatured] = useState(menuItem.isFeatured);
   const [imageUrl, setImageUrl] = useState(menuItem.imageUrl);
+  const [hasVariants, setHasVariants] = useState(
+    (menuItem.variants?.length ?? 0) > 0
+  );
+  const [variantRows, setVariantRows] = useState<VariantDraft[]>(() =>
+    (menuItem.variants ?? []).map((variant) => ({
+      key: variant.id,
+      id: variant.id,
+      name: variant.name,
+      price: String(variant.price),
+    }))
+  );
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -63,6 +80,12 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
 
     if (!name.trim() || !price.trim()) {
       setMessage(dict.menuItems.requiredFields);
+      return;
+    }
+
+    const variants = hasVariants ? collectValidVariants(variantRows) : [];
+    if (hasVariants && variants.length === 0) {
+      setMessage(dict.menuItems.variantsRequired);
       return;
     }
 
@@ -83,6 +106,7 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
           isActive,
           isFeatured,
           imageUrl,
+          variants,
         }),
       });
       const result = await response.json();
@@ -152,6 +176,16 @@ export function EditMenuItemForm({ menuItem, categories }: EditMenuItemFormProps
             placeholder={dict.menuItems.originalPricePlaceholder}
           />
         </FormField>
+      </FormSection>
+
+      <MenuItemVariantsFields
+        enabled={hasVariants}
+        onEnabledChange={setHasVariants}
+        rows={variantRows}
+        onRowsChange={setVariantRows}
+      />
+
+      <FormSection>
         <CheckboxField id="editIsActive" label={dict.menuItems.activeItem} checked={isActive} onChange={setIsActive} />
         <CheckboxField id="editIsFeatured" label={dict.menuItems.featuredItem} checked={isFeatured} onChange={setIsFeatured} />
       </FormSection>
